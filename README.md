@@ -10,8 +10,7 @@
 
 ### (almost) WISIWYG edit mode
 
-The theming (typograpĥic styles) are applied during the edition
-but.. the Markdown syntax tags like (`#` ,`##`, etc..) are always visible during the edition with some colored sugar to make them stand out.
+The theming (typograpĥic styles colors..) are applied during the edition _but_.. the **Markdown** syntax tags like (`#` ,`##`, etc..) are always visible during with some colored sugar to make them stand out.
 
 ![Rendering Screenshot](/public/rendering-screenshot.png)
 
@@ -21,7 +20,7 @@ List of preloaded-plugins:
 
 - GFM (Github Flavored Markdown)
 - Line breaks (force line breaks with single newline `\n`)
-- Support for inline and block `$LaTeX$` expressions
+- Support for inline and block `$\LaTeX$` expressions
 
 ### Themes
 
