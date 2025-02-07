@@ -1,4 +1,4 @@
-import doc from "../content/doc.md?raw";
+import doc from "../README.md?raw";
 import { MarkdownEditor } from "./editor/MarkdownEditor";
 import { getPageParameters, type PageParameters } from "./lib/parameters";
 import { applyTheme } from "./lib/theme-loader";
