@@ -1,49 +1,4 @@
-/**
- * Root variables for theming.
- * Define global styles for typography, colors, and layout.
- */
-:root {
-  /* Typography */
-  --font-size-base: 18px;
-  --font-family-serif: serif;
-  --font-family-sans: sans-serif;
-  --font-family-mono: monospace;
-  --line-height-base: 1.5;
-  --font-weight-base: 400;
-
-  /** Define the usages of the font families */
-  --font-family-headings: var(--font-family-serif);
-  --font-family-content: var(--font-family-serif);
-
-  /* Typography - Headings */
-  --heading-margin-top: 1rem;
-  --heading-margin-bottom: 0.5rem;
-
-  /* Typography - Paragraphs */
-  --paragraph-margin-bottom: 0.8rem;
-
-  /* Typography - List Items */
-  --list-item-line-height: 1.2;
-
-  /* Colors */
-  --color-text-base: #222;
-  --color-background-base: #f0f0f0;
-  --color-page-background: white;
-  --color-heading: black;
-  --color-strong: var(--color-heading);
-  --color-meta: darkgrey;
-  --color-link: #14d1f1;
-
-  /* Layout */
-  --page-width: 80%;
-  --page-max-width: 800px;
-  --page-margin: 2rem;
-  --page-padding: 3rem;
-
-  /* CodeMirror Editor */
-  --codemirror-selection-background: yellow;
-  --codemirror-active-line-background: #00000005;
-}
+@import url(themes/default.css);
 
 body {
   margin: 0;
@@ -128,6 +83,14 @@ a:visited,
 a:hover,
 .cm-link:not(.cm-meta):nth-child(even):hover {
   text-decoration: underline;
+}
+
+code,
+.cm-mono {
+  font-size: calc(var(--font-size-base) * 0.8);
+  background-color: var(--color-code-background);
+  line-height: 1;
+  padding: 2px;
 }
 
 img {
