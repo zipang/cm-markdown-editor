@@ -90,7 +90,11 @@ code,
   font-size: calc(var(--font-size-base) * 0.8);
   background-color: var(--color-code-background);
   line-height: 1;
-  padding: 2px;
+  padding: 4px;
+  border-radius: 4px;
+}
+pre:has(> code) {
+  background-color: var(--color-code-background);
 }
 
 img {
