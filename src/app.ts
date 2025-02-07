@@ -1,7 +1,7 @@
 import doc from "../content/doc.md?raw";
 import { MarkdownEditor } from "./editor/MarkdownEditor";
 import { getPageParameters, type PageParameters } from "./lib/parameters";
-import { applyTheme } from "./toolbar/theme-loader";
+import { applyTheme } from "./lib/theme-loader";
 import { createToolbar } from "./toolbar/toggle-preview";
 
 const { mode, theme } = getPageParameters() as PageParameters;

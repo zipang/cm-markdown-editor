@@ -1,0 +1,29 @@
+/* Revisions Theme */
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lato&display=swap");
+
+:root {
+  --font-family-headings: "Montserrat", serif;
+  --font-family-content: "Lato", serif;
+  --color-text-base: #333;
+  --color-background-base: #d6f0eb;
+  --color-page-background: white;
+  --color-heading: var(--color-link);
+  --color-meta: #6272a4;
+}
+
+body {
+  background-color: var(--color-background-base);
+}
+
+h1,
+.cm-heading-h1,
+h2,
+.cm-heading-h2,
+h3,
+.cm-heading-h3,
+h4,
+h5,
+h6 {
+  text-transform: uppercase;
+}
