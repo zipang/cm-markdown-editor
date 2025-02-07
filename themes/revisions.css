@@ -1,11 +1,12 @@
 /* Revisions Theme */
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Lato&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&display=swap");
 
 :root {
   --font-family-headings: "Montserrat", serif;
   --font-family-content: "Lato", serif;
   --color-text-base: #333;
+  --color-strong: #111;
   --color-background-base: #d6f0eb;
   --color-page-background: white;
   --color-heading: var(--color-link);
