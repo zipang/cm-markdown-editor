@@ -20,6 +20,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.katex {
+  font-size: var(--font-size-base) !important;
+}
+
 h1,
 .cm-heading-h1,
 h2,
@@ -31,7 +35,7 @@ h5,
 h6 {
   font-family: var(--font-family-headings);
   color: var(--color-heading);
-  font-weight: bold;
+  font-weight: var(--font-weight-heading);
   margin-top: var(--heading-margin-top);
   margin-bottom: var(--heading-margin-bottom);
 }
@@ -61,7 +65,7 @@ h3,
 b,
 strong,
 .cm-strong:not(.cm-meta) {
-  font-weight: 600;
+  font-weight: bold;
   color: var(--color-strong);
 }
 i,
@@ -71,6 +75,10 @@ i,
 
 ul li {
   line-height: var(--list-item-line-height);
+}
+ul.contains-task-list {
+  list-style: none;
+  padding: 1rem;
 }
 
 a,
@@ -116,8 +124,9 @@ img {
 #page-editor .cm-scroller {
   font-family: inherit;
 }
-#page-editor .cm-selectionBackground {
-  background-color: var(--codemirror-selection-background);
+#page-editor .cm-selectionBackground,
+::selection {
+  background-color: var(--color-selection-background);
 }
 #page-editor .cm-focused {
   outline: none;
@@ -159,7 +168,7 @@ img {
     padding: 0;
     width: 100%;
     max-width: none;
-    box-shadow: none;
+    box-shadow: none !important;
   }
   #floating-toolbar {
     display: none;
