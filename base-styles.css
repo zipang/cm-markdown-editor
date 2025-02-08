@@ -109,6 +109,9 @@ img {
   width: 100%;
   height: auto;
 }
+figure.image {
+  margin: 1rem 0;
+}
 
 #page {
   width: var(--page-width);
