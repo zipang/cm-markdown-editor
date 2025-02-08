@@ -6,16 +6,17 @@
   --font-family-headings: "Montserrat", sans-serif;
   --font-family-content: "Nunito", sans-serif;
   --color-text-base: #413114;
+  --color-heading: #2e4555;
+  --color-page-background: #f3f1e8;
+  --color-meta: #416788;
+  --color-link: #eda30f;
   --color-strong: var(--color-text-base);
   --color-background-base: #385758;
-  --color-page-background: #f3f1e8;
-  --color-heading: #2e4555;
-  --color-meta: #416788;
-  --color-link: #ffaa00;
-  --color-selection-background: rgb(255, 193, 60);
-  --codemirror-active-line-background: rgba(255, 230, 0, 0.1);
+  --color-selection: #41678830;
+  --color-active-line: rgba(255, 230, 0, 0.1);
 }
 
-body {
-  background-color: var(--color-background-base);
+h1,
+.cm-heading-h1 {
+  font-size: 2.5rem;
 }

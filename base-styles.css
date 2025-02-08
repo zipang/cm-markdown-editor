@@ -129,13 +129,13 @@ figure.image {
 }
 #page-editor .cm-selectionBackground,
 ::selection {
-  background-color: var(--color-selection-background);
+  background-color: var(--color-selection);
 }
 #page-editor .cm-focused {
   outline: none;
 }
 #page-editor .cm-activeLine {
-  background-color: var(--codemirror-active-line-background);
+  background-color: var(--color-active-line);
 }
 
 #page-preview *:first-child {

@@ -42,8 +42,8 @@
   --color-link: #fc0;
 
   /* CodeMirror Editor */
-  --color-selection-background: var(--color-link);
-  --codemirror-active-line-background: #00000005;
+  --color-selection: var(--color-link);
+  --color-active-line: #00000005;
 }
 
 h1,

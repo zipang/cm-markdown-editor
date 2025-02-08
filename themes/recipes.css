@@ -15,8 +15,8 @@
   --color-heading: #4e3122;
   --color-meta: #416788;
   --color-link: rgb(255, 222, 60);
-  --color-selection-background: rgb(255, 222, 60);
-  --codemirror-active-line-background: rgba(255, 230, 0, 0.1);
+  --color-selection: rgb(255, 222, 60);
+  --color-active-line: rgba(255, 230, 0, 0.1);
   --heading-margin-top: 0.4rem;
   --heading-margin-bottom: 0;
 }

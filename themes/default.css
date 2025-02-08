@@ -40,6 +40,6 @@
   --page-padding: 3rem;
 
   /* CodeMirror Editor */
-  --color-selection-background: yellow;
-  --codemirror-active-line-background: #00000005;
+  --color-selection: yellow;
+  --color-active-line: #00000005;
 }
