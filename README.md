@@ -10,7 +10,7 @@
 
 ### (almost) WISIWYG edit mode
 
-The theming (typograpĥic styles colors..) are applied during the edition _but_.. the **Markdown** syntax tags like (`#` ,`##`, etc..) are always visible during with some colored sugar to make them stand out.
+The theming (typographic styles, colors..) are automatically applied _during_ the edition _but_.. the **Markdown** syntax tags like (`#`, `##`, etc..) are _always_ visible with some colored sugar to make them stand out.
 
 ![Rendering Screenshot](/public/rendering-screenshot.png)
 
@@ -18,9 +18,13 @@ The theming (typograpĥic styles colors..) are applied during the edition _but_.
 
 List of preloaded-plugins:
 
-- GFM (Github Flavored Markdown)
-- Line breaks (force line breaks with single newline `\n`)
-- Support for inline and block `$\LaTeX$` expressions
+- [x] GFM (Github Flavored Markdown)
+- [x] History (undo any edit with `Ctrl-Z`, redo with `Ctrl-Y`)
+- [x] Automatic slug ids for headings (allow TOC generation)
+- [x] Line breaks (force line breaks with single newline `\n`)
+- [x] TODO lists (like this one)
+- [x] Support for inline (`$...$`) and block (`$$...$$`) $\LaTeX$ expressions
+- [ ] Drop images for insertion
 
 ### Themes
 
@@ -40,21 +44,18 @@ Themes are just CSS files that override the current values of the available CSS 
   --font-family-mono: monospace;
   --font-size-base: 18px;
   --line-height-base: 1.5;
+  --line-height-list-item: 1.2;
   --font-weight-base: 400;
+  --font-weight-heading: bold;
 
   /** Define the usages of the font families */
   --font-family-headings: var(--font-family-serif);
   --font-family-content: var(--font-family-serif);
 
-  /* Margins - Headings */
+  /* Block margins */
   --heading-margin-top: 1rem;
   --heading-margin-bottom: 0.5rem;
-
-  /* Margins - Headings */
   --paragraph-margin-bottom: 0.8rem;
-
-  /* Typography - List Items */
-  --list-item-line-height: 1.2;
 
   /* Colors */
   --color-background-base: #f0f0f0;
@@ -74,15 +75,18 @@ Themes are just CSS files that override the current values of the available CSS 
   --page-padding: 3rem;
 
   /* CodeMirror Editor */
-  --codemirror-selection-background: yellow;
+  --color-selection-background: yellow;
   --codemirror-active-line-background: #00000005;
 }
 ```
 
-List of themes :
+List of available themes :
 
 - default
+- natgeo
+- marko
 - revisions
 - fruity
-- eggplant
+- recipes
+- country
 - dracula
