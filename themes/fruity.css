@@ -2,13 +2,13 @@
 @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap");
 
 :root {
-  --font-family-base: "Nunito", sans-serif;
+  --font-family-content: "Nunito", sans-serif;
   --color-text-base: #333;
   --color-background-base: #fef8b7;
   --color-page-background: #f8f8f8;
   --color-heading: #f8818c;
   --color-meta: #8ff414;
-  --codemirror-selection-background: rgb(66, 255, 60);
+  --color-selection-background: rgb(66, 255, 60);
   --codemirror-active-line-background: rgba(255, 230, 0, 0.1);
 }
 

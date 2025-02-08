@@ -1,0 +1,111 @@
+/* Recipes Theme */
+@import url("https://fonts.googleapis.com/css2?family=Barriecito&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cedarville+Cursive&display=swap");
+
+:root {
+  --font-family-headings: "Barriecito", serif;
+  --font-family-content: "Cedarville Cursive", serif;
+  --font-family-mono: "Cedarville Cursive", serif;
+  --font-size-base: 26px;
+  --color-text-base: #413114;
+  --color-strong: var(--color-text-base);
+  --color-background-base: #fef8b7;
+  --color-page-background: #fffce0;
+  --color-heading: #4e3122;
+  --color-meta: #416788;
+  --color-link: rgb(255, 222, 60);
+  --color-selection-background: rgb(255, 222, 60);
+  --codemirror-active-line-background: rgba(255, 230, 0, 0.1);
+  --heading-margin-top: 0.4rem;
+  --heading-margin-bottom: 0;
+}
+
+h1,
+.cm-heading-h1:not(.cm-meta) {
+  font-family: "Barriecito", serif;
+  font-size: 3rem;
+}
+h2,
+.cm-heading-h2 {
+  font-size: 2rem;
+}
+
+h2,
+.cm-heading-h2:not(.cm-meta),
+h3,
+.cm-heading-h3:not(.cm-meta) {
+  display: inline-block;
+}
+
+a,
+a:visited,
+.cm-link {
+  font-family: "Caveat", serif;
+  color: var(--color-text-base);
+  background-image: linear-gradient(
+    120deg,
+    var(--color-link),
+    var(--color-link)
+  );
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 0;
+  border-bottom: 4px solid var(--color-meta);
+  text-decoration: none;
+  -webkit-transition: background-size 0.125s ease-in;
+  transition: background-size 0.125s ease-in;
+}
+a:hover,
+.cm-link:hover {
+  text-decoration: none !important;
+}
+a:hover {
+  background-size: 100% 100%;
+}
+
+/**
+ * Restore the Markdown manual tags
+  */
+ul {
+  list-style: none; /* Remove default list bullets */
+  padding-left: 1rem; /* Add some left padding for the text */
+}
+
+ul li {
+  position: relative; /* Needed for absolute positioning of the custom marker */
+  padding-left: 1em; /* Space for the custom marker */
+}
+
+ul li::before {
+  content: "-"; /* The custom marker text */
+  position: absolute;
+  left: 0; /* Position the marker at the beginning of the list item */
+  color: var(--color-meta); /* Custom marker color (e.g., a shade of red) */
+  font-family: var(
+    --font-family-mono
+  ); /* Custom marker font (e.g., monospace) */
+  font-size: 1.2em; /* Adjust the size as needed */
+}
+
+/* General rule for all headings */
+h1::before,
+h2::before,
+h3::before {
+  font-family: var(--font-family-mono);
+  color: var(--color-meta); /* Replace with your desired color */
+  margin-right: 0.2rem; /* Adjust spacing between the text and the heading */
+}
+
+/* Specific rules for each heading level */
+h1::before {
+  content: "# ";
+}
+
+h2::before {
+  content: "## ";
+}
+
+h3::before {
+  content: "### ";
+}

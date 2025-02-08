@@ -9,21 +9,18 @@
   --font-family-mono: monospace;
   --font-size-base: 18px;
   --line-height-base: 1.5;
+  --line-height-list-item: 1.2;
   --font-weight-base: 400;
+  --font-weight-heading: bold;
 
   /** Define the usages of the font families */
   --font-family-headings: var(--font-family-serif);
   --font-family-content: var(--font-family-serif);
 
-  /* Margins - Headings */
+  /* Block margins */
   --heading-margin-top: 1rem;
   --heading-margin-bottom: 0.5rem;
-
-  /* Margins - Headings */
   --paragraph-margin-bottom: 0.8rem;
-
-  /* Typography - List Items */
-  --list-item-line-height: 1.2;
 
   /* Colors */
   --color-background-base: #f0f0f0;
@@ -43,6 +40,6 @@
   --page-padding: 3rem;
 
   /* CodeMirror Editor */
-  --codemirror-selection-background: yellow;
+  --color-selection-background: yellow;
   --codemirror-active-line-background: #00000005;
 }

@@ -1,0 +1,21 @@
+/* Recipes Theme */
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap");
+
+:root {
+  --font-family-headings: "Montserrat", sans-serif;
+  --font-family-content: "Nunito", sans-serif;
+  --color-text-base: #413114;
+  --color-strong: var(--color-text-base);
+  --color-background-base: #385758;
+  --color-page-background: #f3f1e8;
+  --color-heading: #2e4555;
+  --color-meta: #416788;
+  --color-link: #ffaa00;
+  --color-selection-background: rgb(255, 193, 60);
+  --codemirror-active-line-background: rgba(255, 230, 0, 0.1);
+}
+
+body {
+  background-color: var(--color-background-base);
+}
