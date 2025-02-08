@@ -4,11 +4,10 @@ import { Processor, unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
-import remarkCustomHeaderId from "remark-custom-header-id";
 import remarkMath from "remark-math";
 import remarkRehype from "remark-rehype";
-// @ts-expect-error TODO: find the declarations
-import rehypeMath from "rehype-math";
+import rehypeSlug from "rehype-slug";
+import rehypeKatex from "rehype-katex";
 import rehypeStringify from "rehype-stringify";
 
 export interface EditorMode {
@@ -38,10 +37,10 @@ export class MarkdownEditor {
       .use(remarkParse) // Parse markdown content
       .use(remarkGfm) // Add GitHub Flavored Markdown support
       .use(remarkBreaks)
-      .use(remarkCustomHeaderId)
       .use(remarkMath) // Parse math expressions
       .use(remarkRehype) // Convert to HTML AST
-      .use(rehypeMath) // Process math in HTML context
+      .use(rehypeKatex)
+      .use(rehypeSlug)
       .use(rehypeStringify); // Serialize to HTML string();
     this.updateView();
   }
