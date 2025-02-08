@@ -12,7 +12,7 @@
 
 The theming (typographic styles, colors..) are automatically applied _during_ the edition _but_.. the **Markdown** syntax tags like (`#`, `##`, etc..) are _always_ visible with some colored sugar to make them stand out.
 
-![Rendering Screenshot](/public/rendering-screenshot.png)
+![Rendering Screenshot](/rendering-screenshot.png)
 
 ### Markdown to HTML with advanced plugins
 
@@ -21,6 +21,7 @@ List of preloaded-plugins:
 - [x] GFM (Github Flavored Markdown)
 - [x] History (undo any edit with `Ctrl-Z`, redo with `Ctrl-Y`)
 - [x] Automatic slug ids for headings (allow TOC generation)
+- [x] Open external links in new window
 - [x] Line breaks (force line breaks with single newline `\n`)
 - [x] TODO lists (like this one)
 - [x] Support for inline (`$...$`) and block (`$$...$$`) $\LaTeX$ expressions

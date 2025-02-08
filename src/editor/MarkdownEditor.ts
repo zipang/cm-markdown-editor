@@ -7,6 +7,7 @@ import remarkBreaks from "remark-breaks";
 import remarkMath from "remark-math";
 import remarkRehype from "remark-rehype";
 import rehypeSlug from "rehype-slug";
+import rehypeExternalLinks from "rehype-external-links";
 import rehypeFigure from "rehype-figure";
 import rehypeKatex from "rehype-katex";
 import rehypeStringify from "rehype-stringify";
@@ -42,6 +43,7 @@ export class MarkdownEditor {
       .use(remarkRehype) // Convert to HTML AST
       .use(rehypeKatex)
       .use(rehypeSlug)
+      .use(rehypeExternalLinks, { target: "_blank" })
       .use(rehypeFigure, { className: "image" })
       .use(rehypeStringify); // Serialize to HTML string();
     this.updateView();
