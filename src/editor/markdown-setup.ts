@@ -37,6 +37,9 @@ export const basicWritingSetup: Extension[] = [
   keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
 ];
 
+/**
+ * Position classes to style all the markdown nodes in edit mode like their HTML equivalents
+ */
 export const defaultMarkdownTheme: Extension = syntaxHighlighting(
   HighlightStyle.define([
     {
@@ -67,9 +70,18 @@ export const defaultMarkdownTheme: Extension = syntaxHighlighting(
       tag: t.strong,
       class: "cm-strong",
     },
-    { tag: t.monospace, class: "cm-mono", fontFamily: "monospace" },
-    { tag: t.content, class: "cm-p", fontFamily: "serif", color: "#111" },
-    { tag: t.meta, class: "cm-meta", color: "darkgrey" },
+    {
+      tag: t.monospace,
+      class: "cm-mono",
+    },
+    {
+      tag: t.content,
+      class: "cm-p",
+    },
+    {
+      tag: t.meta,
+      class: "cm-meta",
+    },
   ]),
   { fallback: true }
 );
