@@ -10,9 +10,11 @@ import { type EditorMode } from "../editor/MarkdownEditor";
 
 export interface PageParameters extends EditorMode {
   theme: "default" | "dracula" | "fruity";
+  palette?: "default" | "fruity" | "natgeo";
 }
 export const DEFAULTS_PARAMS: PageParameters = {
   theme: "default",
+  palette: "default",
   mode: "edit",
 };
 

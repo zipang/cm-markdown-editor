@@ -63,8 +63,8 @@ Themes are just CSS files that override the current values of the available CSS 
   --color-page-background: white;
 
   --color-text-base: #222;
-  --color-heading: black;
-  --color-strong: var(--color-heading);
+  --color-headings: black;
+  --color-strong: var(--color-headings);
   --color-meta: darkgrey;
   --color-code-background: var(--color-background-base);
   --color-link: #14d1f1;

@@ -10,18 +10,44 @@ export function applyTheme(theme = "default") {
   // If not, create one
   if (!themeLink) {
     themeLink = document.createElement("link");
-    themeLink.id = "theme-link";
+    themeLink.id = "theme-loader";
     themeLink.rel = "stylesheet";
     document.head.appendChild(themeLink);
   }
 
-  const themeUrl = `themes/${theme}.css`;
+  const themeUrl = `style/themes/${theme}.css`;
   // Set the href attribute to the new theme URL
   themeLink.href = themeUrl;
 
   // Optional: Add an event listener to handle load errors
   themeLink.addEventListener("error", () => {
     console.error("Failed to load theme:", themeUrl);
+  });
+}
+/**
+ * Dynamically loads a CSS palette file into the DOM.
+ *
+ * @param {string} palette - The name of the CSS theme file to load.
+ */
+export function applyPalette(palette = "default") {
+  // Check if a theme link element already exists
+  let paletteLink = document.getElementById("palette-loader") as HTMLLinkElement;
+
+  // If not, create one
+  if (!paletteLink) {
+    paletteLink = document.createElement("link");
+    paletteLink.id = "palette-loader";
+    paletteLink.rel = "stylesheet";
+    document.head.appendChild(paletteLink);
+  }
+
+  const paletteUrl = `style/palettes/${palette}.css`;
+  // Set the href attribute to the new theme URL
+  paletteLink.href = paletteUrl;
+
+  // Optional: Add an event listener to handle load errors
+  paletteLink.addEventListener("error", () => {
+    console.error("Failed to load palette:", paletteUrl);
   });
 }
 

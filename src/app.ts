@@ -1,10 +1,10 @@
 import doc from "../README.md?raw";
 import { MarkdownEditor } from "./editor/MarkdownEditor";
 import { getPageParameters, type PageParameters } from "./lib/parameters";
-import { applyTheme } from "./lib/theme-loader";
+import { applyTheme, applyPalette } from "./lib/theme-loader";
 import { createToolbar } from "./toolbar/toggle-preview";
 
-const { mode, theme } = getPageParameters() as PageParameters;
+const { mode, theme, palette } = getPageParameters() as PageParameters;
 
 const createEditor = () => {
   try {
@@ -17,5 +17,8 @@ const createEditor = () => {
 
 if (theme !== "default") {
   applyTheme(theme);
+}
+if (palette !== "default") {
+  applyPalette(palette);
 }
 createEditor();
