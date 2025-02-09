@@ -1,28 +1,26 @@
 /**
- * Root variables for theming.
- * Redefine only the theme's colors.
+ * Default palette
  */
- :root {
-    /* Colors */
-    --color-background-base: #f0f0f0;
-    --color-page-background: white;
-  
-    --color-text-base: #222;
-    --color-headings: black;
-    --color-heading-h1: var(--color-headings);
-    --color-heading-h2: var(--color-headings);
-    --color-heading-h3: var(--color-headings);
-    --color-heading-h4: var(--color-headings);
-    --color-heading-h5: var(--color-headings);
-    --color-heading-h6: var(--color-headings);
-  
-    --color-strong: var(--color-headings);
-    --color-meta: darkgrey;
-    --color-code-background: var(--color-background-base);
-    --color-link: #14d1f1;
-  
-    /* CodeMirror Editor */
-    --color-selection: yellow;
-    --color-active-line: #00000005;
-  }
-  
+:root {
+  /* Colors */
+  --color-background-base: #f0f0f0;
+  --color-page-background: white;
+
+  --color-text-base: #222;
+  --color-headings: black;
+  --color-heading-h1: var(--color-headings);
+  --color-heading-h2: var(--color-headings);
+  --color-heading-h3: var(--color-headings);
+  --color-heading-h4: var(--color-headings);
+  --color-heading-h5: var(--color-headings);
+  --color-heading-h6: var(--color-headings);
+
+  --color-strong: var(--color-headings);
+  --color-meta: darkgrey;
+  --color-code-background: var(--color-background-base);
+  --color-link: #14d1f1;
+
+  /* CodeMirror Editor */
+  --color-selection: yellow;
+  --color-active-line: #00000005;
+}
