@@ -9,7 +9,7 @@
   --color-strong: #111;
   --color-background-base: #d6f0eb;
   --color-page-background: white;
-  --color-heading: var(--color-link);
+  --color-headings: var(--color-link);
   --color-meta: #6272a4;
 }
 
