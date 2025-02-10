@@ -91,3 +91,39 @@ List of available themes :
 - recipes
 - country
 - dracula
+
+### Palettes
+
+Surcharge the theme's default color with a palette.
+Load a different theme by appending a parameter `?palette=` to the editor's URL.
+
+Palettes are just a subset of the theme's variables : they contain only the color's definitions :
+
+```css
+/**
+ * Default palette
+ */
+:root {
+  /* Colors */
+  --color-background-base: #f0f0f0;
+  --color-page-background: white;
+
+  --color-text-base: #222;
+  --color-headings: black;
+  --color-heading-h1: var(--color-headings);
+  --color-heading-h2: var(--color-headings);
+  --color-heading-h3: var(--color-headings);
+  --color-heading-h4: var(--color-headings);
+  --color-heading-h5: var(--color-headings);
+  --color-heading-h6: var(--color-headings);
+
+  --color-strong: var(--color-headings);
+  --color-meta: darkgrey;
+  --color-code-background: var(--color-background-base);
+  --color-link: #14d1f1;
+
+  /* CodeMirror Editor */
+  --color-selection: yellow;
+  --color-active-line: #00000005;
+}
+```
