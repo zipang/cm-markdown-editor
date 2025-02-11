@@ -1,0 +1,26 @@
+/**
+ * Star Wars Palette
+ */
+:root {
+  /* Colors */
+  --color-background-base: #000000;
+  --color-page-background: #111111;
+
+  --color-text-base: #ffe81f; /* Yellow text for Star Wars feel */
+  --color-headings: #ffffff;
+  --color-heading-h1: var(--color-headings);
+  --color-heading-h2: var(--color-headings);
+  --color-heading-h3: var(--color-headings);
+  --color-heading-h4: var(--color-headings);
+  --color-heading-h5: var(--color-headings);
+  --color-heading-h6: var(--color-headings);
+
+  --color-strong: #ff0000; /* Red for strong emphasis */
+  --color-meta: #888888;
+  --color-code-background: #222222;
+  --color-link: #00bfff; /* Bright blue for links */
+
+  /* CodeMirror Editor */
+  --color-selection: #ffe81f; /* Yellow selection */
+  --color-active-line: #ffffff10;
+}
