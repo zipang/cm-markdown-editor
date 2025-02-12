@@ -21,6 +21,7 @@
   --color-link: #14d1f1;
 
   /* CodeMirror Editor */
+  --color-cursor: var(--color-text-base);
   --color-selection: yellow;
   --color-active-line: #00000005;
 }

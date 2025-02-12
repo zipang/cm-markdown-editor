@@ -65,7 +65,7 @@ p,
   margin-bottom: var(--paragraph-margin-bottom);
 }
 .cm-meta {
-  color: var(--color-meta)!important;
+  color: var(--color-meta) !important;
   font-family: var(--font-family-mono);
 }
 
@@ -98,6 +98,10 @@ a:visited,
 a:hover,
 .cm-link:not(.cm-meta):nth-child(even):hover {
   text-decoration: underline;
+}
+
+.cm-cursor {
+  border-right: 0.4rem solid var(--color-cursor) !important;
 }
 
 code,
