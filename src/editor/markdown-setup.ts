@@ -13,7 +13,7 @@ import {
   keymap,
 } from "@codemirror/view";
 import {
-  defaultKeymap,
+  standardKeymap,
   indentWithTab,
   history,
   historyKeymap,
@@ -22,6 +22,7 @@ import {
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
 import { tags as t } from "@lezer/highlight";
+import { markdownKeyMaps } from "./markdown-keymaps";
 
 /**
  * Replace the basicsetup provided by code mirror to suppress all code-relative extensions
@@ -34,7 +35,7 @@ export const basicWritingSetup: Extension[] = [
   indentOnInput(),
   EditorView.lineWrapping,
   highlightSpecialChars({}),
-  keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
+  keymap.of([...standardKeymap, ...historyKeymap, indentWithTab]),
 ];
 
 /**
@@ -93,6 +94,7 @@ export const defaultMarkdownSetup: Extension[] = [
     codeLanguages: languages,
     addKeymap: true,
   }),
+  keymap.of([...markdownKeyMaps]),
   defaultMarkdownTheme,
 ];
 
