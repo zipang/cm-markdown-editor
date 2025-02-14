@@ -1,130 +1,101 @@
 import {
   EditorSelection,
-  StateCommand,
   Text,
   Transaction,
+  type StateCommand,
 } from "@codemirror/state";
-import type { EditorView, KeyBinding } from "@codemirror/view";
+import { type KeyBinding } from "@codemirror/view";
 
 /**
- * Target the italic style on the current editor selection
- * @param target
- * @returns
+ * Target the marker style on the current editor selection
+ * @param marker The string used to delimite a marked section
+ * @returns {StateCommand} the function to run an a keybinding
  */
-export const toggleItalicSelection: StateCommand = ({ state, dispatch }) => {
-  const changes = state.changeByRange((range) => {
-    const isItalicBefore = state.sliceDoc(range.from - 1, range.from) === "_";
-    const isItalicAfter = state.sliceDoc(range.to, range.to + 1) === "_";
-    const changes = [];
+export const toggleSelection: (marker: string) => StateCommand =
+  (marker) =>
+  ({ state, dispatch }) => {
+    const mLength = marker.length;
 
-    changes.push(
-      isItalicBefore
-        ? {
-            from: range.from - 1,
-            to: range.from,
-            insert: Text.of([""]),
-          }
-        : {
-            from: range.from,
-            insert: Text.of(["_"]),
-          }
+    const selection = state.selection.main;
+    if (selection.empty) {
+      // Don't do anything
+      return false;
+    }
+
+    const changes = state.changeByRange((range) => {
+      const isMarkerBefore =
+        state.sliceDoc(range.from - mLength, range.from) === marker;
+      const isMarkerAfter =
+        state.sliceDoc(range.to, range.to + mLength) === marker;
+      const changes = [];
+
+      changes.push(
+        isMarkerBefore
+          ? {
+              from: range.from - mLength,
+              to: range.from,
+              insert: Text.of([""]),
+            }
+          : {
+              from: range.from,
+              insert: Text.of([marker]),
+            }
+      );
+
+      changes.push(
+        isMarkerAfter
+          ? {
+              from: range.to,
+              to: range.to + mLength,
+              insert: Text.of([""]),
+            }
+          : {
+              from: range.to,
+              insert: Text.of([marker]),
+            }
+      );
+
+      const extendBefore = isMarkerBefore ? -1 * mLength : mLength;
+      const extendAfter = isMarkerAfter ? -1 * mLength : mLength;
+
+      return {
+        changes,
+        range: EditorSelection.range(
+          range.from + extendBefore,
+          range.to + extendAfter
+        ),
+      };
+    });
+
+    dispatch(
+      state.update(changes, {
+        scrollIntoView: true,
+        annotations: Transaction.userEvent.of("input"),
+      })
     );
 
-    changes.push(
-      isItalicAfter
-        ? {
-            from: range.to,
-            to: range.to + 1,
-            insert: Text.of([""]),
-          }
-        : {
-            from: range.to,
-            insert: Text.of(["_"]),
-          }
-    );
-
-    const extendBefore = isItalicBefore ? -1 : 1;
-    const extendAfter = isItalicAfter ? -1 : 1;
-
-    return {
-      changes,
-      range: EditorSelection.range(
-        range.from + extendBefore,
-        range.to + extendAfter
-      ),
-    };
-  });
-
-  dispatch(
-    state.update(changes, {
-      scrollIntoView: true,
-      annotations: Transaction.userEvent.of("input"),
-    })
-  );
-
-  return true;
-};
+    return true;
+  };
 
 /**
- * Target the italic style on the current editor selection
- * @param target
- * @returns
+ * Toggle the italic style on the current editor selection
  */
-export const toggleBoldSelection: StateCommand = ({ state, dispatch }) => {
-  const changes = state.changeByRange((range) => {
-    const isBoldBefore = state.sliceDoc(range.from - 2, range.from) === "**";
-    const isBoldAfter = state.sliceDoc(range.to, range.to + 2) === "**";
-    const changes = [];
+export const toggleItalicSelection: StateCommand = toggleSelection("_");
 
-    changes.push(
-      isBoldBefore
-        ? {
-            from: range.from - 2,
-            to: range.from,
-            insert: Text.of([""]),
-          }
-        : {
-            from: range.from,
-            insert: Text.of(["**"]),
-          }
-    );
+/**
+ * Toggle the italic style on the current editor selection
+ */
+export const toggleBoldSelection: StateCommand = toggleSelection("**");
 
-    changes.push(
-      isBoldAfter
-        ? {
-            from: range.to,
-            to: range.to + 2,
-            insert: Text.of([""]),
-          }
-        : {
-            from: range.to,
-            insert: Text.of(["**"]),
-          }
-    );
-
-    const extendBefore = isBoldBefore ? -2 : 2;
-    const extendAfter = isBoldAfter ? -2 : 2;
-
-    return {
-      changes,
-      range: EditorSelection.range(
-        range.from + extendBefore,
-        range.to + extendAfter
-      ),
-    };
-  });
-
-  dispatch(
-    state.update(changes, {
-      scrollIntoView: true,
-      annotations: Transaction.userEvent.of("input"),
-    })
-  );
-
-  return true;
-};
+/**
+ * Toggle the inline code style on the current editor selection
+ */
+export const toggleCodeSelection: StateCommand = toggleSelection("\u0060");
 
 export const markdownKeyMaps: ReadonlyArray<KeyBinding> = [
-  { key: "Ctrl-i", run: toggleItalicSelection },
-  { key: "Ctrl-b", run: toggleBoldSelection },
+  // Note: `Mod` refers to `Ctrl` on Linux and Windows and `Cmd` on Mac keyboards
+  { key: "Mod-i", run: toggleItalicSelection },
+  { key: "Mod-b", run: toggleBoldSelection },
+  // prettier-ignore
+  { key: "`", run: toggleCodeSelection },
 ];
