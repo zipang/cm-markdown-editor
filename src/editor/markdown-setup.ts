@@ -9,20 +9,36 @@ import {
   drawSelection,
   dropCursor,
   highlightActiveLine,
-  highlightSpecialChars,
   keymap,
+  type KeyBinding,
 } from "@codemirror/view";
 import {
   standardKeymap,
   indentWithTab,
   history,
   historyKeymap,
+  moveLineUp,
+  moveLineDown,
+  copyLineUp,
+  copyLineDown,
 } from "@codemirror/commands";
 
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
 import { tags as t } from "@lezer/highlight";
 import { markdownKeyMaps } from "./markdown-keymaps";
+
+/**
+ * Extract a few bindings from the defaultKeymap
+ */
+const extendedKeymaps: readonly KeyBinding[] = [
+  { key: "Alt-ArrowUp", run: moveLineUp },
+  { key: "Ctrl-Shift-ArrowUp", run: moveLineUp },
+  { key: "Shift-Alt-ArrowUp", run: copyLineUp },
+  { key: "Alt-ArrowDown", run: moveLineDown },
+  { key: "Ctrl-Shift-ArrowDown", run: moveLineDown },
+  { key: "Shift-Alt-ArrowDown", run: copyLineDown },
+];
 
 /**
  * Replace the basicsetup provided by code mirror to suppress all code-relative extensions
@@ -34,8 +50,12 @@ export const basicWritingSetup: Extension[] = [
   dropCursor(),
   indentOnInput(),
   EditorView.lineWrapping,
-  highlightSpecialChars({}),
-  keymap.of([...standardKeymap, ...historyKeymap, indentWithTab]),
+  keymap.of([
+    ...standardKeymap,
+    ...historyKeymap,
+    indentWithTab,
+    ...extendedKeymaps,
+  ]),
 ];
 
 /**
