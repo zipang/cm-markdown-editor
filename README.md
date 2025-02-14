@@ -25,7 +25,20 @@ List of preloaded-plugins:
 - [x] Line breaks (force line breaks with single newline `\n`)
 - [x] TODO lists (like this one)
 - [x] Support for inline (`$...$`) and block (`$$...$$`) $\LaTeX$ expressions
+- [x] Common keybindings + some more...
 - [ ] Drop images for insertion
+
+List of keybindings :
+
+All the of the [standards key maps](https://codemirror.net/docs/ref/#commands.standardKeymap) plus the followings:
+
+- `Ctrl-b`: Toggle **bold** selection
+- `Ctrl-i`: Toggle _italic_ selection
+- `BackQuote`: Toggle `code` selection
+- `Alt-ArrowUp`, `Ctrl-Shift-ArrowUp`: Move line Up
+- `Alt-ArrowDown`, `Ctrl-Shift-ArrowDown`: Move line Down
+- `Shift-Alt-ArrowUp`: Copy line Up
+- `Shift-Alt-ArrowDown`: Copy line Down
 
 ### Themes
 
