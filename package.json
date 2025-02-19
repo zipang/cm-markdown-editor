@@ -4,8 +4,9 @@
   "version": "0.0.2",
   "type": "module",
   "scripts": {
+    "check": "bun --bun tsc",
     "start": "bun --bun vite",
-    "build:static": "bun --bun tsc && bun --bun vite build",
+    "build:static": "bun --bun vite build",
     "preview": "bun --bun vite preview"
   },
   "devDependencies": {
