@@ -1,30 +1,30 @@
-import { resolve } from "node:path";
 import { defineConfig } from "vite";
-
-const projectRoot = import.meta.path;
 
 export default defineConfig({
   build: {
     lib: {
       entry: {
-        "cm-markdown-editor": resolve(projectRoot, "src/index.ts"),
-        "cm-markdown-editor/react": resolve(projectRoot, "src/react/index.ts"),
-        "cm-markdown-editor/solid": resolve(projectRoot, "src/solid/index.ts"),
+        editor: "src/editor/index.ts",
+        // "editor/react": "src/react/index.ts",
+        // "cm-markdown-editor/solid": resolve(projectRoot, "src/solid/index.ts"),
       },
       name: "CmMarkdownEditor",
+      fileName: "cme",
+      formats: ["es"],
     },
     rollupOptions: {
+      input: {
+        demo: "index.html",
+      },
       // make sure to externalize deps that shouldn't be bundled
       // into your library
-      external: ["react", "solid-js"],
+      external: ["react", "react-dom", "solid-js"],
       output: {
         // Provide global variables to use in the UMD build
         // for externalized deps
-        globals: {
-          vue: "React",
-        },
+        globals: {},
       },
     },
-    target: "esnext",
+    target: "modules",
   },
 });
