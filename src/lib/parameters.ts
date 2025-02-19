@@ -9,8 +9,8 @@
 import { type EditorMode } from "../editor/MarkdownEditor";
 
 export interface PageParameters extends EditorMode {
-  theme: "default" | "dracula" | "fruity";
-  palette?: "default" | "fruity" | "natgeo";
+  theme: string;
+  palette?: string;
 }
 export const DEFAULTS_PARAMS: PageParameters = {
   theme: "default",
@@ -27,11 +27,14 @@ export const DEFAULTS_PARAMS: PageParameters = {
  */
 export function getPageParameters() {
   const urlParams = new URLSearchParams(window.location.search);
-  const params = { ...DEFAULTS_PARAMS }; // Create a copy of defaultParams
+  const params = { ...DEFAULTS_PARAMS } as PageParameters; // Create a copy of defaultParams
 
   for (const [key, value] of urlParams.entries()) {
-    params[key] = value;
+    if (key === "theme" || key === "palette") {
+      params[key] = value;
+    }
   }
 
+  console.log(`Loaded theme and palette`, params);
   return params;
 }
