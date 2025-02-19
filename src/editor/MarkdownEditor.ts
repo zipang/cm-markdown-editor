@@ -30,6 +30,7 @@ export class MarkdownEditor {
 
   constructor(config: MarkdownEditorConfig) {
     this._mode = config.mode || "preview";
+    this.loadKatexScript();
     this.initializeContainers(config.parentId);
     this.editorView = createEditorView({
       ...config,
@@ -52,6 +53,12 @@ export class MarkdownEditor {
 
   get mode() {
     return this._mode;
+  }
+
+  private async loadKatexScript() {
+    const katex = await import("katex");
+    globalThis.katex = katex;
+    console.log("Imported katex in the global context");
   }
 
   private initializeContainers(parentId: string) {
