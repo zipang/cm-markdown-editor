@@ -1,0 +1,19 @@
+/**
+ * Natgeo Theme
+ */
+:root {
+  /* Colors */
+  --color-background-base: #f0f0f0;
+  --color-page-background: white;
+
+  --color-text-base: #2b2d2e;
+  --color-headings: black;
+  --color-strong: var(--color-headings);
+  --color-meta: #6c6e6f;
+  --color-code-background: var(--color-background-base);
+  --color-link: #fc0;
+
+  /* CodeMirror Editor */
+  --color-selection: var(--color-link);
+  --color-active-line: #2b2d2e11;
+}

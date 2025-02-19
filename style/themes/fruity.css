@@ -1,0 +1,32 @@
+/* Fruity Theme */
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap");
+
+:root {
+  --font-family-content: "Nunito", sans-serif;
+  --color-text-base: #333;
+  --color-background-base: #fef8b7;
+  --color-page-background: #f8f8f8;
+  --color-headings: #f8818c;
+  --color-meta: #8ff414;
+  --color-selection: rgb(66, 255, 60);
+  --color-active-line: rgba(255, 230, 0, 0.1);
+}
+
+body {
+  background-color: var(--color-background-base);
+}
+
+h1,
+.cm-heading-h1:not(.cm-meta) {
+  color: var(--color-link); /* Orange */
+}
+
+h2,
+.cm-heading-h2:not(.cm-meta) {
+  color: #ffaa00; /* Orange */
+}
+
+h3,
+.cm-heading-h3:not(.cm-meta) {
+  color: #f8818c; /* Light Peach */
+}

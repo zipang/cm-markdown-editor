@@ -1,0 +1,18 @@
+/* Dracula Theme */
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap");
+
+:root {
+  --font-family-base: "Fira Code", monospace;
+  --color-text-base: #f8f8f2; /* Slightly off-white */
+  --color-background-base: #282a36; /* Dracula background */
+  --color-headings: #bd93f9; /* Purple */
+  --color-strong: #ff79c6; /* Pink */
+  --color-link: #8be9fd; /* Cyan */
+  --color-meta: #6272a4;
+  --color-page-background: #363043; /* Match background */
+}
+
+#page {
+  box-shadow: 0 0 20px rgba(135, 235, 14, 0.8);
+  border-radius: 10px;
+}
