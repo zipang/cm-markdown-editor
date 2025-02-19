@@ -24,7 +24,6 @@ import {
 } from "@codemirror/commands";
 
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
-import { languages } from "@codemirror/language-data";
 import { tags as t } from "@lezer/highlight";
 import { markdownKeyMaps } from "./markdown-keymaps";
 
@@ -61,7 +60,7 @@ export const basicWritingSetup: Extension[] = [
 /**
  * Position classes to style all the markdown nodes in edit mode like their HTML equivalents
  */
-export const defaultMarkdownTheme: Extension = syntaxHighlighting(
+export const markdownHighlights: Extension = syntaxHighlighting(
   HighlightStyle.define([
     {
       tag: t.heading1,
@@ -104,18 +103,19 @@ export const defaultMarkdownTheme: Extension = syntaxHighlighting(
       class: "cm-meta",
     },
   ]),
-  { fallback: true }
+  { fallback: false }
 );
 
 export const defaultMarkdownSetup: Extension[] = [
   basicWritingSetup,
   markdown({
     base: markdownLanguage,
-    codeLanguages: languages,
+    codeLanguages: [],
+    completeHTMLTags: false,
     addKeymap: true,
   }),
   keymap.of([...markdownKeyMaps]),
-  defaultMarkdownTheme,
+  markdownHighlights,
 ];
 
 export interface EditorViewConfig {
