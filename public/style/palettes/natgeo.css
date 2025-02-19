@@ -15,5 +15,5 @@
 
   /* CodeMirror Editor */
   --color-selection: var(--color-link);
-  --color-active-line: rgba(43, 45, 46, 5);
+  --color-active-line: #2b2d2e11;
 }
