@@ -1,6 +1,8 @@
 import { defineConfig } from "vite";
+import packageConf from "./package.json";
 
 export default defineConfig({
+  base: `/${packageConf.name}`,
   build: {
     lib: {
       entry: {
