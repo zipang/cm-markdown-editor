@@ -9,7 +9,7 @@ jobs:
   build-and-deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: https://zipang.github.io/cm-markdown-editor/
 
     runs-on: ubuntu-latest
 
