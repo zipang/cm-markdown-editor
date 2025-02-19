@@ -1,3 +1,5 @@
+const BASE_URL = import.meta.env.BASE_URL;
+
 /**
  * Dynamically loads a CSS theme file into the DOM.
  *
@@ -15,7 +17,7 @@ export function applyTheme(theme = "default") {
     document.head.appendChild(themeLink);
   }
 
-  const themeUrl = `style/themes/${theme}.css`;
+  const themeUrl = `${BASE_URL}/style/themes/${theme}.css`;
   // Set the href attribute to the new theme URL
   themeLink.href = themeUrl;
 
@@ -31,7 +33,9 @@ export function applyTheme(theme = "default") {
  */
 export function applyPalette(palette = "default") {
   // Check if a theme link element already exists
-  let paletteLink = document.getElementById("palette-loader") as HTMLLinkElement;
+  let paletteLink = document.getElementById(
+    "palette-loader"
+  ) as HTMLLinkElement;
 
   // If not, create one
   if (!paletteLink) {
@@ -41,7 +45,7 @@ export function applyPalette(palette = "default") {
     document.head.appendChild(paletteLink);
   }
 
-  const paletteUrl = `style/palettes/${palette}.css`;
+  const paletteUrl = `${BASE_URL}/style/palettes/${palette}.css`;
   // Set the href attribute to the new theme URL
   paletteLink.href = paletteUrl;
 

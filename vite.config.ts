@@ -2,6 +2,8 @@ import { defineConfig } from "vite";
 import packageConf from "./package.json";
 
 export default defineConfig({
+  // Because the deployment inside Github Pages will use the name of our package
+  // https://{owner}.github.io/{package_name}
   base: `/${packageConf.name}`,
   build: {
     lib: {
