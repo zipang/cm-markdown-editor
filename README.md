@@ -108,9 +108,9 @@ List of available themes :
 ### Palettes
 
 Surcharge the theme's default color with a palette.
-Load a different theme by appending a parameter `?palette=` to the editor's URL.
+Load a different palette by appending a parameter `?palette=` to the editor's URL.
 
-Palettes are just a subset of the theme's variables : they contain only the color's definitions :
+Palettes are just a subset of all the theme's variables. They contain only the colors definitions:
 
 ```css
 /**
