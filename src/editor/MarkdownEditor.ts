@@ -1,5 +1,4 @@
 import { EditorView } from "@codemirror/view";
-import { createEditorView, type EditorViewConfig } from "./markdown-setup";
 import { Processor, unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
@@ -8,9 +7,11 @@ import remarkMath from "remark-math";
 import remarkRehype from "remark-rehype";
 import rehypeSlug from "rehype-slug";
 import rehypeExternalLinks from "rehype-external-links";
+// @ts-expect-error : missing types
 import rehypeFigure from "rehype-figure";
 import rehypeKatex from "rehype-katex";
 import rehypeStringify from "rehype-stringify";
+import { createEditorView, type EditorViewConfig } from "./markdown-setup";
 
 export interface EditorMode {
   mode: "edit" | "preview";
@@ -101,6 +102,13 @@ export class MarkdownEditor {
       );
       return `<code>${(error as Error).message}</code>`;
     }
+  }
+
+  /**
+   * Current editor's content as a string
+   */
+  text(): string {
+    return this.editorView.state.doc.toString();
   }
 
   /**
