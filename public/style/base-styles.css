@@ -101,11 +101,12 @@ a:hover,
 }
 
 .cm-cursor {
-  border-right: 0.4rem solid var(--color-cursor) !important;
+  border-right: 2px solid var(--color-cursor) !important;
 }
 
 code,
 .cm-mono {
+  font-family: var(--font-family-mono);
   font-size: calc(var(--font-size-base) * 0.8);
   background-color: var(--color-code-background);
   line-height: 1;
