@@ -6,12 +6,12 @@
  * `your-page.html?theme=dark&mode=preview&optionalParam=value`
  */
 
-import { type EditorMode } from "../editor/MarkdownEditor";
-
-export interface PageParameters extends EditorMode {
+export interface PageParameters {
   theme: string;
   palette?: string;
+  mode: "edit" | "preview";
 }
+
 export const DEFAULTS_PARAMS: PageParameters = {
   theme: "default",
   palette: "default",
@@ -25,9 +25,9 @@ export const DEFAULTS_PARAMS: PageParameters = {
  * @returns {object} An object containing the URL parameters,
  *                   merged with the default values.
  */
-export function getPageParameters() {
+export function getPageParameters(defaults = {}) {
   const urlParams = new URLSearchParams(window.location.search);
-  const params = { ...DEFAULTS_PARAMS } as PageParameters; // Create a copy of defaultParams
+  const params = { ...DEFAULTS_PARAMS, ...defaults } as PageParameters; // Create a copy of defaultParams
 
   for (const [key, value] of urlParams.entries()) {
     if (key === "theme" || key === "palette") {

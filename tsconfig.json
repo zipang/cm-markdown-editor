@@ -1,5 +1,11 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@cme/*": ["src/*"],
+      "@example/*": ["example/*"]
+    },
+
     "jsx": "preserve",
     "target": "ESNext",
     "useDefineForClassFields": true,
@@ -21,5 +27,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+
+  // "include": ["src", "app", "app.ts"],
+  "exclude": ["node_modules", "content", "public", "dist"]
 }

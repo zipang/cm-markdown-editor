@@ -1,7 +1,7 @@
-import { MarkdownEditor } from "./editor/MarkdownEditor";
-import { getPageParameters, type PageParameters } from "./lib/parameters";
-import { applyTheme, applyPalette } from "./lib/theme-loader";
+import { MarkdownEditor } from "@cme/editor";
+import { applyTheme, applyPalette } from "@cme/utils";
 import { createToolbar } from "./toolbar/toggle-preview";
+import { getPageParameters, type PageParameters } from "./parameters";
 import "katex/dist/katex.min.css";
 import doc from "../README.md?raw";
 

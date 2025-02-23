@@ -1,4 +1,7 @@
+// @see https://vite.dev/guide/env-and-mode.html#built-in-constants
 const BASE_URL = import.meta.env.BASE_URL;
+
+import { resolve } from "path";
 
 /**
  * Dynamically loads a CSS theme file into the DOM.
@@ -17,7 +20,7 @@ export function applyTheme(theme = "default") {
     document.head.appendChild(themeLink);
   }
 
-  const themeUrl = `${BASE_URL}/style/themes/${theme}.css`;
+  const themeUrl = resolve(BASE_URL, `style/themes/${theme}.css`);
   // Set the href attribute to the new theme URL
   themeLink.href = themeUrl;
 
@@ -45,7 +48,7 @@ export function applyPalette(palette = "default") {
     document.head.appendChild(paletteLink);
   }
 
-  const paletteUrl = `${BASE_URL}/style/palettes/${palette}.css`;
+  const paletteUrl = resolve(BASE_URL, `style/palettes/${palette}.css`);
   // Set the href attribute to the new theme URL
   paletteLink.href = paletteUrl;
 
