@@ -26,6 +26,8 @@ jobs:
         run: bun install
 
       - name: Build project
+        env:
+          BASE_URL: /cm-markdown-editor
         run: bun --bun build:static # Your custom build command
 
       - name: Deploy to GitHub Pages
