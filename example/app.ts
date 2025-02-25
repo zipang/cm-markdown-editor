@@ -1,21 +1,23 @@
 import { MarkdownEditor } from "@cme/editor";
 import { applyTheme, applyPalette } from "@cme/utils";
-import { createToolbar } from "./toolbar/toggle-preview";
 import { getPageParameters, type PageParameters } from "./parameters";
+import { createToolbar } from "./toolbar/toggle-preview";
 import "katex/dist/katex.min.css";
-import doc from "../README.md?raw";
 
 const { mode, theme, palette } = getPageParameters() as PageParameters;
+const baseUrl = document.location.href;
 
-const createEditor = () => {
+const createEditor = (content = "") => {
   try {
-    applyTheme(theme);
-    applyPalette(palette);
-    const ed = new MarkdownEditor({ parentId: "page", doc, mode });
+    applyTheme(theme, baseUrl);
+    applyPalette(palette, baseUrl);
+    const ed = new MarkdownEditor({ parentId: "page", doc: content, mode });
     createToolbar(ed);
   } catch (err) {
     console.error(err);
   }
 };
 
-createEditor();
+fetch("/content/recipes/bread.md")
+  .then((resp) => resp.text())
+  .then(createEditor);

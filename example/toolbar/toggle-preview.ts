@@ -1,4 +1,4 @@
-import { MarkdownEditor } from "../../src/editor/MarkdownEditor";
+import { type MarkdownEditor } from "@cme/editor";
 
 export const createToolbar = (
   editor: MarkdownEditor,

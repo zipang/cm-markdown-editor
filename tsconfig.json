@@ -2,8 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@cme/*": ["src/*"],
-      "@example/*": ["example/*"]
+      "@cme/*": ["src/*"]
     },
 
     "jsx": "preserve",
@@ -29,5 +28,5 @@
   },
 
   // "include": ["src", "app", "app.ts"],
-  "exclude": ["node_modules", "content", "public", "dist"]
+  "exclude": ["content", "dist", "node_modules", "public"]
 }

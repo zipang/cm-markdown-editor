@@ -5,15 +5,14 @@
   "type": "module",
   "scripts": {
     "check": "bun --bun tsc",
-    "start": "bun --bun vite",
-    "build:static": "bun --bun vite build",
-    "preview": "bun --bun vite preview"
+    "start": "bun --bun server.ts",
+    "build:lib": "rm -Rf dist/ && mkdir dist/ && mkdir dist/style && cp -r src/style/* dist/style && bun ./build.ts",
+    "build:gh-pages": "bun --bun ./build-gh-pages.ts",
+    "preview": "bun public/index.html"
   },
   "devDependencies": {
     "@types/bun": "^1.2.3",
-    "typescript": "~5.7.3",
-    "vite": "^6.1.1",
-    "vite-plugin-node-polyfills": "^0.23.0"
+    "typescript": "~5.7.3"
   },
   "dependencies": {
     "@codemirror/basic-setup": "^0.20.0",

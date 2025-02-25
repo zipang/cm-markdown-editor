@@ -1,14 +1,10 @@
-// @see https://vite.dev/guide/env-and-mode.html#built-in-constants
-const BASE_URL = import.meta.env.BASE_URL;
-
-import { resolve } from "path";
-
 /**
  * Dynamically loads a CSS theme file into the DOM.
  *
  * @param {string} theme - The name of the CSS theme file to load.
+ * @param {string} baseUrl - The base location of the style/
  */
-export function applyTheme(theme = "default") {
+export function applyTheme(theme = "default", baseUrl = "") {
   // Check if a theme link element already exists
   let themeLink = document.getElementById("theme-loader") as HTMLLinkElement;
 
@@ -20,9 +16,12 @@ export function applyTheme(theme = "default") {
     document.head.appendChild(themeLink);
   }
 
-  const themeUrl = resolve(BASE_URL, `style/themes/${theme}.css`);
+  const themeUrl = new URL(
+    `style/themes/${theme}.css`,
+    baseUrl || window.location.href
+  );
   // Set the href attribute to the new theme URL
-  themeLink.href = themeUrl;
+  themeLink.href = themeUrl.toString();
 
   // Optional: Add an event listener to handle load errors
   themeLink.addEventListener("error", () => {
@@ -34,7 +33,7 @@ export function applyTheme(theme = "default") {
  *
  * @param {string} palette - The name of the CSS theme file to load.
  */
-export function applyPalette(palette = "default") {
+export function applyPalette(palette = "default", baseUrl = "") {
   // Check if a theme link element already exists
   let paletteLink = document.getElementById(
     "palette-loader"
@@ -48,9 +47,12 @@ export function applyPalette(palette = "default") {
     document.head.appendChild(paletteLink);
   }
 
-  const paletteUrl = resolve(BASE_URL, `style/palettes/${palette}.css`);
+  const paletteUrl = new URL(
+    `style/palettes/${palette}.css`,
+    baseUrl || window.location.href
+  );
   // Set the href attribute to the new theme URL
-  paletteLink.href = paletteUrl;
+  paletteLink.href = paletteUrl.toString();
 
   // Optional: Add an event listener to handle load errors
   paletteLink.addEventListener("error", () => {

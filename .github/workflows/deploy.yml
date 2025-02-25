@@ -25,13 +25,13 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Build project
+      - name: Build demo app
         env:
           BASE_URL: /cm-markdown-editor
-        run: bun --bun build:static # Your custom build command
+        run: bun --bun build:gh-pages # Your custom build command
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GH_BOT_ACCESS_TOKEN }}
-          publish_dir: ./dist # or the folder where your static files are located
+          publish_dir: ./public # or the folder where your static files are located
