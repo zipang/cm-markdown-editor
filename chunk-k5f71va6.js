@@ -51832,4 +51832,4 @@ var createEditor = (content4 = "") => {
     console.error(err);
   }
 };
-fetch("/content/recipes/bread.md").then((resp) => resp.text()).then(createEditor);
+fetch("README.md").then((resp) => resp.text()).then(createEditor);
