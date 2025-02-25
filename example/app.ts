@@ -18,6 +18,6 @@ const createEditor = (content = "") => {
   }
 };
 
-fetch("/content/recipes/bread.md")
+fetch("README.md")
   .then((resp) => resp.text())
   .then(createEditor);
