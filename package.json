@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "check": "bun --bun tsc",
-    "start": "bun index.html",
-    "build:static": "rm -Rf dist/ && mkdir dist/ && cp -r public/* dist/ && bun ./build.ts",
-    "preview": "bun dist/index.html"
+    "start": "bun --bun server.ts",
+    "build:lib": "rm -Rf dist/ && mkdir dist/ && mkdir dist/style && cp -r src/style/* dist/style && bun ./build.ts",
+    "build:gh-pages": "bun --bun ./build-gh-pages.ts",
+    "preview": "bun public/index.html"
   },
   "devDependencies": {
     "@types/bun": "^1.2.3",
