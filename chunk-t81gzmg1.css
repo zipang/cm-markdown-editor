@@ -138,9 +138,20 @@ pre:has( > code) {
   background-color: var(--color-code-background);
 }
 
+table {
+  table-layout: fixed;
+  width: 100%;
+}
+
 img {
   width: 100%;
   height: auto;
+}
+
+td > img {
+  width: auto;
+  height: 3rem;
+  margin: 0 auto;
 }
 
 figure.image {
