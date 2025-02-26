@@ -1,10 +1,20 @@
 # MARKDOWN THEMABLE EDITOR
 
-## Tech
+_A distraction free Markdown editor based on CodeMirror_
 
-- [CodeMirror with a few plugins](https://codemirror.net/docs/)
-- [Rehype, Remark.. for the markdown to HTML conversion](https://unifiedjs.com/)
-- [Vite](https://vite.dev/)
+## Technical stack
+
+- [CodeMirror (with a few plugins)](https://codemirror.net/docs/) is the underlying editor.
+- [Rehype, Remark..](https://unifiedjs.com/) for parsing of markdown and HTML conversion.
+- [Bun](https://bun.sh/) is used as the Typescript runtime, bundler, and dev server !
+
+## Demo
+
+Open the page at https://zipang.github.io/cm-markdown-editor : the editor is preloaded with the content of this _README_.
+When clicking on the **PREVIEW** button you can toggle between the preview and edit modes.
+By appending some parameters like `theme` and `palette` to the URL you can change the default theme and palette.
+
+Eg.: https://zipang.github.io/cm-markdown-editor?theme=marko&palette=natgeo
 
 ## Features
 
@@ -12,7 +22,7 @@
 
 The theming (typographic styles, colors..) are automatically applied _during_ the edition _but_.. the **Markdown** syntax tags like (`#`, `##`, etc..) are _always_ visible with some colored sugar to make them stand out.
 
-![Rendering Screenshot](/rendering-screenshot.png)
+![Preview screenshot](/preview-screenshot.png)
 
 ### Markdown to HTML with advanced plugins
 
@@ -97,6 +107,7 @@ Themes are just CSS files that override the current values of the available CSS 
 List of available themes :
 
 - default
+- clean
 - natgeo
 - marko
 - revisions
