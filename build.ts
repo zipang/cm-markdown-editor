@@ -4,6 +4,10 @@ Bun.build({
   target: "browser",
   format: "esm",
   sourcemap: "external",
-  minify: false,
+  minify: true,
   packages: "bundle",
+  loader: {
+    ".md": "text",
+  },
+  splitting: true,
 });
