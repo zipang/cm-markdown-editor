@@ -1,0 +1,25 @@
+/* Manet Palette */
+:root {
+  --color-text-base: #323330;
+  --color-background-base: #f2ecdc;
+  --color-page-background: #f8f8f8;
+
+  --color-headings: black;
+
+  --color-link: #d87757;
+  --color-meta: #bebab1;
+  --color-selection: #a9eb25;
+  --color-active-line: #fedfd5;
+}
+
+a,
+a:visited,
+.cm-link {
+  color: var(--color-link);
+  border-bottom: 2px solid var(--color-link);
+}
+a:hover,
+.cm-link:hover {
+  background-color: var(--color-active-line);
+  text-decoration: none !important;
+}
