@@ -1,0 +1,3 @@
+[loader]
+# Load markdown files as text
+".md" = "text"
