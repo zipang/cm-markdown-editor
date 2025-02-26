@@ -7,7 +7,7 @@
     "check": "bun --bun tsc",
     "start": "bun dev-server.ts",
     "build:lib": "rm -Rf dist/ && mkdir dist/ && mkdir dist/style && cp -r src/style/* dist/style && bun ./build.ts",
-    "build:gh-pages": "rm -Rf public/ && mkdir public/ && mkdir public/style && cp README.md public/ && cp -r src/style/* public/style && bun ./build-gh-pages.ts",
+    "build:gh-pages": "rm -Rf public/ && mkdir public/ && mkdir public/style && cp README.md public/ && cp -r src/style/* public/style && cp -r src/assets/* public/ && bun ./build-gh-pages.ts",
     "preview": "bun public/index.html"
   },
   "devDependencies": {
