@@ -1,0 +1,15 @@
+:root {
+  /* Colors */
+  --color-page-background: #f3f1e8;
+  --color-background-base: #385758;
+
+  --color-headings: #2e4555;
+  --color-text-base: #413114;
+
+  --color-meta: #416788;
+  --color-link: #eda30f;
+  --color-strong: var(--color-text-base);
+  --color-code-background: #839492;
+  --color-selection: #41678830;
+  --color-active-line: rgba(255, 230, 0, 0.1);
+}
