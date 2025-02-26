@@ -117,10 +117,21 @@ pre:has(> code) {
   background-color: var(--color-code-background);
 }
 
+table {
+  width: 100%;
+  table-layout: fixed;
+}
+
 img {
   width: 100%;
   height: auto;
 }
+td > img {
+  margin: 0 auto;
+  width: auto;
+  height: 3rem;
+}
+
 figure.image {
   margin: 1rem 0;
 }
