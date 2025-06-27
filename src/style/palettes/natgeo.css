@@ -2,43 +2,39 @@
  * Natgeo Theme
  */
 :root {
-  /* Colors */
-  --color-background-base: #f0f0f0;
-  --color-page-background: white;
+	/* Colors */
+	--color-background-base: #f0f0f0;
+	--color-page-background: white;
 
-  --color-text-base: #2b2d2e;
-  --color-headings: black;
-  --color-strong: var(--color-headings);
-  --color-meta: #6c6e6f;
-  --color-code-background: var(--color-background-base);
-  --color-link: #fc0;
+	--color-text-base: #2b2d2e;
+	--color-headings: black;
+	--color-strong: var(--color-headings);
+	--color-meta: #6c6e6f;
+	--color-code-background: var(--color-background-base);
+	--color-link: #fc0;
 
-  /* CodeMirror Editor */
-  --color-selection: var(--color-link);
-  --color-active-line: #2b2d2e11;
+	/* CodeMirror Editor */
+	--color-selection: var(--color-link);
+	--color-active-line: #2b2d2e11;
 }
 
 a,
 a:visited,
 .cm-link {
-  color: var(--color-text-base);
-  background-image: linear-gradient(
-    120deg,
-    var(--color-link),
-    var(--color-link)
-  );
-  background-position: 0 100%;
-  background-repeat: no-repeat;
-  background-size: 100% 0;
-  border-bottom: 2px solid var(--color-link);
-  text-decoration: none;
-  -webkit-transition: background-size 0.125s ease-in;
-  transition: background-size 0.125s ease-in;
+	color: var(--color-text-base);
+	background-image: linear-gradient(120deg, var(--color-link), var(--color-link));
+	background-position: 0 100%;
+	background-repeat: no-repeat;
+	background-size: 100% 0;
+	border-bottom: 2px solid var(--color-link);
+	text-decoration: none;
+	-webkit-transition: background-size 0.125s ease-in;
+	transition: background-size 0.125s ease-in;
 }
 a:hover,
 .cm-link:hover {
-  text-decoration: none !important;
+	text-decoration: none !important;
 }
 a:hover {
-  background-size: 100% 100%;
+	background-size: 100% 100%;
 }
