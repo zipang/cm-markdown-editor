@@ -43,7 +43,11 @@ a:visited,
 .cm-link {
 	font-family: "Caveat", serif;
 	color: var(--color-text-base);
-	background-image: linear-gradient(120deg, var(--color-link), var(--color-link));
+	background-image: linear-gradient(
+		120deg,
+		var(--color-link),
+		var(--color-link)
+	);
 	background-position: 0 100%;
 	background-repeat: no-repeat;
 	background-size: 100% 0;

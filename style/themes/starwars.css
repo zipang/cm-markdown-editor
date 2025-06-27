@@ -5,51 +5,50 @@
  * Define global styles for typography, colors, and layout.
  */
 :root {
-	/* Typography */
-	--font-family-headings: "SF Distant Galaxy", sans-serif;
-	--font-family-sans: sans-serif;
-	--font-family-mono: monospace;
-	--font-size-base: 18px;
-	--line-height-base: 1.5;
-	--line-height-headings: 1;
-	--line-height-list-item: 1.2;
-	--font-weight-base: 400;
-	--font-weight-heading: bold;
+    /* Typography */
+    --font-family-headings: "SF Distant Galaxy", sans-serif;
+    --font-family-sans: sans-serif;
+    --font-family-mono: monospace;
+    --font-size-base: 18px;
+    --line-height-base: 1.5;
+    --line-height-headings: 1;
+    --line-height-list-item: 1.2;
+    --font-weight-base: 400;
+    --font-weight-heading: bold;
 
-	/** Define the usages of the font families */
-	--font-family-headings: var(--font-family-serif);
-	--font-family-content: var(--font-family-serif);
+    /** Define the usages of the font families */
+    --font-family-content: var(--font-family-serif);
 
-	/* Block margins */
-	--heading-margin-top: 1rem;
-	--heading-margin-bottom: 0.5rem;
-	--paragraph-margin-bottom: 0.8rem;
+    /* Block margins */
+    --heading-margin-top: 1rem;
+    --heading-margin-bottom: 0.5rem;
+    --paragraph-margin-bottom: 0.8rem;
 
-	/* Colors */
-	--color-background-base: #f0f0f0;
-	--color-page-background: white;
+    /* Colors */
+    --color-background-base: #f0f0f0;
+    --color-page-background: white;
 
-	--color-text-base: #222;
-	--color-headings: black;
-	--color-heading-h1: var(--color-headings);
-	--color-heading-h2: var(--color-headings);
-	--color-heading-h3: var(--color-headings);
-	--color-heading-h4: var(--color-headings);
-	--color-heading-h5: var(--color-headings);
-	--color-heading-h6: var(--color-headings);
+    --color-text-base: #222;
+    --color-headings: black;
+    --color-heading-h1: var(--color-headings);
+    --color-heading-h2: var(--color-headings);
+    --color-heading-h3: var(--color-headings);
+    --color-heading-h4: var(--color-headings);
+    --color-heading-h5: var(--color-headings);
+    --color-heading-h6: var(--color-headings);
 
-	--color-strong: var(--color-headings);
-	--color-meta: darkgrey;
-	--color-code-background: var(--color-background-base);
-	--color-link: #14d1f1;
+    --color-strong: var(--color-headings);
+    --color-meta: darkgrey;
+    --color-code-background: var(--color-background-base);
+    --color-link: #14d1f1;
 
-	/* Layout */
-	--page-width: 80%;
-	--page-max-width: 800px;
-	--page-margin: 2rem;
-	--page-padding: 3rem;
+    /* Layout */
+    --page-width: 80%;
+    --page-max-width: 800px;
+    --page-margin: 2rem;
+    --page-padding: 3rem;
 
-	/* CodeMirror Editor */
-	--color-selection: yellow;
-	--color-active-line: #00000005;
+    /* CodeMirror Editor */
+    --color-selection: yellow;
+    --color-active-line: #00000005;
 }
