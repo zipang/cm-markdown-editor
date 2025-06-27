@@ -7,15 +7,15 @@
  */
 
 export interface PageParameters {
-  theme: string;
-  palette?: string;
-  mode: "edit" | "preview";
+	theme: string;
+	palette?: string;
+	mode: "edit" | "preview";
 }
 
 export const DEFAULTS_PARAMS: PageParameters = {
-  theme: "default",
-  palette: "default",
-  mode: "edit",
+	theme: "default",
+	palette: "default",
+	mode: "edit"
 };
 
 /**
@@ -26,15 +26,15 @@ export const DEFAULTS_PARAMS: PageParameters = {
  *                   merged with the default values.
  */
 export function getPageParameters(defaults = {}) {
-  const urlParams = new URLSearchParams(window.location.search);
-  const params = { ...DEFAULTS_PARAMS, ...defaults } as PageParameters; // Create a copy of defaultParams
+	const urlParams = new URLSearchParams(window.location.search);
+	const params = { ...DEFAULTS_PARAMS, ...defaults } as PageParameters; // Create a copy of defaultParams
 
-  for (const [key, value] of urlParams.entries()) {
-    if (key === "theme" || key === "palette") {
-      params[key] = value;
-    }
-  }
+	for (const [key, value] of urlParams.entries()) {
+		if (key === "theme" || key === "palette") {
+			params[key] = value;
+		}
+	}
 
-  console.log(`Loaded theme and palette`, params);
-  return params;
+	console.log(`Loaded theme and palette`, params);
+	return params;
 }

@@ -8,16 +8,16 @@ const { mode, theme, palette } = getPageParameters() as PageParameters;
 const baseUrl = document.location.href;
 
 const createEditor = (content = "") => {
-  try {
-    applyTheme(theme, baseUrl);
-    applyPalette(palette, baseUrl);
-    const ed = new MarkdownEditor({ parentId: "page", doc: content, mode });
-    createToolbar(ed);
-  } catch (err) {
-    console.error(err);
-  }
+	try {
+		applyTheme(theme, baseUrl);
+		applyPalette(palette, baseUrl);
+		const ed = new MarkdownEditor({ parentId: "page", doc: content, mode });
+		createToolbar(ed);
+	} catch (err) {
+		console.error(err);
+	}
 };
 
 fetch("README.md")
-  .then((resp) => resp.text())
-  .then(createEditor);
+	.then((resp) => resp.text())
+	.then(createEditor);
