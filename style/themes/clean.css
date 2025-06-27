@@ -3,17 +3,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Nunito:ital@0;1&display=swap");
 
 :root {
-  --font-family-headings: "Montserrat", sans-serif;
-  --font-family-content: "Nunito", sans-serif;
-  --heading-margin-top: 2rem;
+	--font-family-headings: "Montserrat", sans-serif;
+	--font-family-content: "Nunito", sans-serif;
+	--heading-margin-top: 2rem;
 }
 
 h1,
 .cm-heading-h1 {
-  font-size: 2.5rem;
+	font-size: 2.5rem;
 }
 
 p,
 .cm-p {
-  text-align: justify;
+	text-align: justify;
 }

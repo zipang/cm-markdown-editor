@@ -3,18 +3,18 @@
 @import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&display=swap");
 
 :root {
-  --font-family-headings: "Montserrat", serif;
-  --font-family-content: "Lato", serif;
-  --color-text-base: #333;
-  --color-strong: #111;
-  --color-background-base: #d6f0eb;
-  --color-page-background: white;
-  --color-headings: var(--color-link);
-  --color-meta: #6272a4;
+	--font-family-headings: "Montserrat", serif;
+	--font-family-content: "Lato", serif;
+	--color-text-base: #333;
+	--color-strong: #111;
+	--color-background-base: #d6f0eb;
+	--color-page-background: white;
+	--color-headings: var(--color-link);
+	--color-meta: #6272a4;
 }
 
 body {
-  background-color: var(--color-background-base);
+	background-color: var(--color-background-base);
 }
 
 h1,
@@ -26,5 +26,5 @@ h3,
 h4,
 h5,
 h6 {
-  text-transform: uppercase;
+	text-transform: uppercase;
 }

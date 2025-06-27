@@ -1,0 +1,22 @@
+/* Readable Theme */
+
+:root {
+    --font-family-headings: Georgia, serif;
+    --font-size-base: 22px;
+    --line-height-headings: 1.2;
+    --heading-margin-top: 2rem;
+
+    --font-family-content: serif;
+    --page-padding: 8rem;
+}
+
+h1,
+.cm-heading-h1 {
+    font-size: 2.5rem;
+}
+
+p,
+.cm-p {
+    text-align: justify;
+    max-width: 75ch;
+}

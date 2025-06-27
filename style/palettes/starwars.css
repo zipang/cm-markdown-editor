@@ -2,26 +2,26 @@
  * Star Wars Palette
  */
 :root {
-  /* Colors */
-  --color-background-base: #000000;
-  --color-page-background: #2d2d2d; /* Tricorn black */
+	/* Colors */
+	--color-background-base: #000000;
+	--color-page-background: #2d2d2d; /* Tricorn black */
 
-  --color-text-base: #ffe81f; /* Star Wars yellow sun */
-  --color-headings: #ffffff;
-  --color-heading-h1: var(--color-headings);
-  --color-heading-h2: var(--color-headings);
-  --color-heading-h3: var(--color-headings);
-  --color-heading-h4: var(--color-headings);
-  --color-heading-h5: var(--color-headings);
-  --color-heading-h6: var(--color-headings);
+	--color-text-base: #ffe81f; /* Star Wars yellow sun */
+	--color-headings: #ffffff;
+	--color-heading-h1: var(--color-headings);
+	--color-heading-h2: var(--color-headings);
+	--color-heading-h3: var(--color-headings);
+	--color-heading-h4: var(--color-headings);
+	--color-heading-h5: var(--color-headings);
+	--color-heading-h6: var(--color-headings);
 
-  --color-strong: #a53d08; /* Sith emphasis */
-  --color-meta: #bbc9db;
-  --color-code-background: #424022;
-  --color-link: #2c8bcf; /* Star Wars R2 */
+	--color-strong: #a53d08; /* Sith emphasis */
+	--color-meta: #bbc9db;
+	--color-code-background: #424022;
+	--color-link: #2c8bcf; /* Star Wars R2 */
 
-  /* CodeMirror Editor */
-  --color-cursor: var(--color-strong);
-  --color-selection: #bbc9db99; /* Yellow selection */
-  --color-active-line: #ffe81f20;
+	/* CodeMirror Editor */
+	--color-cursor: var(--color-strong);
+	--color-selection: #bbc9db99; /* Yellow selection */
+	--color-active-line: #ffe81f20;
 }

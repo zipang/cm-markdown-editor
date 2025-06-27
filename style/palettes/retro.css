@@ -1,13 +1,13 @@
 /* Retro Palette */
 :root {
-  --color-text-base: #443;
-  --color-background-base: #f2ecdc;
-  --color-page-background: #f8f8f8;
+	--color-text-base: #443;
+	--color-background-base: #f2ecdc;
+	--color-page-background: #f8f8f8;
 
-  --color-headings: #221;
+	--color-headings: #221;
 
-  --color-link: #f2845f;
-  --color-meta: #8ebbae;
-  --color-selection: #f2ecdc;
-  --color-active-line: #8ebbaeff;
+	--color-link: #f2845f;
+	--color-meta: #8ebbae;
+	--color-selection: #f2ecdc;
+	--color-active-line: #8ebbaeff;
 }

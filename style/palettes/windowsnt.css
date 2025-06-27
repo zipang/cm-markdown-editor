@@ -2,25 +2,25 @@
  * Windows NT Palette
  */
 :root {
-  /* Colors */
-  --color-background-base: #c0c0c0;
-  --color-page-background: #ffffff;
+	/* Colors */
+	--color-background-base: #c0c0c0;
+	--color-page-background: #ffffff;
 
-  --color-text-base: #000000;
-  --color-headings: #000080; /* Dark blue for headings */
-  --color-heading-h1: var(--color-headings);
-  --color-heading-h2: var(--color-headings);
-  --color-heading-h3: var(--color-headings);
-  --color-heading-h4: var(--color-headings);
-  --color-heading-h5: var(--color-headings);
-  --color-heading-h6: var(--color-headings);
+	--color-text-base: #000000;
+	--color-headings: #000080; /* Dark blue for headings */
+	--color-heading-h1: var(--color-headings);
+	--color-heading-h2: var(--color-headings);
+	--color-heading-h3: var(--color-headings);
+	--color-heading-h4: var(--color-headings);
+	--color-heading-h5: var(--color-headings);
+	--color-heading-h6: var(--color-headings);
 
-  --color-strong: #800000; /* Maroon for strong emphasis */
-  --color-meta: #808080;
-  --color-code-background: #e0e0e0;
-  --color-link: #0000ff; /* Blue for links */
+	--color-strong: #800000; /* Maroon for strong emphasis */
+	--color-meta: #808080;
+	--color-code-background: #e0e0e0;
+	--color-link: #0000ff; /* Blue for links */
 
-  /* CodeMirror Editor */
-  --color-selection: #000080; /* Dark blue selection */
-  --color-active-line: #00000010;
+	/* CodeMirror Editor */
+	--color-selection: #000080; /* Dark blue selection */
+	--color-active-line: #00000010;
 }

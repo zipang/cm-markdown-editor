@@ -1,15 +1,15 @@
 /* Fruity Palette */
 :root {
-    --color-text-base: #333;
-    --color-background-base: #fef8b7;
-    --color-page-background: #f8f8f8;
+	--color-text-base: #333;
+	--color-background-base: #fef8b7;
+	--color-page-background: #f8f8f8;
 
-    --color-headings: #f8818c;
-    --color-heading-h1: #8ff414; /* Green Lime */
-    --color-heading-h2: #ffaa00; /* Orange */
+	--color-headings: #f8818c;
+	--color-heading-h1: #8ff414; /* Green Lime */
+	--color-heading-h2: #ffaa00; /* Orange */
 
-    --color-link: var(--color-heading-h1);
-    --color-meta: var(--color-heading-h1);
-    --color-selection: rgb(66, 255, 60);
-    --color-active-line: rgba(255, 230, 0, 0.1);
+	--color-link: var(--color-heading-h1);
+	--color-meta: var(--color-heading-h1);
+	--color-selection: rgb(66, 255, 60);
+	--color-active-line: rgba(255, 230, 0, 0.1);
 }
