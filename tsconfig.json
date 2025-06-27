@@ -1,32 +1,32 @@
 {
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@cme/*": ["src/*"]
-    },
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@cme/*": ["src/*"]
+		},
 
-    "jsx": "preserve",
-    "target": "ESNext",
-    "useDefineForClassFields": true,
-    "module": "ESNext",
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "skipLibCheck": true,
+		"jsx": "preserve",
+		"target": "ESNext",
+		"useDefineForClassFields": true,
+		"module": "ESNext",
+		"lib": ["ESNext", "DOM", "DOM.Iterable"],
+		"skipLibCheck": true,
 
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "noEmit": true,
+		/* Bundler mode */
+		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true,
+		"isolatedModules": true,
+		"moduleDetection": "force",
+		"noEmit": true,
 
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
-  },
+		/* Linting */
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUncheckedSideEffectImports": true
+	},
 
-  // "include": ["src", "app", "app.ts"],
-  "exclude": ["content", "dist", "node_modules", "public"]
+	// "include": ["src", "app", "app.ts"],
+	"exclude": ["content", "dist", "node_modules", "public"]
 }
