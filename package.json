@@ -20,7 +20,8 @@
 		"build:lib": "rm -Rf dist/ && tsc && mkdir dist/style && cp -r src/style/* dist/style && bun ./build.ts",
 		"build:gh-pages": "rm -Rf public/ && mkdir public/ && mkdir public/style && cp README.md public/ && cp -r src/style/* public/style && cp -r src/assets/* public/ && bun ./build-gh-pages.ts",
 		"preview": "bun public/index.html",
-		"release": "bun build:lib && bun test && npm version patch && npm publish"
+		"release": "./scripts/release.sh",
+        "test": "bun test src/**/*.spec.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.6",
