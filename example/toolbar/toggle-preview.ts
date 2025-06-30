@@ -1,4 +1,4 @@
-import { type MarkdownEditor } from "@cme/editor";
+import { type MarkdownEditor } from "@cm-markdown-editor/editor";
 
 export const createToolbar = (editor: MarkdownEditor, toolbarId = "floating-toolbar") => {
 	const toolbar = document.createElement("aside");

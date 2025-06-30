@@ -1,5 +1,5 @@
-import { MarkdownEditor } from "@cme/editor";
-import { applyTheme, applyPalette } from "@cme/utils";
+import { MarkdownEditor } from "@cm-markdown-editor/editor";
+import { applyTheme, applyPalette } from "@cm-markdown-editor/utils";
 import { getPageParameters, type PageParameters } from "./parameters";
 import { createToolbar } from "./toolbar/toggle-preview";
 import "katex/dist/katex.min.css";
@@ -18,6 +18,6 @@ const createEditor = (content = "") => {
 	}
 };
 
-fetch("README.md")
+fetch("/README.md")
 	.then((resp) => resp.text())
 	.then(createEditor);

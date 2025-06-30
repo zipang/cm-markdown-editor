@@ -2,7 +2,7 @@
  * Dynamically loads a CSS theme file into the DOM.
  *
  * @param {string} theme - The name of the CSS theme file to load.
- * @param {string} baseUrl - The base location of the style/
+ * @param {string} baseUrl - The base location of the `style/` dir
  */
 export function applyTheme(theme = "default", baseUrl = "") {
 	// Check if a theme link element already exists
@@ -59,13 +59,3 @@ export function applyPalette(palette = "default", baseUrl = "") {
 		console.error("Failed to load palette:", paletteUrl);
 	});
 }
-
-/**
- * Example usage:
- *
- * To load a theme, call the loadTheme function with the name of the theme file.
- * For example:
- *
- * loadTheme('dracula');
- * loadTheme('default');
- */
