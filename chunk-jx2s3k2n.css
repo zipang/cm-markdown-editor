@@ -382,7 +382,7 @@ figure.image {
 }
 
 .katex .katex-version:after {
-  content: "0.16.21";
+  content: "0.16.22";
 }
 
 .katex .katex-mathml {

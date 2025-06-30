@@ -632,8 +632,8 @@ var require_immutable = __commonJS((exports, module) => {
   var hasOwnProperty2 = Object.prototype.hasOwnProperty;
   function extend() {
     var target = {};
-    for (var i2 = 0;i2 < arguments.length; i2++) {
-      var source = arguments[i2];
+    for (var i = 0;i < arguments.length; i++) {
+      var source = arguments[i];
       for (var key in source) {
         if (hasOwnProperty2.call(source, key)) {
           target[key] = source[key];
@@ -10105,7 +10105,3014 @@ function math(options) {
     text: { [codes.dollarSign]: mathText(options) }
   };
 }
-// node_modules/katex/dist/katex.mjs
+// node_modules/remark-math/lib/index.js
+var emptyOptions3 = {};
+function remarkMath(options) {
+  const self2 = this;
+  const settings = options || emptyOptions3;
+  const data = self2.data();
+  const micromarkExtensions = data.micromarkExtensions || (data.micromarkExtensions = []);
+  const fromMarkdownExtensions = data.fromMarkdownExtensions || (data.fromMarkdownExtensions = []);
+  const toMarkdownExtensions = data.toMarkdownExtensions || (data.toMarkdownExtensions = []);
+  micromarkExtensions.push(math(settings));
+  fromMarkdownExtensions.push(mathFromMarkdown());
+  toMarkdownExtensions.push(mathToMarkdown(settings));
+}
+// node_modules/mdast-util-to-hast/lib/handlers/blockquote.js
+"";
+function blockquote2(state, node2) {
+  const result = {
+    type: "element",
+    tagName: "blockquote",
+    properties: {},
+    children: state.wrap(state.all(node2), true)
+  };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/break.js
+"";
+function hardBreak2(state, node2) {
+  const result = { type: "element", tagName: "br", properties: {}, children: [] };
+  state.patch(node2, result);
+  return [state.applyData(node2, result), { type: "text", value: `
+` }];
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/code.js
+"";
+function code3(state, node2) {
+  const value = node2.value ? node2.value + `
+` : "";
+  const properties = {};
+  if (node2.lang) {
+    properties.className = ["language-" + node2.lang];
+  }
+  let result = {
+    type: "element",
+    tagName: "code",
+    properties,
+    children: [{ type: "text", value }]
+  };
+  if (node2.meta) {
+    result.data = { meta: node2.meta };
+  }
+  state.patch(node2, result);
+  result = state.applyData(node2, result);
+  result = { type: "element", tagName: "pre", properties: {}, children: [result] };
+  state.patch(node2, result);
+  return result;
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/delete.js
+"";
+function strikethrough(state, node2) {
+  const result = {
+    type: "element",
+    tagName: "del",
+    properties: {},
+    children: state.all(node2)
+  };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/emphasis.js
+"";
+function emphasis2(state, node2) {
+  const result = {
+    type: "element",
+    tagName: "em",
+    properties: {},
+    children: state.all(node2)
+  };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/footnote-reference.js
+function footnoteReference2(state, node2) {
+  const clobberPrefix = typeof state.options.clobberPrefix === "string" ? state.options.clobberPrefix : "user-content-";
+  const id = String(node2.identifier).toUpperCase();
+  const safeId = normalizeUri(id.toLowerCase());
+  const index2 = state.footnoteOrder.indexOf(id);
+  let counter;
+  let reuseCounter = state.footnoteCounts.get(id);
+  if (reuseCounter === undefined) {
+    reuseCounter = 0;
+    state.footnoteOrder.push(id);
+    counter = state.footnoteOrder.length;
+  } else {
+    counter = index2 + 1;
+  }
+  reuseCounter += 1;
+  state.footnoteCounts.set(id, reuseCounter);
+  const link2 = {
+    type: "element",
+    tagName: "a",
+    properties: {
+      href: "#" + clobberPrefix + "fn-" + safeId,
+      id: clobberPrefix + "fnref-" + safeId + (reuseCounter > 1 ? "-" + reuseCounter : ""),
+      dataFootnoteRef: true,
+      ariaDescribedBy: ["footnote-label"]
+    },
+    children: [{ type: "text", value: String(counter) }]
+  };
+  state.patch(node2, link2);
+  const sup = {
+    type: "element",
+    tagName: "sup",
+    properties: {},
+    children: [link2]
+  };
+  state.patch(node2, sup);
+  return state.applyData(node2, sup);
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/heading.js
+"";
+function heading2(state, node2) {
+  const result = {
+    type: "element",
+    tagName: "h" + node2.depth,
+    properties: {},
+    children: state.all(node2)
+  };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/html.js
+"";
+function html2(state, node2) {
+  if (state.options.allowDangerousHtml) {
+    const result = { type: "raw", value: node2.value };
+    state.patch(node2, result);
+    return state.applyData(node2, result);
+  }
+  return;
+}
+
+// node_modules/mdast-util-to-hast/lib/revert.js
+"";
+function revert(state, node2) {
+  const subtype = node2.referenceType;
+  let suffix = "]";
+  if (subtype === "collapsed") {
+    suffix += "[]";
+  } else if (subtype === "full") {
+    suffix += "[" + (node2.label || node2.identifier) + "]";
+  }
+  if (node2.type === "imageReference") {
+    return [{ type: "text", value: "![" + node2.alt + suffix }];
+  }
+  const contents = state.all(node2);
+  const head = contents[0];
+  if (head && head.type === "text") {
+    head.value = "[" + head.value;
+  } else {
+    contents.unshift({ type: "text", value: "[" });
+  }
+  const tail = contents[contents.length - 1];
+  if (tail && tail.type === "text") {
+    tail.value += suffix;
+  } else {
+    contents.push({ type: "text", value: suffix });
+  }
+  return contents;
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/image-reference.js
+function imageReference2(state, node2) {
+  const id = String(node2.identifier).toUpperCase();
+  const definition3 = state.definitionById.get(id);
+  if (!definition3) {
+    return revert(state, node2);
+  }
+  const properties = { src: normalizeUri(definition3.url || ""), alt: node2.alt };
+  if (definition3.title !== null && definition3.title !== undefined) {
+    properties.title = definition3.title;
+  }
+  const result = { type: "element", tagName: "img", properties, children: [] };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/image.js
+function image2(state, node2) {
+  const properties = { src: normalizeUri(node2.url) };
+  if (node2.alt !== null && node2.alt !== undefined) {
+    properties.alt = node2.alt;
+  }
+  if (node2.title !== null && node2.title !== undefined) {
+    properties.title = node2.title;
+  }
+  const result = { type: "element", tagName: "img", properties, children: [] };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/inline-code.js
+"";
+function inlineCode2(state, node2) {
+  const text5 = { type: "text", value: node2.value.replace(/\r?\n|\r/g, " ") };
+  state.patch(node2, text5);
+  const result = {
+    type: "element",
+    tagName: "code",
+    properties: {},
+    children: [text5]
+  };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/link-reference.js
+function linkReference2(state, node2) {
+  const id = String(node2.identifier).toUpperCase();
+  const definition3 = state.definitionById.get(id);
+  if (!definition3) {
+    return revert(state, node2);
+  }
+  const properties = { href: normalizeUri(definition3.url || "") };
+  if (definition3.title !== null && definition3.title !== undefined) {
+    properties.title = definition3.title;
+  }
+  const result = {
+    type: "element",
+    tagName: "a",
+    properties,
+    children: state.all(node2)
+  };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/link.js
+function link2(state, node2) {
+  const properties = { href: normalizeUri(node2.url) };
+  if (node2.title !== null && node2.title !== undefined) {
+    properties.title = node2.title;
+  }
+  const result = {
+    type: "element",
+    tagName: "a",
+    properties,
+    children: state.all(node2)
+  };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/list-item.js
+"";
+function listItem2(state, node2, parent) {
+  const results = state.all(node2);
+  const loose = parent ? listLoose(parent) : listItemLoose(node2);
+  const properties = {};
+  const children = [];
+  if (typeof node2.checked === "boolean") {
+    const head = results[0];
+    let paragraph2;
+    if (head && head.type === "element" && head.tagName === "p") {
+      paragraph2 = head;
+    } else {
+      paragraph2 = { type: "element", tagName: "p", properties: {}, children: [] };
+      results.unshift(paragraph2);
+    }
+    if (paragraph2.children.length > 0) {
+      paragraph2.children.unshift({ type: "text", value: " " });
+    }
+    paragraph2.children.unshift({
+      type: "element",
+      tagName: "input",
+      properties: { type: "checkbox", checked: node2.checked, disabled: true },
+      children: []
+    });
+    properties.className = ["task-list-item"];
+  }
+  let index2 = -1;
+  while (++index2 < results.length) {
+    const child = results[index2];
+    if (loose || index2 !== 0 || child.type !== "element" || child.tagName !== "p") {
+      children.push({ type: "text", value: `
+` });
+    }
+    if (child.type === "element" && child.tagName === "p" && !loose) {
+      children.push(...child.children);
+    } else {
+      children.push(child);
+    }
+  }
+  const tail = results[results.length - 1];
+  if (tail && (loose || tail.type !== "element" || tail.tagName !== "p")) {
+    children.push({ type: "text", value: `
+` });
+  }
+  const result = { type: "element", tagName: "li", properties, children };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+function listLoose(node2) {
+  let loose = false;
+  if (node2.type === "list") {
+    loose = node2.spread || false;
+    const children = node2.children;
+    let index2 = -1;
+    while (!loose && ++index2 < children.length) {
+      loose = listItemLoose(children[index2]);
+    }
+  }
+  return loose;
+}
+function listItemLoose(node2) {
+  const spread = node2.spread;
+  return spread === null || spread === undefined ? node2.children.length > 1 : spread;
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/list.js
+"";
+function list3(state, node2) {
+  const properties = {};
+  const results = state.all(node2);
+  let index2 = -1;
+  if (typeof node2.start === "number" && node2.start !== 1) {
+    properties.start = node2.start;
+  }
+  while (++index2 < results.length) {
+    const child = results[index2];
+    if (child.type === "element" && child.tagName === "li" && child.properties && Array.isArray(child.properties.className) && child.properties.className.includes("task-list-item")) {
+      properties.className = ["contains-task-list"];
+      break;
+    }
+  }
+  const result = {
+    type: "element",
+    tagName: node2.ordered ? "ol" : "ul",
+    properties,
+    children: state.wrap(results, true)
+  };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/paragraph.js
+"";
+function paragraph2(state, node2) {
+  const result = {
+    type: "element",
+    tagName: "p",
+    properties: {},
+    children: state.all(node2)
+  };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/root.js
+"";
+function root2(state, node2) {
+  const result = { type: "root", children: state.wrap(state.all(node2)) };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/strong.js
+"";
+function strong2(state, node2) {
+  const result = {
+    type: "element",
+    tagName: "strong",
+    properties: {},
+    children: state.all(node2)
+  };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/unist-util-position/lib/index.js
+var pointEnd = point3("end");
+var pointStart = point3("start");
+function point3(type) {
+  return point4;
+  function point4(node2) {
+    const point5 = node2 && node2.position && node2.position[type] || {};
+    if (typeof point5.line === "number" && point5.line > 0 && typeof point5.column === "number" && point5.column > 0) {
+      return {
+        line: point5.line,
+        column: point5.column,
+        offset: typeof point5.offset === "number" && point5.offset > -1 ? point5.offset : undefined
+      };
+    }
+  }
+}
+function position2(node2) {
+  const start = pointStart(node2);
+  const end = pointEnd(node2);
+  if (start && end) {
+    return { start, end };
+  }
+}
+// node_modules/mdast-util-to-hast/lib/handlers/table.js
+function table(state, node2) {
+  const rows = state.all(node2);
+  const firstRow = rows.shift();
+  const tableContent = [];
+  if (firstRow) {
+    const head = {
+      type: "element",
+      tagName: "thead",
+      properties: {},
+      children: state.wrap([firstRow], true)
+    };
+    state.patch(node2.children[0], head);
+    tableContent.push(head);
+  }
+  if (rows.length > 0) {
+    const body = {
+      type: "element",
+      tagName: "tbody",
+      properties: {},
+      children: state.wrap(rows, true)
+    };
+    const start = pointStart(node2.children[1]);
+    const end = pointEnd(node2.children[node2.children.length - 1]);
+    if (start && end)
+      body.position = { start, end };
+    tableContent.push(body);
+  }
+  const result = {
+    type: "element",
+    tagName: "table",
+    properties: {},
+    children: state.wrap(tableContent, true)
+  };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/table-row.js
+"";
+function tableRow(state, node2, parent) {
+  const siblings = parent ? parent.children : undefined;
+  const rowIndex = siblings ? siblings.indexOf(node2) : 1;
+  const tagName = rowIndex === 0 ? "th" : "td";
+  const align = parent && parent.type === "table" ? parent.align : undefined;
+  const length = align ? align.length : node2.children.length;
+  let cellIndex = -1;
+  const cells = [];
+  while (++cellIndex < length) {
+    const cell = node2.children[cellIndex];
+    const properties = {};
+    const alignValue = align ? align[cellIndex] : undefined;
+    if (alignValue) {
+      properties.align = alignValue;
+    }
+    let result2 = { type: "element", tagName, properties, children: [] };
+    if (cell) {
+      result2.children = state.all(cell);
+      state.patch(cell, result2);
+      result2 = state.applyData(cell, result2);
+    }
+    cells.push(result2);
+  }
+  const result = {
+    type: "element",
+    tagName: "tr",
+    properties: {},
+    children: state.wrap(cells, true)
+  };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/table-cell.js
+"";
+function tableCell(state, node2) {
+  const result = {
+    type: "element",
+    tagName: "td",
+    properties: {},
+    children: state.all(node2)
+  };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/trim-lines/index.js
+var tab = 9;
+var space = 32;
+function trimLines(value) {
+  const source = String(value);
+  const search2 = /\r?\n|\r/g;
+  let match = search2.exec(source);
+  let last = 0;
+  const lines = [];
+  while (match) {
+    lines.push(trimLine(source.slice(last, match.index), last > 0, true), match[0]);
+    last = match.index + match[0].length;
+    match = search2.exec(source);
+  }
+  lines.push(trimLine(source.slice(last), last > 0, false));
+  return lines.join("");
+}
+function trimLine(value, start, end) {
+  let startIndex = 0;
+  let endIndex = value.length;
+  if (start) {
+    let code4 = value.codePointAt(startIndex);
+    while (code4 === tab || code4 === space) {
+      startIndex++;
+      code4 = value.codePointAt(startIndex);
+    }
+  }
+  if (end) {
+    let code4 = value.codePointAt(endIndex - 1);
+    while (code4 === tab || code4 === space) {
+      endIndex--;
+      code4 = value.codePointAt(endIndex - 1);
+    }
+  }
+  return endIndex > startIndex ? value.slice(startIndex, endIndex) : "";
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/text.js
+function text5(state, node2) {
+  const result = { type: "text", value: trimLines(String(node2.value)) };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/thematic-break.js
+"";
+function thematicBreak3(state, node2) {
+  const result = {
+    type: "element",
+    tagName: "hr",
+    properties: {},
+    children: []
+  };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+
+// node_modules/mdast-util-to-hast/lib/handlers/index.js
+var handlers = {
+  blockquote: blockquote2,
+  break: hardBreak2,
+  code: code3,
+  delete: strikethrough,
+  emphasis: emphasis2,
+  footnoteReference: footnoteReference2,
+  heading: heading2,
+  html: html2,
+  imageReference: imageReference2,
+  image: image2,
+  inlineCode: inlineCode2,
+  linkReference: linkReference2,
+  link: link2,
+  listItem: listItem2,
+  list: list3,
+  paragraph: paragraph2,
+  root: root2,
+  strong: strong2,
+  table,
+  tableCell,
+  tableRow,
+  text: text5,
+  thematicBreak: thematicBreak3,
+  toml: ignore,
+  yaml: ignore,
+  definition: ignore,
+  footnoteDefinition: ignore
+};
+function ignore() {
+  return;
+}
+
+// node_modules/@ungap/structured-clone/esm/types.js
+var VOID = -1;
+var PRIMITIVE = 0;
+var ARRAY = 1;
+var OBJECT = 2;
+var DATE = 3;
+var REGEXP = 4;
+var MAP = 5;
+var SET = 6;
+var ERROR = 7;
+var BIGINT = 8;
+
+// node_modules/@ungap/structured-clone/esm/deserialize.js
+var env = typeof self === "object" ? self : globalThis;
+var deserializer = ($, _) => {
+  const as = (out, index2) => {
+    $.set(index2, out);
+    return out;
+  };
+  const unpair = (index2) => {
+    if ($.has(index2))
+      return $.get(index2);
+    const [type, value] = _[index2];
+    switch (type) {
+      case PRIMITIVE:
+      case VOID:
+        return as(value, index2);
+      case ARRAY: {
+        const arr = as([], index2);
+        for (const index3 of value)
+          arr.push(unpair(index3));
+        return arr;
+      }
+      case OBJECT: {
+        const object = as({}, index2);
+        for (const [key, index3] of value)
+          object[unpair(key)] = unpair(index3);
+        return object;
+      }
+      case DATE:
+        return as(new Date(value), index2);
+      case REGEXP: {
+        const { source, flags } = value;
+        return as(new RegExp(source, flags), index2);
+      }
+      case MAP: {
+        const map3 = as(new Map, index2);
+        for (const [key, index3] of value)
+          map3.set(unpair(key), unpair(index3));
+        return map3;
+      }
+      case SET: {
+        const set = as(new Set, index2);
+        for (const index3 of value)
+          set.add(unpair(index3));
+        return set;
+      }
+      case ERROR: {
+        const { name, message } = value;
+        return as(new env[name](message), index2);
+      }
+      case BIGINT:
+        return as(BigInt(value), index2);
+      case "BigInt":
+        return as(Object(BigInt(value)), index2);
+      case "ArrayBuffer":
+        return as(new Uint8Array(value).buffer, value);
+      case "DataView": {
+        const { buffer } = new Uint8Array(value);
+        return as(new DataView(buffer), value);
+      }
+    }
+    return as(new env[type](value), index2);
+  };
+  return unpair;
+};
+var deserialize = (serialized) => deserializer(new Map, serialized)(0);
+
+// node_modules/@ungap/structured-clone/esm/serialize.js
+var EMPTY = "";
+var { toString: toString2 } = {};
+var { keys } = Object;
+var typeOf = (value) => {
+  const type = typeof value;
+  if (type !== "object" || !value)
+    return [PRIMITIVE, type];
+  const asString = toString2.call(value).slice(8, -1);
+  switch (asString) {
+    case "Array":
+      return [ARRAY, EMPTY];
+    case "Object":
+      return [OBJECT, EMPTY];
+    case "Date":
+      return [DATE, EMPTY];
+    case "RegExp":
+      return [REGEXP, EMPTY];
+    case "Map":
+      return [MAP, EMPTY];
+    case "Set":
+      return [SET, EMPTY];
+    case "DataView":
+      return [ARRAY, asString];
+  }
+  if (asString.includes("Array"))
+    return [ARRAY, asString];
+  if (asString.includes("Error"))
+    return [ERROR, asString];
+  return [OBJECT, asString];
+};
+var shouldSkip = ([TYPE, type]) => TYPE === PRIMITIVE && (type === "function" || type === "symbol");
+var serializer = (strict, json, $, _) => {
+  const as = (out, value) => {
+    const index2 = _.push(out) - 1;
+    $.set(value, index2);
+    return index2;
+  };
+  const pair = (value) => {
+    if ($.has(value))
+      return $.get(value);
+    let [TYPE, type] = typeOf(value);
+    switch (TYPE) {
+      case PRIMITIVE: {
+        let entry = value;
+        switch (type) {
+          case "bigint":
+            TYPE = BIGINT;
+            entry = value.toString();
+            break;
+          case "function":
+          case "symbol":
+            if (strict)
+              throw new TypeError("unable to serialize " + type);
+            entry = null;
+            break;
+          case "undefined":
+            return as([VOID], value);
+        }
+        return as([TYPE, entry], value);
+      }
+      case ARRAY: {
+        if (type) {
+          let spread = value;
+          if (type === "DataView") {
+            spread = new Uint8Array(value.buffer);
+          } else if (type === "ArrayBuffer") {
+            spread = new Uint8Array(value);
+          }
+          return as([type, [...spread]], value);
+        }
+        const arr = [];
+        const index2 = as([TYPE, arr], value);
+        for (const entry of value)
+          arr.push(pair(entry));
+        return index2;
+      }
+      case OBJECT: {
+        if (type) {
+          switch (type) {
+            case "BigInt":
+              return as([type, value.toString()], value);
+            case "Boolean":
+            case "Number":
+            case "String":
+              return as([type, value.valueOf()], value);
+          }
+        }
+        if (json && "toJSON" in value)
+          return pair(value.toJSON());
+        const entries = [];
+        const index2 = as([TYPE, entries], value);
+        for (const key of keys(value)) {
+          if (strict || !shouldSkip(typeOf(value[key])))
+            entries.push([pair(key), pair(value[key])]);
+        }
+        return index2;
+      }
+      case DATE:
+        return as([TYPE, value.toISOString()], value);
+      case REGEXP: {
+        const { source, flags } = value;
+        return as([TYPE, { source, flags }], value);
+      }
+      case MAP: {
+        const entries = [];
+        const index2 = as([TYPE, entries], value);
+        for (const [key, entry] of value) {
+          if (strict || !(shouldSkip(typeOf(key)) || shouldSkip(typeOf(entry))))
+            entries.push([pair(key), pair(entry)]);
+        }
+        return index2;
+      }
+      case SET: {
+        const entries = [];
+        const index2 = as([TYPE, entries], value);
+        for (const entry of value) {
+          if (strict || !shouldSkip(typeOf(entry)))
+            entries.push(pair(entry));
+        }
+        return index2;
+      }
+    }
+    const { message } = value;
+    return as([TYPE, { name: type, message }], value);
+  };
+  return pair;
+};
+var serialize2 = (value, { json, lossy } = {}) => {
+  const _ = [];
+  return serializer(!(json || lossy), !!json, new Map, _)(value), _;
+};
+
+// node_modules/@ungap/structured-clone/esm/index.js
+var esm_default = typeof structuredClone === "function" ? (any, options) => options && (("json" in options) || ("lossy" in options)) ? deserialize(serialize2(any, options)) : structuredClone(any) : (any, options) => deserialize(serialize2(any, options));
+
+// node_modules/mdast-util-to-hast/lib/footer.js
+function defaultFootnoteBackContent(_, rereferenceIndex) {
+  const result = [{ type: "text", value: "↩" }];
+  if (rereferenceIndex > 1) {
+    result.push({
+      type: "element",
+      tagName: "sup",
+      properties: {},
+      children: [{ type: "text", value: String(rereferenceIndex) }]
+    });
+  }
+  return result;
+}
+function defaultFootnoteBackLabel(referenceIndex, rereferenceIndex) {
+  return "Back to reference " + (referenceIndex + 1) + (rereferenceIndex > 1 ? "-" + rereferenceIndex : "");
+}
+function footer(state) {
+  const clobberPrefix = typeof state.options.clobberPrefix === "string" ? state.options.clobberPrefix : "user-content-";
+  const footnoteBackContent = state.options.footnoteBackContent || defaultFootnoteBackContent;
+  const footnoteBackLabel = state.options.footnoteBackLabel || defaultFootnoteBackLabel;
+  const footnoteLabel = state.options.footnoteLabel || "Footnotes";
+  const footnoteLabelTagName = state.options.footnoteLabelTagName || "h2";
+  const footnoteLabelProperties = state.options.footnoteLabelProperties || {
+    className: ["sr-only"]
+  };
+  const listItems = [];
+  let referenceIndex = -1;
+  while (++referenceIndex < state.footnoteOrder.length) {
+    const definition3 = state.footnoteById.get(state.footnoteOrder[referenceIndex]);
+    if (!definition3) {
+      continue;
+    }
+    const content3 = state.all(definition3);
+    const id = String(definition3.identifier).toUpperCase();
+    const safeId = normalizeUri(id.toLowerCase());
+    let rereferenceIndex = 0;
+    const backReferences = [];
+    const counts = state.footnoteCounts.get(id);
+    while (counts !== undefined && ++rereferenceIndex <= counts) {
+      if (backReferences.length > 0) {
+        backReferences.push({ type: "text", value: " " });
+      }
+      let children = typeof footnoteBackContent === "string" ? footnoteBackContent : footnoteBackContent(referenceIndex, rereferenceIndex);
+      if (typeof children === "string") {
+        children = { type: "text", value: children };
+      }
+      backReferences.push({
+        type: "element",
+        tagName: "a",
+        properties: {
+          href: "#" + clobberPrefix + "fnref-" + safeId + (rereferenceIndex > 1 ? "-" + rereferenceIndex : ""),
+          dataFootnoteBackref: "",
+          ariaLabel: typeof footnoteBackLabel === "string" ? footnoteBackLabel : footnoteBackLabel(referenceIndex, rereferenceIndex),
+          className: ["data-footnote-backref"]
+        },
+        children: Array.isArray(children) ? children : [children]
+      });
+    }
+    const tail = content3[content3.length - 1];
+    if (tail && tail.type === "element" && tail.tagName === "p") {
+      const tailTail = tail.children[tail.children.length - 1];
+      if (tailTail && tailTail.type === "text") {
+        tailTail.value += " ";
+      } else {
+        tail.children.push({ type: "text", value: " " });
+      }
+      tail.children.push(...backReferences);
+    } else {
+      content3.push(...backReferences);
+    }
+    const listItem3 = {
+      type: "element",
+      tagName: "li",
+      properties: { id: clobberPrefix + "fn-" + safeId },
+      children: state.wrap(content3, true)
+    };
+    state.patch(definition3, listItem3);
+    listItems.push(listItem3);
+  }
+  if (listItems.length === 0) {
+    return;
+  }
+  return {
+    type: "element",
+    tagName: "section",
+    properties: { dataFootnotes: true, className: ["footnotes"] },
+    children: [
+      {
+        type: "element",
+        tagName: footnoteLabelTagName,
+        properties: {
+          ...esm_default(footnoteLabelProperties),
+          id: "footnote-label"
+        },
+        children: [{ type: "text", value: footnoteLabel }]
+      },
+      { type: "text", value: `
+` },
+      {
+        type: "element",
+        tagName: "ol",
+        properties: {},
+        children: state.wrap(listItems, true)
+      },
+      { type: "text", value: `
+` }
+    ]
+  };
+}
+
+// node_modules/mdast-util-to-hast/lib/state.js
+var own3 = {}.hasOwnProperty;
+var emptyOptions4 = {};
+function createState(tree, options) {
+  const settings = options || emptyOptions4;
+  const definitionById = new Map;
+  const footnoteById = new Map;
+  const footnoteCounts = new Map;
+  const handlers2 = { ...handlers, ...settings.handlers };
+  const state = {
+    all: all2,
+    applyData,
+    definitionById,
+    footnoteById,
+    footnoteCounts,
+    footnoteOrder: [],
+    handlers: handlers2,
+    one: one2,
+    options: settings,
+    patch,
+    wrap
+  };
+  visit(tree, function(node2) {
+    if (node2.type === "definition" || node2.type === "footnoteDefinition") {
+      const map3 = node2.type === "definition" ? definitionById : footnoteById;
+      const id = String(node2.identifier).toUpperCase();
+      if (!map3.has(id)) {
+        map3.set(id, node2);
+      }
+    }
+  });
+  return state;
+  function one2(node2, parent) {
+    const type = node2.type;
+    const handle2 = state.handlers[type];
+    if (own3.call(state.handlers, type) && handle2) {
+      return handle2(state, node2, parent);
+    }
+    if (state.options.passThrough && state.options.passThrough.includes(type)) {
+      if ("children" in node2) {
+        const { children, ...shallow } = node2;
+        const result = esm_default(shallow);
+        result.children = state.all(node2);
+        return result;
+      }
+      return esm_default(node2);
+    }
+    const unknown = state.options.unknownHandler || defaultUnknownHandler;
+    return unknown(state, node2, parent);
+  }
+  function all2(parent) {
+    const values2 = [];
+    if ("children" in parent) {
+      const nodes = parent.children;
+      let index2 = -1;
+      while (++index2 < nodes.length) {
+        const result = state.one(nodes[index2], parent);
+        if (result) {
+          if (index2 && nodes[index2 - 1].type === "break") {
+            if (!Array.isArray(result) && result.type === "text") {
+              result.value = trimMarkdownSpaceStart(result.value);
+            }
+            if (!Array.isArray(result) && result.type === "element") {
+              const head = result.children[0];
+              if (head && head.type === "text") {
+                head.value = trimMarkdownSpaceStart(head.value);
+              }
+            }
+          }
+          if (Array.isArray(result)) {
+            values2.push(...result);
+          } else {
+            values2.push(result);
+          }
+        }
+      }
+    }
+    return values2;
+  }
+}
+function patch(from, to) {
+  if (from.position)
+    to.position = position2(from);
+}
+function applyData(from, to) {
+  let result = to;
+  if (from && from.data) {
+    const hName = from.data.hName;
+    const hChildren = from.data.hChildren;
+    const hProperties = from.data.hProperties;
+    if (typeof hName === "string") {
+      if (result.type === "element") {
+        result.tagName = hName;
+      } else {
+        const children = "children" in result ? result.children : [result];
+        result = { type: "element", tagName: hName, properties: {}, children };
+      }
+    }
+    if (result.type === "element" && hProperties) {
+      Object.assign(result.properties, esm_default(hProperties));
+    }
+    if ("children" in result && result.children && hChildren !== null && hChildren !== undefined) {
+      result.children = hChildren;
+    }
+  }
+  return result;
+}
+function defaultUnknownHandler(state, node2) {
+  const data = node2.data || {};
+  const result = "value" in node2 && !(own3.call(data, "hProperties") || own3.call(data, "hChildren")) ? { type: "text", value: node2.value } : {
+    type: "element",
+    tagName: "div",
+    properties: {},
+    children: state.all(node2)
+  };
+  state.patch(node2, result);
+  return state.applyData(node2, result);
+}
+function wrap(nodes, loose) {
+  const result = [];
+  let index2 = -1;
+  if (loose) {
+    result.push({ type: "text", value: `
+` });
+  }
+  while (++index2 < nodes.length) {
+    if (index2)
+      result.push({ type: "text", value: `
+` });
+    result.push(nodes[index2]);
+  }
+  if (loose && nodes.length > 0) {
+    result.push({ type: "text", value: `
+` });
+  }
+  return result;
+}
+function trimMarkdownSpaceStart(value) {
+  let index2 = 0;
+  let code4 = value.charCodeAt(index2);
+  while (code4 === 9 || code4 === 32) {
+    index2++;
+    code4 = value.charCodeAt(index2);
+  }
+  return value.slice(index2);
+}
+
+// node_modules/mdast-util-to-hast/lib/index.js
+function toHast(tree, options) {
+  const state = createState(tree, options);
+  const node2 = state.one(tree, undefined);
+  const foot = footer(state);
+  const result = Array.isArray(node2) ? { type: "root", children: node2 } : node2 || { type: "root", children: [] };
+  if (foot) {
+    ok("children" in result);
+    result.children.push({ type: "text", value: `
+` }, foot);
+  }
+  return result;
+}
+// node_modules/remark-rehype/lib/index.js
+function remarkRehype(destination, options) {
+  if (destination && "run" in destination) {
+    return async function(tree, file) {
+      const hastTree = toHast(tree, { file, ...options });
+      await destination.run(hastTree, file);
+    };
+  }
+  return function(tree, file) {
+    return toHast(tree, { file, ...destination || options });
+  };
+}
+// node_modules/github-slugger/regex.js
+var regex = /[\0-\x1F!-,\.\/:-@\[-\^`\{-\xA9\xAB-\xB4\xB6-\xB9\xBB-\xBF\xD7\xF7\u02C2-\u02C5\u02D2-\u02DF\u02E5-\u02EB\u02ED\u02EF-\u02FF\u0375\u0378\u0379\u037E\u0380-\u0385\u0387\u038B\u038D\u03A2\u03F6\u0482\u0530\u0557\u0558\u055A-\u055F\u0589-\u0590\u05BE\u05C0\u05C3\u05C6\u05C8-\u05CF\u05EB-\u05EE\u05F3-\u060F\u061B-\u061F\u066A-\u066D\u06D4\u06DD\u06DE\u06E9\u06FD\u06FE\u0700-\u070F\u074B\u074C\u07B2-\u07BF\u07F6-\u07F9\u07FB\u07FC\u07FE\u07FF\u082E-\u083F\u085C-\u085F\u086B-\u089F\u08B5\u08C8-\u08D2\u08E2\u0964\u0965\u0970\u0984\u098D\u098E\u0991\u0992\u09A9\u09B1\u09B3-\u09B5\u09BA\u09BB\u09C5\u09C6\u09C9\u09CA\u09CF-\u09D6\u09D8-\u09DB\u09DE\u09E4\u09E5\u09F2-\u09FB\u09FD\u09FF\u0A00\u0A04\u0A0B-\u0A0E\u0A11\u0A12\u0A29\u0A31\u0A34\u0A37\u0A3A\u0A3B\u0A3D\u0A43-\u0A46\u0A49\u0A4A\u0A4E-\u0A50\u0A52-\u0A58\u0A5D\u0A5F-\u0A65\u0A76-\u0A80\u0A84\u0A8E\u0A92\u0AA9\u0AB1\u0AB4\u0ABA\u0ABB\u0AC6\u0ACA\u0ACE\u0ACF\u0AD1-\u0ADF\u0AE4\u0AE5\u0AF0-\u0AF8\u0B00\u0B04\u0B0D\u0B0E\u0B11\u0B12\u0B29\u0B31\u0B34\u0B3A\u0B3B\u0B45\u0B46\u0B49\u0B4A\u0B4E-\u0B54\u0B58-\u0B5B\u0B5E\u0B64\u0B65\u0B70\u0B72-\u0B81\u0B84\u0B8B-\u0B8D\u0B91\u0B96-\u0B98\u0B9B\u0B9D\u0BA0-\u0BA2\u0BA5-\u0BA7\u0BAB-\u0BAD\u0BBA-\u0BBD\u0BC3-\u0BC5\u0BC9\u0BCE\u0BCF\u0BD1-\u0BD6\u0BD8-\u0BE5\u0BF0-\u0BFF\u0C0D\u0C11\u0C29\u0C3A-\u0C3C\u0C45\u0C49\u0C4E-\u0C54\u0C57\u0C5B-\u0C5F\u0C64\u0C65\u0C70-\u0C7F\u0C84\u0C8D\u0C91\u0CA9\u0CB4\u0CBA\u0CBB\u0CC5\u0CC9\u0CCE-\u0CD4\u0CD7-\u0CDD\u0CDF\u0CE4\u0CE5\u0CF0\u0CF3-\u0CFF\u0D0D\u0D11\u0D45\u0D49\u0D4F-\u0D53\u0D58-\u0D5E\u0D64\u0D65\u0D70-\u0D79\u0D80\u0D84\u0D97-\u0D99\u0DB2\u0DBC\u0DBE\u0DBF\u0DC7-\u0DC9\u0DCB-\u0DCE\u0DD5\u0DD7\u0DE0-\u0DE5\u0DF0\u0DF1\u0DF4-\u0E00\u0E3B-\u0E3F\u0E4F\u0E5A-\u0E80\u0E83\u0E85\u0E8B\u0EA4\u0EA6\u0EBE\u0EBF\u0EC5\u0EC7\u0ECE\u0ECF\u0EDA\u0EDB\u0EE0-\u0EFF\u0F01-\u0F17\u0F1A-\u0F1F\u0F2A-\u0F34\u0F36\u0F38\u0F3A-\u0F3D\u0F48\u0F6D-\u0F70\u0F85\u0F98\u0FBD-\u0FC5\u0FC7-\u0FFF\u104A-\u104F\u109E\u109F\u10C6\u10C8-\u10CC\u10CE\u10CF\u10FB\u1249\u124E\u124F\u1257\u1259\u125E\u125F\u1289\u128E\u128F\u12B1\u12B6\u12B7\u12BF\u12C1\u12C6\u12C7\u12D7\u1311\u1316\u1317\u135B\u135C\u1360-\u137F\u1390-\u139F\u13F6\u13F7\u13FE-\u1400\u166D\u166E\u1680\u169B-\u169F\u16EB-\u16ED\u16F9-\u16FF\u170D\u1715-\u171F\u1735-\u173F\u1754-\u175F\u176D\u1771\u1774-\u177F\u17D4-\u17D6\u17D8-\u17DB\u17DE\u17DF\u17EA-\u180A\u180E\u180F\u181A-\u181F\u1879-\u187F\u18AB-\u18AF\u18F6-\u18FF\u191F\u192C-\u192F\u193C-\u1945\u196E\u196F\u1975-\u197F\u19AC-\u19AF\u19CA-\u19CF\u19DA-\u19FF\u1A1C-\u1A1F\u1A5F\u1A7D\u1A7E\u1A8A-\u1A8F\u1A9A-\u1AA6\u1AA8-\u1AAF\u1AC1-\u1AFF\u1B4C-\u1B4F\u1B5A-\u1B6A\u1B74-\u1B7F\u1BF4-\u1BFF\u1C38-\u1C3F\u1C4A-\u1C4C\u1C7E\u1C7F\u1C89-\u1C8F\u1CBB\u1CBC\u1CC0-\u1CCF\u1CD3\u1CFB-\u1CFF\u1DFA\u1F16\u1F17\u1F1E\u1F1F\u1F46\u1F47\u1F4E\u1F4F\u1F58\u1F5A\u1F5C\u1F5E\u1F7E\u1F7F\u1FB5\u1FBD\u1FBF-\u1FC1\u1FC5\u1FCD-\u1FCF\u1FD4\u1FD5\u1FDC-\u1FDF\u1FED-\u1FF1\u1FF5\u1FFD-\u203E\u2041-\u2053\u2055-\u2070\u2072-\u207E\u2080-\u208F\u209D-\u20CF\u20F1-\u2101\u2103-\u2106\u2108\u2109\u2114\u2116-\u2118\u211E-\u2123\u2125\u2127\u2129\u212E\u213A\u213B\u2140-\u2144\u214A-\u214D\u214F-\u215F\u2189-\u24B5\u24EA-\u2BFF\u2C2F\u2C5F\u2CE5-\u2CEA\u2CF4-\u2CFF\u2D26\u2D28-\u2D2C\u2D2E\u2D2F\u2D68-\u2D6E\u2D70-\u2D7E\u2D97-\u2D9F\u2DA7\u2DAF\u2DB7\u2DBF\u2DC7\u2DCF\u2DD7\u2DDF\u2E00-\u2E2E\u2E30-\u3004\u3008-\u3020\u3030\u3036\u3037\u303D-\u3040\u3097\u3098\u309B\u309C\u30A0\u30FB\u3100-\u3104\u3130\u318F-\u319F\u31C0-\u31EF\u3200-\u33FF\u4DC0-\u4DFF\u9FFD-\u9FFF\uA48D-\uA4CF\uA4FE\uA4FF\uA60D-\uA60F\uA62C-\uA63F\uA673\uA67E\uA6F2-\uA716\uA720\uA721\uA789\uA78A\uA7C0\uA7C1\uA7CB-\uA7F4\uA828-\uA82B\uA82D-\uA83F\uA874-\uA87F\uA8C6-\uA8CF\uA8DA-\uA8DF\uA8F8-\uA8FA\uA8FC\uA92E\uA92F\uA954-\uA95F\uA97D-\uA97F\uA9C1-\uA9CE\uA9DA-\uA9DF\uA9FF\uAA37-\uAA3F\uAA4E\uAA4F\uAA5A-\uAA5F\uAA77-\uAA79\uAAC3-\uAADA\uAADE\uAADF\uAAF0\uAAF1\uAAF7-\uAB00\uAB07\uAB08\uAB0F\uAB10\uAB17-\uAB1F\uAB27\uAB2F\uAB5B\uAB6A-\uAB6F\uABEB\uABEE\uABEF\uABFA-\uABFF\uD7A4-\uD7AF\uD7C7-\uD7CA\uD7FC-\uD7FF\uE000-\uF8FF\uFA6E\uFA6F\uFADA-\uFAFF\uFB07-\uFB12\uFB18-\uFB1C\uFB29\uFB37\uFB3D\uFB3F\uFB42\uFB45\uFBB2-\uFBD2\uFD3E-\uFD4F\uFD90\uFD91\uFDC8-\uFDEF\uFDFC-\uFDFF\uFE10-\uFE1F\uFE30-\uFE32\uFE35-\uFE4C\uFE50-\uFE6F\uFE75\uFEFD-\uFF0F\uFF1A-\uFF20\uFF3B-\uFF3E\uFF40\uFF5B-\uFF65\uFFBF-\uFFC1\uFFC8\uFFC9\uFFD0\uFFD1\uFFD8\uFFD9\uFFDD-\uFFFF]|\uD800[\uDC0C\uDC27\uDC3B\uDC3E\uDC4E\uDC4F\uDC5E-\uDC7F\uDCFB-\uDD3F\uDD75-\uDDFC\uDDFE-\uDE7F\uDE9D-\uDE9F\uDED1-\uDEDF\uDEE1-\uDEFF\uDF20-\uDF2C\uDF4B-\uDF4F\uDF7B-\uDF7F\uDF9E\uDF9F\uDFC4-\uDFC7\uDFD0\uDFD6-\uDFFF]|\uD801[\uDC9E\uDC9F\uDCAA-\uDCAF\uDCD4-\uDCD7\uDCFC-\uDCFF\uDD28-\uDD2F\uDD64-\uDDFF\uDF37-\uDF3F\uDF56-\uDF5F\uDF68-\uDFFF]|\uD802[\uDC06\uDC07\uDC09\uDC36\uDC39-\uDC3B\uDC3D\uDC3E\uDC56-\uDC5F\uDC77-\uDC7F\uDC9F-\uDCDF\uDCF3\uDCF6-\uDCFF\uDD16-\uDD1F\uDD3A-\uDD7F\uDDB8-\uDDBD\uDDC0-\uDDFF\uDE04\uDE07-\uDE0B\uDE14\uDE18\uDE36\uDE37\uDE3B-\uDE3E\uDE40-\uDE5F\uDE7D-\uDE7F\uDE9D-\uDEBF\uDEC8\uDEE7-\uDEFF\uDF36-\uDF3F\uDF56-\uDF5F\uDF73-\uDF7F\uDF92-\uDFFF]|\uD803[\uDC49-\uDC7F\uDCB3-\uDCBF\uDCF3-\uDCFF\uDD28-\uDD2F\uDD3A-\uDE7F\uDEAA\uDEAD-\uDEAF\uDEB2-\uDEFF\uDF1D-\uDF26\uDF28-\uDF2F\uDF51-\uDFAF\uDFC5-\uDFDF\uDFF7-\uDFFF]|\uD804[\uDC47-\uDC65\uDC70-\uDC7E\uDCBB-\uDCCF\uDCE9-\uDCEF\uDCFA-\uDCFF\uDD35\uDD40-\uDD43\uDD48-\uDD4F\uDD74\uDD75\uDD77-\uDD7F\uDDC5-\uDDC8\uDDCD\uDDDB\uDDDD-\uDDFF\uDE12\uDE38-\uDE3D\uDE3F-\uDE7F\uDE87\uDE89\uDE8E\uDE9E\uDEA9-\uDEAF\uDEEB-\uDEEF\uDEFA-\uDEFF\uDF04\uDF0D\uDF0E\uDF11\uDF12\uDF29\uDF31\uDF34\uDF3A\uDF45\uDF46\uDF49\uDF4A\uDF4E\uDF4F\uDF51-\uDF56\uDF58-\uDF5C\uDF64\uDF65\uDF6D-\uDF6F\uDF75-\uDFFF]|\uD805[\uDC4B-\uDC4F\uDC5A-\uDC5D\uDC62-\uDC7F\uDCC6\uDCC8-\uDCCF\uDCDA-\uDD7F\uDDB6\uDDB7\uDDC1-\uDDD7\uDDDE-\uDDFF\uDE41-\uDE43\uDE45-\uDE4F\uDE5A-\uDE7F\uDEB9-\uDEBF\uDECA-\uDEFF\uDF1B\uDF1C\uDF2C-\uDF2F\uDF3A-\uDFFF]|\uD806[\uDC3B-\uDC9F\uDCEA-\uDCFE\uDD07\uDD08\uDD0A\uDD0B\uDD14\uDD17\uDD36\uDD39\uDD3A\uDD44-\uDD4F\uDD5A-\uDD9F\uDDA8\uDDA9\uDDD8\uDDD9\uDDE2\uDDE5-\uDDFF\uDE3F-\uDE46\uDE48-\uDE4F\uDE9A-\uDE9C\uDE9E-\uDEBF\uDEF9-\uDFFF]|\uD807[\uDC09\uDC37\uDC41-\uDC4F\uDC5A-\uDC71\uDC90\uDC91\uDCA8\uDCB7-\uDCFF\uDD07\uDD0A\uDD37-\uDD39\uDD3B\uDD3E\uDD48-\uDD4F\uDD5A-\uDD5F\uDD66\uDD69\uDD8F\uDD92\uDD99-\uDD9F\uDDAA-\uDEDF\uDEF7-\uDFAF\uDFB1-\uDFFF]|\uD808[\uDF9A-\uDFFF]|\uD809[\uDC6F-\uDC7F\uDD44-\uDFFF]|[\uD80A\uD80B\uD80E-\uD810\uD812-\uD819\uD824-\uD82B\uD82D\uD82E\uD830-\uD833\uD837\uD839\uD83D\uD83F\uD87B-\uD87D\uD87F\uD885-\uDB3F\uDB41-\uDBFF][\uDC00-\uDFFF]|\uD80D[\uDC2F-\uDFFF]|\uD811[\uDE47-\uDFFF]|\uD81A[\uDE39-\uDE3F\uDE5F\uDE6A-\uDECF\uDEEE\uDEEF\uDEF5-\uDEFF\uDF37-\uDF3F\uDF44-\uDF4F\uDF5A-\uDF62\uDF78-\uDF7C\uDF90-\uDFFF]|\uD81B[\uDC00-\uDE3F\uDE80-\uDEFF\uDF4B-\uDF4E\uDF88-\uDF8E\uDFA0-\uDFDF\uDFE2\uDFE5-\uDFEF\uDFF2-\uDFFF]|\uD821[\uDFF8-\uDFFF]|\uD823[\uDCD6-\uDCFF\uDD09-\uDFFF]|\uD82C[\uDD1F-\uDD4F\uDD53-\uDD63\uDD68-\uDD6F\uDEFC-\uDFFF]|\uD82F[\uDC6B-\uDC6F\uDC7D-\uDC7F\uDC89-\uDC8F\uDC9A-\uDC9C\uDC9F-\uDFFF]|\uD834[\uDC00-\uDD64\uDD6A-\uDD6C\uDD73-\uDD7A\uDD83\uDD84\uDD8C-\uDDA9\uDDAE-\uDE41\uDE45-\uDFFF]|\uD835[\uDC55\uDC9D\uDCA0\uDCA1\uDCA3\uDCA4\uDCA7\uDCA8\uDCAD\uDCBA\uDCBC\uDCC4\uDD06\uDD0B\uDD0C\uDD15\uDD1D\uDD3A\uDD3F\uDD45\uDD47-\uDD49\uDD51\uDEA6\uDEA7\uDEC1\uDEDB\uDEFB\uDF15\uDF35\uDF4F\uDF6F\uDF89\uDFA9\uDFC3\uDFCC\uDFCD]|\uD836[\uDC00-\uDDFF\uDE37-\uDE3A\uDE6D-\uDE74\uDE76-\uDE83\uDE85-\uDE9A\uDEA0\uDEB0-\uDFFF]|\uD838[\uDC07\uDC19\uDC1A\uDC22\uDC25\uDC2B-\uDCFF\uDD2D-\uDD2F\uDD3E\uDD3F\uDD4A-\uDD4D\uDD4F-\uDEBF\uDEFA-\uDFFF]|\uD83A[\uDCC5-\uDCCF\uDCD7-\uDCFF\uDD4C-\uDD4F\uDD5A-\uDFFF]|\uD83B[\uDC00-\uDDFF\uDE04\uDE20\uDE23\uDE25\uDE26\uDE28\uDE33\uDE38\uDE3A\uDE3C-\uDE41\uDE43-\uDE46\uDE48\uDE4A\uDE4C\uDE50\uDE53\uDE55\uDE56\uDE58\uDE5A\uDE5C\uDE5E\uDE60\uDE63\uDE65\uDE66\uDE6B\uDE73\uDE78\uDE7D\uDE7F\uDE8A\uDE9C-\uDEA0\uDEA4\uDEAA\uDEBC-\uDFFF]|\uD83C[\uDC00-\uDD2F\uDD4A-\uDD4F\uDD6A-\uDD6F\uDD8A-\uDFFF]|\uD83E[\uDC00-\uDFEF\uDFFA-\uDFFF]|\uD869[\uDEDE-\uDEFF]|\uD86D[\uDF35-\uDF3F]|\uD86E[\uDC1E\uDC1F]|\uD873[\uDEA2-\uDEAF]|\uD87A[\uDFE1-\uDFFF]|\uD87E[\uDE1E-\uDFFF]|\uD884[\uDF4B-\uDFFF]|\uDB40[\uDC00-\uDCFF\uDDF0-\uDFFF]/g;
+
+// node_modules/github-slugger/index.js
+var own4 = Object.hasOwnProperty;
+
+class BananaSlug {
+  constructor() {
+    this.occurrences;
+    this.reset();
+  }
+  slug(value, maintainCase) {
+    const self2 = this;
+    let result = slug(value, maintainCase === true);
+    const originalSlug = result;
+    while (own4.call(self2.occurrences, result)) {
+      self2.occurrences[originalSlug]++;
+      result = originalSlug + "-" + self2.occurrences[originalSlug];
+    }
+    self2.occurrences[result] = 0;
+    return result;
+  }
+  reset() {
+    this.occurrences = Object.create(null);
+  }
+}
+function slug(value, maintainCase) {
+  if (typeof value !== "string")
+    return "";
+  if (!maintainCase)
+    value = value.toLowerCase();
+  return value.replace(regex, "").replace(/ /g, "-");
+}
+
+// node_modules/hast-util-heading-rank/lib/index.js
+function headingRank(node2) {
+  const name = node2.type === "element" ? node2.tagName.toLowerCase() : "";
+  const code4 = name.length === 2 && name.charCodeAt(0) === 104 ? name.charCodeAt(1) : 0;
+  return code4 > 48 && code4 < 55 ? code4 - 48 : undefined;
+}
+// node_modules/hast-util-to-string/lib/index.js
+function toString3(node2) {
+  if ("children" in node2) {
+    return all2(node2);
+  }
+  return "value" in node2 ? node2.value : "";
+}
+function one2(node2) {
+  if (node2.type === "text") {
+    return node2.value;
+  }
+  return "children" in node2 ? all2(node2) : "";
+}
+function all2(node2) {
+  let index2 = -1;
+  const result = [];
+  while (++index2 < node2.children.length) {
+    result[index2] = one2(node2.children[index2]);
+  }
+  return result.join("");
+}
+// node_modules/rehype-slug/lib/index.js
+var emptyOptions5 = {};
+var slugs = new BananaSlug;
+function rehypeSlug(options) {
+  const settings = options || emptyOptions5;
+  const prefix = settings.prefix || "";
+  return function(tree) {
+    slugs.reset();
+    visit(tree, "element", function(node2) {
+      if (headingRank(node2) && !node2.properties.id) {
+        node2.properties.id = prefix + slugs.slug(toString3(node2));
+      }
+    });
+  };
+}
+// node_modules/hast-util-is-element/lib/index.js
+var convertElement = function(test) {
+  if (test === null || test === undefined) {
+    return element2;
+  }
+  if (typeof test === "string") {
+    return tagNameFactory(test);
+  }
+  if (typeof test === "object") {
+    return anyFactory2(test);
+  }
+  if (typeof test === "function") {
+    return castFactory2(test);
+  }
+  throw new Error("Expected function, string, or array as `test`");
+};
+function anyFactory2(tests) {
+  const checks = [];
+  let index2 = -1;
+  while (++index2 < tests.length) {
+    checks[index2] = convertElement(tests[index2]);
+  }
+  return castFactory2(any);
+  function any(...parameters) {
+    let index3 = -1;
+    while (++index3 < checks.length) {
+      if (checks[index3].apply(this, parameters))
+        return true;
+    }
+    return false;
+  }
+}
+function tagNameFactory(check) {
+  return castFactory2(tagName);
+  function tagName(element2) {
+    return element2.tagName === check;
+  }
+}
+function castFactory2(testFunction) {
+  return check;
+  function check(value, index2, parent) {
+    return Boolean(looksLikeAnElement(value) && testFunction.call(this, value, typeof index2 === "number" ? index2 : undefined, parent || undefined));
+  }
+}
+function element2(element3) {
+  return Boolean(element3 && typeof element3 === "object" && "type" in element3 && element3.type === "element" && "tagName" in element3 && typeof element3.tagName === "string");
+}
+function looksLikeAnElement(value) {
+  return value !== null && typeof value === "object" && "type" in value && "tagName" in value;
+}
+// node_modules/is-absolute-url/index.js
+var ABSOLUTE_URL_REGEX = /^[a-zA-Z][a-zA-Z\d+\-.]*?:/;
+var WINDOWS_PATH_REGEX = /^[a-zA-Z]:\\/;
+function isAbsoluteUrl(url) {
+  if (typeof url !== "string") {
+    throw new TypeError(`Expected a \`string\`, got \`${typeof url}\``);
+  }
+  if (WINDOWS_PATH_REGEX.test(url)) {
+    return false;
+  }
+  return ABSOLUTE_URL_REGEX.test(url);
+}
+
+// node_modules/space-separated-tokens/index.js
+function parse2(value) {
+  const input = String(value || "").trim();
+  return input ? input.split(/[ \t\n\r\f]+/g) : [];
+}
+function stringify(values2) {
+  return values2.join(" ").trim();
+}
+
+// node_modules/rehype-external-links/lib/index.js
+var defaultProtocols = ["http", "https"];
+var defaultRel = ["nofollow"];
+var emptyOptions6 = {};
+function rehypeExternalLinks(options) {
+  const settings = options || emptyOptions6;
+  const protocols = settings.protocols || defaultProtocols;
+  const is2 = convertElement(settings.test);
+  return function(tree) {
+    visit(tree, "element", function(node2, index2, parent) {
+      if (node2.tagName === "a" && typeof node2.properties.href === "string" && is2(node2, index2, parent)) {
+        const url = node2.properties.href;
+        if (isAbsoluteUrl(url) ? protocols.includes(url.slice(0, url.indexOf(":"))) : url.startsWith("//")) {
+          const contentRaw = createIfNeeded(settings.content, node2);
+          const content3 = contentRaw && !Array.isArray(contentRaw) ? [contentRaw] : contentRaw;
+          const relRaw = createIfNeeded(settings.rel, node2) || defaultRel;
+          const rel = typeof relRaw === "string" ? parse2(relRaw) : relRaw;
+          const target = createIfNeeded(settings.target, node2);
+          const properties = createIfNeeded(settings.properties, node2);
+          if (properties) {
+            Object.assign(node2.properties, esm_default(properties));
+          }
+          if (rel.length > 0) {
+            node2.properties.rel = [...rel];
+          }
+          if (target) {
+            node2.properties.target = target;
+          }
+          if (content3) {
+            const properties2 = createIfNeeded(settings.contentProperties, node2) || {};
+            node2.children.push({
+              type: "element",
+              tagName: "span",
+              properties: esm_default(properties2),
+              children: esm_default(content3)
+            });
+          }
+        }
+      }
+    });
+  };
+}
+function createIfNeeded(value, element3) {
+  return typeof value === "function" ? value(element3) : value;
+}
+// src/editor/MarkdownEditor.ts
+var import_rehype_figure = __toESM(require_rehype_figure(), 1);
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/util/schema.js
+class Schema {
+  constructor(property, normal, space2) {
+    this.normal = normal;
+    this.property = property;
+    if (space2) {
+      this.space = space2;
+    }
+  }
+}
+Schema.prototype.normal = {};
+Schema.prototype.property = {};
+Schema.prototype.space = undefined;
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/util/merge.js
+function merge(definitions, space2) {
+  const property = {};
+  const normal = {};
+  for (const definition3 of definitions) {
+    Object.assign(property, definition3.property);
+    Object.assign(normal, definition3.normal);
+  }
+  return new Schema(property, normal, space2);
+}
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/normalize.js
+function normalize(value) {
+  return value.toLowerCase();
+}
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/util/info.js
+class Info {
+  constructor(property, attribute) {
+    this.attribute = attribute;
+    this.property = property;
+  }
+}
+Info.prototype.attribute = "";
+Info.prototype.booleanish = false;
+Info.prototype.boolean = false;
+Info.prototype.commaOrSpaceSeparated = false;
+Info.prototype.commaSeparated = false;
+Info.prototype.defined = false;
+Info.prototype.mustUseProperty = false;
+Info.prototype.number = false;
+Info.prototype.overloadedBoolean = false;
+Info.prototype.property = "";
+Info.prototype.spaceSeparated = false;
+Info.prototype.space = undefined;
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/util/types.js
+var exports_types = {};
+__export(exports_types, {
+  spaceSeparated: () => spaceSeparated,
+  overloadedBoolean: () => overloadedBoolean,
+  number: () => number,
+  commaSeparated: () => commaSeparated,
+  commaOrSpaceSeparated: () => commaOrSpaceSeparated,
+  booleanish: () => booleanish,
+  boolean: () => boolean
+});
+var powers = 0;
+var boolean = increment();
+var booleanish = increment();
+var overloadedBoolean = increment();
+var number = increment();
+var spaceSeparated = increment();
+var commaSeparated = increment();
+var commaOrSpaceSeparated = increment();
+function increment() {
+  return 2 ** ++powers;
+}
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/util/defined-info.js
+var checks = Object.keys(exports_types);
+
+class DefinedInfo extends Info {
+  constructor(property, attribute, mask, space2) {
+    let index2 = -1;
+    super(property, attribute);
+    mark(this, "space", space2);
+    if (typeof mask === "number") {
+      while (++index2 < checks.length) {
+        const check = checks[index2];
+        mark(this, checks[index2], (mask & exports_types[check]) === exports_types[check]);
+      }
+    }
+  }
+}
+DefinedInfo.prototype.defined = true;
+function mark(values2, key, value) {
+  if (value) {
+    values2[key] = value;
+  }
+}
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/util/create.js
+function create(definition3) {
+  const properties = {};
+  const normals = {};
+  for (const [property, value] of Object.entries(definition3.properties)) {
+    const info = new DefinedInfo(property, definition3.transform(definition3.attributes || {}, property), value, definition3.space);
+    if (definition3.mustUseProperty && definition3.mustUseProperty.includes(property)) {
+      info.mustUseProperty = true;
+    }
+    properties[property] = info;
+    normals[normalize(property)] = property;
+    normals[normalize(info.attribute)] = property;
+  }
+  return new Schema(properties, normals, definition3.space);
+}
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/aria.js
+var aria = create({
+  properties: {
+    ariaActiveDescendant: null,
+    ariaAtomic: booleanish,
+    ariaAutoComplete: null,
+    ariaBusy: booleanish,
+    ariaChecked: booleanish,
+    ariaColCount: number,
+    ariaColIndex: number,
+    ariaColSpan: number,
+    ariaControls: spaceSeparated,
+    ariaCurrent: null,
+    ariaDescribedBy: spaceSeparated,
+    ariaDetails: null,
+    ariaDisabled: booleanish,
+    ariaDropEffect: spaceSeparated,
+    ariaErrorMessage: null,
+    ariaExpanded: booleanish,
+    ariaFlowTo: spaceSeparated,
+    ariaGrabbed: booleanish,
+    ariaHasPopup: null,
+    ariaHidden: booleanish,
+    ariaInvalid: null,
+    ariaKeyShortcuts: null,
+    ariaLabel: null,
+    ariaLabelledBy: spaceSeparated,
+    ariaLevel: number,
+    ariaLive: null,
+    ariaModal: booleanish,
+    ariaMultiLine: booleanish,
+    ariaMultiSelectable: booleanish,
+    ariaOrientation: null,
+    ariaOwns: spaceSeparated,
+    ariaPlaceholder: null,
+    ariaPosInSet: number,
+    ariaPressed: booleanish,
+    ariaReadOnly: booleanish,
+    ariaRelevant: null,
+    ariaRequired: booleanish,
+    ariaRoleDescription: spaceSeparated,
+    ariaRowCount: number,
+    ariaRowIndex: number,
+    ariaRowSpan: number,
+    ariaSelected: booleanish,
+    ariaSetSize: number,
+    ariaSort: null,
+    ariaValueMax: number,
+    ariaValueMin: number,
+    ariaValueNow: number,
+    ariaValueText: null,
+    role: null
+  },
+  transform(_, property) {
+    return property === "role" ? property : "aria-" + property.slice(4).toLowerCase();
+  }
+});
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/util/case-sensitive-transform.js
+function caseSensitiveTransform(attributes, attribute) {
+  return attribute in attributes ? attributes[attribute] : attribute;
+}
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/util/case-insensitive-transform.js
+function caseInsensitiveTransform(attributes, property) {
+  return caseSensitiveTransform(attributes, property.toLowerCase());
+}
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/html.js
+var html3 = create({
+  attributes: {
+    acceptcharset: "accept-charset",
+    classname: "class",
+    htmlfor: "for",
+    httpequiv: "http-equiv"
+  },
+  mustUseProperty: ["checked", "multiple", "muted", "selected"],
+  properties: {
+    abbr: null,
+    accept: commaSeparated,
+    acceptCharset: spaceSeparated,
+    accessKey: spaceSeparated,
+    action: null,
+    allow: null,
+    allowFullScreen: boolean,
+    allowPaymentRequest: boolean,
+    allowUserMedia: boolean,
+    alt: null,
+    as: null,
+    async: boolean,
+    autoCapitalize: null,
+    autoComplete: spaceSeparated,
+    autoFocus: boolean,
+    autoPlay: boolean,
+    blocking: spaceSeparated,
+    capture: null,
+    charSet: null,
+    checked: boolean,
+    cite: null,
+    className: spaceSeparated,
+    cols: number,
+    colSpan: null,
+    content: null,
+    contentEditable: booleanish,
+    controls: boolean,
+    controlsList: spaceSeparated,
+    coords: number | commaSeparated,
+    crossOrigin: null,
+    data: null,
+    dateTime: null,
+    decoding: null,
+    default: boolean,
+    defer: boolean,
+    dir: null,
+    dirName: null,
+    disabled: boolean,
+    download: overloadedBoolean,
+    draggable: booleanish,
+    encType: null,
+    enterKeyHint: null,
+    fetchPriority: null,
+    form: null,
+    formAction: null,
+    formEncType: null,
+    formMethod: null,
+    formNoValidate: boolean,
+    formTarget: null,
+    headers: spaceSeparated,
+    height: number,
+    hidden: boolean,
+    high: number,
+    href: null,
+    hrefLang: null,
+    htmlFor: spaceSeparated,
+    httpEquiv: spaceSeparated,
+    id: null,
+    imageSizes: null,
+    imageSrcSet: null,
+    inert: boolean,
+    inputMode: null,
+    integrity: null,
+    is: null,
+    isMap: boolean,
+    itemId: null,
+    itemProp: spaceSeparated,
+    itemRef: spaceSeparated,
+    itemScope: boolean,
+    itemType: spaceSeparated,
+    kind: null,
+    label: null,
+    lang: null,
+    language: null,
+    list: null,
+    loading: null,
+    loop: boolean,
+    low: number,
+    manifest: null,
+    max: null,
+    maxLength: number,
+    media: null,
+    method: null,
+    min: null,
+    minLength: number,
+    multiple: boolean,
+    muted: boolean,
+    name: null,
+    nonce: null,
+    noModule: boolean,
+    noValidate: boolean,
+    onAbort: null,
+    onAfterPrint: null,
+    onAuxClick: null,
+    onBeforeMatch: null,
+    onBeforePrint: null,
+    onBeforeToggle: null,
+    onBeforeUnload: null,
+    onBlur: null,
+    onCancel: null,
+    onCanPlay: null,
+    onCanPlayThrough: null,
+    onChange: null,
+    onClick: null,
+    onClose: null,
+    onContextLost: null,
+    onContextMenu: null,
+    onContextRestored: null,
+    onCopy: null,
+    onCueChange: null,
+    onCut: null,
+    onDblClick: null,
+    onDrag: null,
+    onDragEnd: null,
+    onDragEnter: null,
+    onDragExit: null,
+    onDragLeave: null,
+    onDragOver: null,
+    onDragStart: null,
+    onDrop: null,
+    onDurationChange: null,
+    onEmptied: null,
+    onEnded: null,
+    onError: null,
+    onFocus: null,
+    onFormData: null,
+    onHashChange: null,
+    onInput: null,
+    onInvalid: null,
+    onKeyDown: null,
+    onKeyPress: null,
+    onKeyUp: null,
+    onLanguageChange: null,
+    onLoad: null,
+    onLoadedData: null,
+    onLoadedMetadata: null,
+    onLoadEnd: null,
+    onLoadStart: null,
+    onMessage: null,
+    onMessageError: null,
+    onMouseDown: null,
+    onMouseEnter: null,
+    onMouseLeave: null,
+    onMouseMove: null,
+    onMouseOut: null,
+    onMouseOver: null,
+    onMouseUp: null,
+    onOffline: null,
+    onOnline: null,
+    onPageHide: null,
+    onPageShow: null,
+    onPaste: null,
+    onPause: null,
+    onPlay: null,
+    onPlaying: null,
+    onPopState: null,
+    onProgress: null,
+    onRateChange: null,
+    onRejectionHandled: null,
+    onReset: null,
+    onResize: null,
+    onScroll: null,
+    onScrollEnd: null,
+    onSecurityPolicyViolation: null,
+    onSeeked: null,
+    onSeeking: null,
+    onSelect: null,
+    onSlotChange: null,
+    onStalled: null,
+    onStorage: null,
+    onSubmit: null,
+    onSuspend: null,
+    onTimeUpdate: null,
+    onToggle: null,
+    onUnhandledRejection: null,
+    onUnload: null,
+    onVolumeChange: null,
+    onWaiting: null,
+    onWheel: null,
+    open: boolean,
+    optimum: number,
+    pattern: null,
+    ping: spaceSeparated,
+    placeholder: null,
+    playsInline: boolean,
+    popover: null,
+    popoverTarget: null,
+    popoverTargetAction: null,
+    poster: null,
+    preload: null,
+    readOnly: boolean,
+    referrerPolicy: null,
+    rel: spaceSeparated,
+    required: boolean,
+    reversed: boolean,
+    rows: number,
+    rowSpan: number,
+    sandbox: spaceSeparated,
+    scope: null,
+    scoped: boolean,
+    seamless: boolean,
+    selected: boolean,
+    shadowRootClonable: boolean,
+    shadowRootDelegatesFocus: boolean,
+    shadowRootMode: null,
+    shape: null,
+    size: number,
+    sizes: null,
+    slot: null,
+    span: number,
+    spellCheck: booleanish,
+    src: null,
+    srcDoc: null,
+    srcLang: null,
+    srcSet: null,
+    start: number,
+    step: null,
+    style: null,
+    tabIndex: number,
+    target: null,
+    title: null,
+    translate: null,
+    type: null,
+    typeMustMatch: boolean,
+    useMap: null,
+    value: booleanish,
+    width: number,
+    wrap: null,
+    writingSuggestions: null,
+    align: null,
+    aLink: null,
+    archive: spaceSeparated,
+    axis: null,
+    background: null,
+    bgColor: null,
+    border: number,
+    borderColor: null,
+    bottomMargin: number,
+    cellPadding: null,
+    cellSpacing: null,
+    char: null,
+    charOff: null,
+    classId: null,
+    clear: null,
+    code: null,
+    codeBase: null,
+    codeType: null,
+    color: null,
+    compact: boolean,
+    declare: boolean,
+    event: null,
+    face: null,
+    frame: null,
+    frameBorder: null,
+    hSpace: number,
+    leftMargin: number,
+    link: null,
+    longDesc: null,
+    lowSrc: null,
+    marginHeight: number,
+    marginWidth: number,
+    noResize: boolean,
+    noHref: boolean,
+    noShade: boolean,
+    noWrap: boolean,
+    object: null,
+    profile: null,
+    prompt: null,
+    rev: null,
+    rightMargin: number,
+    rules: null,
+    scheme: null,
+    scrolling: booleanish,
+    standby: null,
+    summary: null,
+    text: null,
+    topMargin: number,
+    valueType: null,
+    version: null,
+    vAlign: null,
+    vLink: null,
+    vSpace: number,
+    allowTransparency: null,
+    autoCorrect: null,
+    autoSave: null,
+    disablePictureInPicture: boolean,
+    disableRemotePlayback: boolean,
+    prefix: null,
+    property: null,
+    results: number,
+    security: null,
+    unselectable: null
+  },
+  space: "html",
+  transform: caseInsensitiveTransform
+});
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/svg.js
+var svg = create({
+  attributes: {
+    accentHeight: "accent-height",
+    alignmentBaseline: "alignment-baseline",
+    arabicForm: "arabic-form",
+    baselineShift: "baseline-shift",
+    capHeight: "cap-height",
+    className: "class",
+    clipPath: "clip-path",
+    clipRule: "clip-rule",
+    colorInterpolation: "color-interpolation",
+    colorInterpolationFilters: "color-interpolation-filters",
+    colorProfile: "color-profile",
+    colorRendering: "color-rendering",
+    crossOrigin: "crossorigin",
+    dataType: "datatype",
+    dominantBaseline: "dominant-baseline",
+    enableBackground: "enable-background",
+    fillOpacity: "fill-opacity",
+    fillRule: "fill-rule",
+    floodColor: "flood-color",
+    floodOpacity: "flood-opacity",
+    fontFamily: "font-family",
+    fontSize: "font-size",
+    fontSizeAdjust: "font-size-adjust",
+    fontStretch: "font-stretch",
+    fontStyle: "font-style",
+    fontVariant: "font-variant",
+    fontWeight: "font-weight",
+    glyphName: "glyph-name",
+    glyphOrientationHorizontal: "glyph-orientation-horizontal",
+    glyphOrientationVertical: "glyph-orientation-vertical",
+    hrefLang: "hreflang",
+    horizAdvX: "horiz-adv-x",
+    horizOriginX: "horiz-origin-x",
+    horizOriginY: "horiz-origin-y",
+    imageRendering: "image-rendering",
+    letterSpacing: "letter-spacing",
+    lightingColor: "lighting-color",
+    markerEnd: "marker-end",
+    markerMid: "marker-mid",
+    markerStart: "marker-start",
+    navDown: "nav-down",
+    navDownLeft: "nav-down-left",
+    navDownRight: "nav-down-right",
+    navLeft: "nav-left",
+    navNext: "nav-next",
+    navPrev: "nav-prev",
+    navRight: "nav-right",
+    navUp: "nav-up",
+    navUpLeft: "nav-up-left",
+    navUpRight: "nav-up-right",
+    onAbort: "onabort",
+    onActivate: "onactivate",
+    onAfterPrint: "onafterprint",
+    onBeforePrint: "onbeforeprint",
+    onBegin: "onbegin",
+    onCancel: "oncancel",
+    onCanPlay: "oncanplay",
+    onCanPlayThrough: "oncanplaythrough",
+    onChange: "onchange",
+    onClick: "onclick",
+    onClose: "onclose",
+    onCopy: "oncopy",
+    onCueChange: "oncuechange",
+    onCut: "oncut",
+    onDblClick: "ondblclick",
+    onDrag: "ondrag",
+    onDragEnd: "ondragend",
+    onDragEnter: "ondragenter",
+    onDragExit: "ondragexit",
+    onDragLeave: "ondragleave",
+    onDragOver: "ondragover",
+    onDragStart: "ondragstart",
+    onDrop: "ondrop",
+    onDurationChange: "ondurationchange",
+    onEmptied: "onemptied",
+    onEnd: "onend",
+    onEnded: "onended",
+    onError: "onerror",
+    onFocus: "onfocus",
+    onFocusIn: "onfocusin",
+    onFocusOut: "onfocusout",
+    onHashChange: "onhashchange",
+    onInput: "oninput",
+    onInvalid: "oninvalid",
+    onKeyDown: "onkeydown",
+    onKeyPress: "onkeypress",
+    onKeyUp: "onkeyup",
+    onLoad: "onload",
+    onLoadedData: "onloadeddata",
+    onLoadedMetadata: "onloadedmetadata",
+    onLoadStart: "onloadstart",
+    onMessage: "onmessage",
+    onMouseDown: "onmousedown",
+    onMouseEnter: "onmouseenter",
+    onMouseLeave: "onmouseleave",
+    onMouseMove: "onmousemove",
+    onMouseOut: "onmouseout",
+    onMouseOver: "onmouseover",
+    onMouseUp: "onmouseup",
+    onMouseWheel: "onmousewheel",
+    onOffline: "onoffline",
+    onOnline: "ononline",
+    onPageHide: "onpagehide",
+    onPageShow: "onpageshow",
+    onPaste: "onpaste",
+    onPause: "onpause",
+    onPlay: "onplay",
+    onPlaying: "onplaying",
+    onPopState: "onpopstate",
+    onProgress: "onprogress",
+    onRateChange: "onratechange",
+    onRepeat: "onrepeat",
+    onReset: "onreset",
+    onResize: "onresize",
+    onScroll: "onscroll",
+    onSeeked: "onseeked",
+    onSeeking: "onseeking",
+    onSelect: "onselect",
+    onShow: "onshow",
+    onStalled: "onstalled",
+    onStorage: "onstorage",
+    onSubmit: "onsubmit",
+    onSuspend: "onsuspend",
+    onTimeUpdate: "ontimeupdate",
+    onToggle: "ontoggle",
+    onUnload: "onunload",
+    onVolumeChange: "onvolumechange",
+    onWaiting: "onwaiting",
+    onZoom: "onzoom",
+    overlinePosition: "overline-position",
+    overlineThickness: "overline-thickness",
+    paintOrder: "paint-order",
+    panose1: "panose-1",
+    pointerEvents: "pointer-events",
+    referrerPolicy: "referrerpolicy",
+    renderingIntent: "rendering-intent",
+    shapeRendering: "shape-rendering",
+    stopColor: "stop-color",
+    stopOpacity: "stop-opacity",
+    strikethroughPosition: "strikethrough-position",
+    strikethroughThickness: "strikethrough-thickness",
+    strokeDashArray: "stroke-dasharray",
+    strokeDashOffset: "stroke-dashoffset",
+    strokeLineCap: "stroke-linecap",
+    strokeLineJoin: "stroke-linejoin",
+    strokeMiterLimit: "stroke-miterlimit",
+    strokeOpacity: "stroke-opacity",
+    strokeWidth: "stroke-width",
+    tabIndex: "tabindex",
+    textAnchor: "text-anchor",
+    textDecoration: "text-decoration",
+    textRendering: "text-rendering",
+    transformOrigin: "transform-origin",
+    typeOf: "typeof",
+    underlinePosition: "underline-position",
+    underlineThickness: "underline-thickness",
+    unicodeBidi: "unicode-bidi",
+    unicodeRange: "unicode-range",
+    unitsPerEm: "units-per-em",
+    vAlphabetic: "v-alphabetic",
+    vHanging: "v-hanging",
+    vIdeographic: "v-ideographic",
+    vMathematical: "v-mathematical",
+    vectorEffect: "vector-effect",
+    vertAdvY: "vert-adv-y",
+    vertOriginX: "vert-origin-x",
+    vertOriginY: "vert-origin-y",
+    wordSpacing: "word-spacing",
+    writingMode: "writing-mode",
+    xHeight: "x-height",
+    playbackOrder: "playbackorder",
+    timelineBegin: "timelinebegin"
+  },
+  properties: {
+    about: commaOrSpaceSeparated,
+    accentHeight: number,
+    accumulate: null,
+    additive: null,
+    alignmentBaseline: null,
+    alphabetic: number,
+    amplitude: number,
+    arabicForm: null,
+    ascent: number,
+    attributeName: null,
+    attributeType: null,
+    azimuth: number,
+    bandwidth: null,
+    baselineShift: null,
+    baseFrequency: null,
+    baseProfile: null,
+    bbox: null,
+    begin: null,
+    bias: number,
+    by: null,
+    calcMode: null,
+    capHeight: number,
+    className: spaceSeparated,
+    clip: null,
+    clipPath: null,
+    clipPathUnits: null,
+    clipRule: null,
+    color: null,
+    colorInterpolation: null,
+    colorInterpolationFilters: null,
+    colorProfile: null,
+    colorRendering: null,
+    content: null,
+    contentScriptType: null,
+    contentStyleType: null,
+    crossOrigin: null,
+    cursor: null,
+    cx: null,
+    cy: null,
+    d: null,
+    dataType: null,
+    defaultAction: null,
+    descent: number,
+    diffuseConstant: number,
+    direction: null,
+    display: null,
+    dur: null,
+    divisor: number,
+    dominantBaseline: null,
+    download: boolean,
+    dx: null,
+    dy: null,
+    edgeMode: null,
+    editable: null,
+    elevation: number,
+    enableBackground: null,
+    end: null,
+    event: null,
+    exponent: number,
+    externalResourcesRequired: null,
+    fill: null,
+    fillOpacity: number,
+    fillRule: null,
+    filter: null,
+    filterRes: null,
+    filterUnits: null,
+    floodColor: null,
+    floodOpacity: null,
+    focusable: null,
+    focusHighlight: null,
+    fontFamily: null,
+    fontSize: null,
+    fontSizeAdjust: null,
+    fontStretch: null,
+    fontStyle: null,
+    fontVariant: null,
+    fontWeight: null,
+    format: null,
+    fr: null,
+    from: null,
+    fx: null,
+    fy: null,
+    g1: commaSeparated,
+    g2: commaSeparated,
+    glyphName: commaSeparated,
+    glyphOrientationHorizontal: null,
+    glyphOrientationVertical: null,
+    glyphRef: null,
+    gradientTransform: null,
+    gradientUnits: null,
+    handler: null,
+    hanging: number,
+    hatchContentUnits: null,
+    hatchUnits: null,
+    height: null,
+    href: null,
+    hrefLang: null,
+    horizAdvX: number,
+    horizOriginX: number,
+    horizOriginY: number,
+    id: null,
+    ideographic: number,
+    imageRendering: null,
+    initialVisibility: null,
+    in: null,
+    in2: null,
+    intercept: number,
+    k: number,
+    k1: number,
+    k2: number,
+    k3: number,
+    k4: number,
+    kernelMatrix: commaOrSpaceSeparated,
+    kernelUnitLength: null,
+    keyPoints: null,
+    keySplines: null,
+    keyTimes: null,
+    kerning: null,
+    lang: null,
+    lengthAdjust: null,
+    letterSpacing: null,
+    lightingColor: null,
+    limitingConeAngle: number,
+    local: null,
+    markerEnd: null,
+    markerMid: null,
+    markerStart: null,
+    markerHeight: null,
+    markerUnits: null,
+    markerWidth: null,
+    mask: null,
+    maskContentUnits: null,
+    maskUnits: null,
+    mathematical: null,
+    max: null,
+    media: null,
+    mediaCharacterEncoding: null,
+    mediaContentEncodings: null,
+    mediaSize: number,
+    mediaTime: null,
+    method: null,
+    min: null,
+    mode: null,
+    name: null,
+    navDown: null,
+    navDownLeft: null,
+    navDownRight: null,
+    navLeft: null,
+    navNext: null,
+    navPrev: null,
+    navRight: null,
+    navUp: null,
+    navUpLeft: null,
+    navUpRight: null,
+    numOctaves: null,
+    observer: null,
+    offset: null,
+    onAbort: null,
+    onActivate: null,
+    onAfterPrint: null,
+    onBeforePrint: null,
+    onBegin: null,
+    onCancel: null,
+    onCanPlay: null,
+    onCanPlayThrough: null,
+    onChange: null,
+    onClick: null,
+    onClose: null,
+    onCopy: null,
+    onCueChange: null,
+    onCut: null,
+    onDblClick: null,
+    onDrag: null,
+    onDragEnd: null,
+    onDragEnter: null,
+    onDragExit: null,
+    onDragLeave: null,
+    onDragOver: null,
+    onDragStart: null,
+    onDrop: null,
+    onDurationChange: null,
+    onEmptied: null,
+    onEnd: null,
+    onEnded: null,
+    onError: null,
+    onFocus: null,
+    onFocusIn: null,
+    onFocusOut: null,
+    onHashChange: null,
+    onInput: null,
+    onInvalid: null,
+    onKeyDown: null,
+    onKeyPress: null,
+    onKeyUp: null,
+    onLoad: null,
+    onLoadedData: null,
+    onLoadedMetadata: null,
+    onLoadStart: null,
+    onMessage: null,
+    onMouseDown: null,
+    onMouseEnter: null,
+    onMouseLeave: null,
+    onMouseMove: null,
+    onMouseOut: null,
+    onMouseOver: null,
+    onMouseUp: null,
+    onMouseWheel: null,
+    onOffline: null,
+    onOnline: null,
+    onPageHide: null,
+    onPageShow: null,
+    onPaste: null,
+    onPause: null,
+    onPlay: null,
+    onPlaying: null,
+    onPopState: null,
+    onProgress: null,
+    onRateChange: null,
+    onRepeat: null,
+    onReset: null,
+    onResize: null,
+    onScroll: null,
+    onSeeked: null,
+    onSeeking: null,
+    onSelect: null,
+    onShow: null,
+    onStalled: null,
+    onStorage: null,
+    onSubmit: null,
+    onSuspend: null,
+    onTimeUpdate: null,
+    onToggle: null,
+    onUnload: null,
+    onVolumeChange: null,
+    onWaiting: null,
+    onZoom: null,
+    opacity: null,
+    operator: null,
+    order: null,
+    orient: null,
+    orientation: null,
+    origin: null,
+    overflow: null,
+    overlay: null,
+    overlinePosition: number,
+    overlineThickness: number,
+    paintOrder: null,
+    panose1: null,
+    path: null,
+    pathLength: number,
+    patternContentUnits: null,
+    patternTransform: null,
+    patternUnits: null,
+    phase: null,
+    ping: spaceSeparated,
+    pitch: null,
+    playbackOrder: null,
+    pointerEvents: null,
+    points: null,
+    pointsAtX: number,
+    pointsAtY: number,
+    pointsAtZ: number,
+    preserveAlpha: null,
+    preserveAspectRatio: null,
+    primitiveUnits: null,
+    propagate: null,
+    property: commaOrSpaceSeparated,
+    r: null,
+    radius: null,
+    referrerPolicy: null,
+    refX: null,
+    refY: null,
+    rel: commaOrSpaceSeparated,
+    rev: commaOrSpaceSeparated,
+    renderingIntent: null,
+    repeatCount: null,
+    repeatDur: null,
+    requiredExtensions: commaOrSpaceSeparated,
+    requiredFeatures: commaOrSpaceSeparated,
+    requiredFonts: commaOrSpaceSeparated,
+    requiredFormats: commaOrSpaceSeparated,
+    resource: null,
+    restart: null,
+    result: null,
+    rotate: null,
+    rx: null,
+    ry: null,
+    scale: null,
+    seed: null,
+    shapeRendering: null,
+    side: null,
+    slope: null,
+    snapshotTime: null,
+    specularConstant: number,
+    specularExponent: number,
+    spreadMethod: null,
+    spacing: null,
+    startOffset: null,
+    stdDeviation: null,
+    stemh: null,
+    stemv: null,
+    stitchTiles: null,
+    stopColor: null,
+    stopOpacity: null,
+    strikethroughPosition: number,
+    strikethroughThickness: number,
+    string: null,
+    stroke: null,
+    strokeDashArray: commaOrSpaceSeparated,
+    strokeDashOffset: null,
+    strokeLineCap: null,
+    strokeLineJoin: null,
+    strokeMiterLimit: number,
+    strokeOpacity: number,
+    strokeWidth: null,
+    style: null,
+    surfaceScale: number,
+    syncBehavior: null,
+    syncBehaviorDefault: null,
+    syncMaster: null,
+    syncTolerance: null,
+    syncToleranceDefault: null,
+    systemLanguage: commaOrSpaceSeparated,
+    tabIndex: number,
+    tableValues: null,
+    target: null,
+    targetX: number,
+    targetY: number,
+    textAnchor: null,
+    textDecoration: null,
+    textRendering: null,
+    textLength: null,
+    timelineBegin: null,
+    title: null,
+    transformBehavior: null,
+    type: null,
+    typeOf: commaOrSpaceSeparated,
+    to: null,
+    transform: null,
+    transformOrigin: null,
+    u1: null,
+    u2: null,
+    underlinePosition: number,
+    underlineThickness: number,
+    unicode: null,
+    unicodeBidi: null,
+    unicodeRange: null,
+    unitsPerEm: number,
+    values: null,
+    vAlphabetic: number,
+    vMathematical: number,
+    vectorEffect: null,
+    vHanging: number,
+    vIdeographic: number,
+    version: null,
+    vertAdvY: number,
+    vertOriginX: number,
+    vertOriginY: number,
+    viewBox: null,
+    viewTarget: null,
+    visibility: null,
+    width: null,
+    widths: null,
+    wordSpacing: null,
+    writingMode: null,
+    x: null,
+    x1: null,
+    x2: null,
+    xChannelSelector: null,
+    xHeight: number,
+    y: null,
+    y1: null,
+    y2: null,
+    yChannelSelector: null,
+    z: null,
+    zoomAndPan: null
+  },
+  space: "svg",
+  transform: caseSensitiveTransform
+});
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/xlink.js
+var xlink = create({
+  properties: {
+    xLinkActuate: null,
+    xLinkArcRole: null,
+    xLinkHref: null,
+    xLinkRole: null,
+    xLinkShow: null,
+    xLinkTitle: null,
+    xLinkType: null
+  },
+  space: "xlink",
+  transform(_, property) {
+    return "xlink:" + property.slice(5).toLowerCase();
+  }
+});
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/xmlns.js
+var xmlns = create({
+  attributes: { xmlnsxlink: "xmlns:xlink" },
+  properties: { xmlnsXLink: null, xmlns: null },
+  space: "xmlns",
+  transform: caseInsensitiveTransform
+});
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/xml.js
+var xml = create({
+  properties: { xmlBase: null, xmlLang: null, xmlSpace: null },
+  space: "xml",
+  transform(_, property) {
+    return "xml:" + property.slice(3).toLowerCase();
+  }
+});
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/find.js
+var cap = /[A-Z]/g;
+var dash = /-[a-z]/g;
+var valid = /^data[-\w.:]+$/i;
+function find(schema, value) {
+  const normal = normalize(value);
+  let property = value;
+  let Type = Info;
+  if (normal in schema.normal) {
+    return schema.property[schema.normal[normal]];
+  }
+  if (normal.length > 4 && normal.slice(0, 4) === "data" && valid.test(value)) {
+    if (value.charAt(4) === "-") {
+      const rest = value.slice(5).replace(dash, camelcase);
+      property = "data" + rest.charAt(0).toUpperCase() + rest.slice(1);
+    } else {
+      const rest = value.slice(4);
+      if (!dash.test(rest)) {
+        let dashes = rest.replace(cap, kebab);
+        if (dashes.charAt(0) !== "-") {
+          dashes = "-" + dashes;
+        }
+        value = "data" + dashes;
+      }
+    }
+    Type = DefinedInfo;
+  }
+  return new Type(property, value);
+}
+function kebab($0) {
+  return "-" + $0.toLowerCase();
+}
+function camelcase($0) {
+  return $0.charAt(1).toUpperCase();
+}
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/index.js
+var html4 = merge([aria, html3, xlink, xmlns, xml], "html");
+var svg2 = merge([aria, svg, xlink, xmlns, xml], "svg");
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/comma-separated-tokens/index.js
+function parse3(value) {
+  const tokens = [];
+  const input = String(value || "");
+  let index2 = input.indexOf(",");
+  let start = 0;
+  let end = false;
+  while (!end) {
+    if (index2 === -1) {
+      index2 = input.length;
+      end = true;
+    }
+    const token = input.slice(start, index2).trim();
+    if (token || !end) {
+      tokens.push(token);
+    }
+    start = index2 + 1;
+    index2 = input.indexOf(",", start);
+  }
+  return tokens;
+}
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/hast-util-parse-selector/lib/index.js
+var search2 = /[#.]/g;
+function parseSelector(selector, defaultTagName) {
+  const value = selector || "";
+  const props = {};
+  let start = 0;
+  let previous4;
+  let tagName;
+  while (start < value.length) {
+    search2.lastIndex = start;
+    const match = search2.exec(value);
+    const subvalue = value.slice(start, match ? match.index : value.length);
+    if (subvalue) {
+      if (!previous4) {
+        tagName = subvalue;
+      } else if (previous4 === "#") {
+        props.id = subvalue;
+      } else if (Array.isArray(props.className)) {
+        props.className.push(subvalue);
+      } else {
+        props.className = [subvalue];
+      }
+      start += subvalue.length;
+    }
+    if (match) {
+      previous4 = match[0];
+      start++;
+    }
+  }
+  return {
+    type: "element",
+    tagName: tagName || defaultTagName || "div",
+    properties: props,
+    children: []
+  };
+}
+// node_modules/hast-util-from-dom/node_modules/hastscript/lib/create-h.js
+function createH(schema, defaultTagName, caseSensitive) {
+  const adjust = caseSensitive ? createAdjustMap(caseSensitive) : undefined;
+  function h(selector, properties, ...children) {
+    let node2;
+    if (selector === null || selector === undefined) {
+      node2 = { type: "root", children: [] };
+      const child = properties;
+      children.unshift(child);
+    } else {
+      node2 = parseSelector(selector, defaultTagName);
+      const lower = node2.tagName.toLowerCase();
+      const adjusted = adjust ? adjust.get(lower) : undefined;
+      node2.tagName = adjusted || lower;
+      if (isChild(properties)) {
+        children.unshift(properties);
+      } else {
+        for (const [key, value] of Object.entries(properties)) {
+          addProperty(schema, node2.properties, key, value);
+        }
+      }
+    }
+    for (const child of children) {
+      addChild(node2.children, child);
+    }
+    if (node2.type === "element" && node2.tagName === "template") {
+      node2.content = { type: "root", children: node2.children };
+      node2.children = [];
+    }
+    return node2;
+  }
+  return h;
+}
+function isChild(value) {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    return true;
+  }
+  if (typeof value.type !== "string")
+    return false;
+  const record = value;
+  const keys2 = Object.keys(value);
+  for (const key of keys2) {
+    const value2 = record[key];
+    if (value2 && typeof value2 === "object") {
+      if (!Array.isArray(value2))
+        return true;
+      const list4 = value2;
+      for (const item of list4) {
+        if (typeof item !== "number" && typeof item !== "string") {
+          return true;
+        }
+      }
+    }
+  }
+  if ("children" in value && Array.isArray(value.children)) {
+    return true;
+  }
+  return false;
+}
+function addProperty(schema, properties, key, value) {
+  const info = find(schema, key);
+  let result;
+  if (value === null || value === undefined)
+    return;
+  if (typeof value === "number") {
+    if (Number.isNaN(value))
+      return;
+    result = value;
+  } else if (typeof value === "boolean") {
+    result = value;
+  } else if (typeof value === "string") {
+    if (info.spaceSeparated) {
+      result = parse2(value);
+    } else if (info.commaSeparated) {
+      result = parse3(value);
+    } else if (info.commaOrSpaceSeparated) {
+      result = parse2(parse3(value).join(" "));
+    } else {
+      result = parsePrimitive(info, info.property, value);
+    }
+  } else if (Array.isArray(value)) {
+    result = [...value];
+  } else {
+    result = info.property === "style" ? style(value) : String(value);
+  }
+  if (Array.isArray(result)) {
+    const finalResult = [];
+    for (const item of result) {
+      finalResult.push(parsePrimitive(info, info.property, item));
+    }
+    result = finalResult;
+  }
+  if (info.property === "className" && Array.isArray(properties.className)) {
+    result = properties.className.concat(result);
+  }
+  properties[info.property] = result;
+}
+function addChild(nodes, value) {
+  if (value === null || value === undefined) {} else if (typeof value === "number" || typeof value === "string") {
+    nodes.push({ type: "text", value: String(value) });
+  } else if (Array.isArray(value)) {
+    for (const child of value) {
+      addChild(nodes, child);
+    }
+  } else if (typeof value === "object" && "type" in value) {
+    if (value.type === "root") {
+      addChild(nodes, value.children);
+    } else {
+      nodes.push(value);
+    }
+  } else {
+    throw new Error("Expected node, nodes, or string, got `" + value + "`");
+  }
+}
+function parsePrimitive(info, name, value) {
+  if (typeof value === "string") {
+    if (info.number && value && !Number.isNaN(Number(value))) {
+      return Number(value);
+    }
+    if ((info.boolean || info.overloadedBoolean) && (value === "" || normalize(value) === normalize(name))) {
+      return true;
+    }
+  }
+  return value;
+}
+function style(styles) {
+  const result = [];
+  for (const [key, value] of Object.entries(styles)) {
+    result.push([key, value].join(": "));
+  }
+  return result.join("; ");
+}
+function createAdjustMap(values2) {
+  const result = new Map;
+  for (const value of values2) {
+    result.set(value.toLowerCase(), value);
+  }
+  return result;
+}
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/lib/svg-case-sensitive-tag-names.js
+var svgCaseSensitiveTagNames = [
+  "altGlyph",
+  "altGlyphDef",
+  "altGlyphItem",
+  "animateColor",
+  "animateMotion",
+  "animateTransform",
+  "clipPath",
+  "feBlend",
+  "feColorMatrix",
+  "feComponentTransfer",
+  "feComposite",
+  "feConvolveMatrix",
+  "feDiffuseLighting",
+  "feDisplacementMap",
+  "feDistantLight",
+  "feDropShadow",
+  "feFlood",
+  "feFuncA",
+  "feFuncB",
+  "feFuncG",
+  "feFuncR",
+  "feGaussianBlur",
+  "feImage",
+  "feMerge",
+  "feMergeNode",
+  "feMorphology",
+  "feOffset",
+  "fePointLight",
+  "feSpecularLighting",
+  "feSpotLight",
+  "feTile",
+  "feTurbulence",
+  "foreignObject",
+  "glyphRef",
+  "linearGradient",
+  "radialGradient",
+  "solidColor",
+  "textArea",
+  "textPath"
+];
+
+// node_modules/hast-util-from-dom/node_modules/hastscript/lib/index.js
+var h = createH(html4, "div");
+var s = createH(svg2, "g", svgCaseSensitiveTagNames);
+// node_modules/web-namespaces/index.js
+var webNamespaces = {
+  html: "http://www.w3.org/1999/xhtml",
+  mathml: "http://www.w3.org/1998/Math/MathML",
+  svg: "http://www.w3.org/2000/svg",
+  xlink: "http://www.w3.org/1999/xlink",
+  xml: "http://www.w3.org/XML/1998/namespace",
+  xmlns: "http://www.w3.org/2000/xmlns/"
+};
+
+// node_modules/hast-util-from-dom/lib/index.js
+function fromDom(tree, options) {
+  return transform(tree, options || {}) || { type: "root", children: [] };
+}
+function transform(node2, options) {
+  const transformed = one3(node2, options);
+  if (transformed && options.afterTransform)
+    options.afterTransform(node2, transformed);
+  return transformed;
+}
+function one3(node2, options) {
+  switch (node2.nodeType) {
+    case 1: {
+      const domNode = node2;
+      return element3(domNode, options);
+    }
+    case 3: {
+      const domNode = node2;
+      return text6(domNode);
+    }
+    case 8: {
+      const domNode = node2;
+      return comment(domNode);
+    }
+    case 9: {
+      const domNode = node2;
+      return root3(domNode, options);
+    }
+    case 10: {
+      return doctype();
+    }
+    case 11: {
+      const domNode = node2;
+      return root3(domNode, options);
+    }
+    default: {
+      return;
+    }
+  }
+}
+function root3(node2, options) {
+  return { type: "root", children: all3(node2, options) };
+}
+function doctype() {
+  return { type: "doctype" };
+}
+function text6(node2) {
+  return { type: "text", value: node2.nodeValue || "" };
+}
+function comment(node2) {
+  return { type: "comment", value: node2.nodeValue || "" };
+}
+function element3(node2, options) {
+  const space2 = node2.namespaceURI;
+  const x = space2 === webNamespaces.svg ? s : h;
+  const tagName = space2 === webNamespaces.html ? node2.tagName.toLowerCase() : node2.tagName;
+  const content3 = space2 === webNamespaces.html && tagName === "template" ? node2.content : node2;
+  const attributes = node2.getAttributeNames();
+  const properties = {};
+  let index2 = -1;
+  while (++index2 < attributes.length) {
+    properties[attributes[index2]] = node2.getAttribute(attributes[index2]) || "";
+  }
+  return x(tagName, properties, all3(content3, options));
+}
+function all3(node2, options) {
+  const nodes = node2.childNodes;
+  const children = [];
+  let index2 = -1;
+  while (++index2 < nodes.length) {
+    const child = transform(nodes[index2], options);
+    if (child !== undefined) {
+      children.push(child);
+    }
+  }
+  return children;
+}
+// node_modules/hast-util-from-html-isomorphic/lib/browser.js
+var parser = new DOMParser;
+function fromHtmlIsomorphic(value, options) {
+  const node2 = options?.fragment ? parseFragment(value) : parser.parseFromString(value, "text/html");
+  return fromDom(node2);
+}
+function parseFragment(value) {
+  const template = document.createElement("template");
+  template.innerHTML = value;
+  return template.content;
+}
+
+// node_modules/unist-util-find-after/lib/index.js
+var findAfter = function(parent, index2, test) {
+  const is2 = convert(test);
+  if (!parent || !parent.type || !parent.children) {
+    throw new Error("Expected parent node");
+  }
+  if (typeof index2 === "number") {
+    if (index2 < 0 || index2 === Number.POSITIVE_INFINITY) {
+      throw new Error("Expected positive finite number as index");
+    }
+  } else {
+    index2 = parent.children.indexOf(index2);
+    if (index2 < 0) {
+      throw new Error("Expected child node or index");
+    }
+  }
+  while (++index2 < parent.children.length) {
+    if (is2(parent.children[index2], index2, parent)) {
+      return parent.children[index2];
+    }
+  }
+  return;
+};
+// node_modules/hast-util-to-text/lib/index.js
+var searchLineFeeds = /\n/g;
+var searchTabOrSpaces = /[\t ]+/g;
+var br = convertElement("br");
+var cell = convertElement(isCell);
+var p = convertElement("p");
+var row = convertElement("tr");
+var notRendered = convertElement([
+  "datalist",
+  "head",
+  "noembed",
+  "noframes",
+  "noscript",
+  "rp",
+  "script",
+  "style",
+  "template",
+  "title",
+  hidden,
+  closedDialog
+]);
+var blockOrCaption = convertElement([
+  "address",
+  "article",
+  "aside",
+  "blockquote",
+  "body",
+  "caption",
+  "center",
+  "dd",
+  "dialog",
+  "dir",
+  "dl",
+  "dt",
+  "div",
+  "figure",
+  "figcaption",
+  "footer",
+  "form,",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "header",
+  "hgroup",
+  "hr",
+  "html",
+  "legend",
+  "li",
+  "listing",
+  "main",
+  "menu",
+  "nav",
+  "ol",
+  "p",
+  "plaintext",
+  "pre",
+  "section",
+  "ul",
+  "xmp"
+]);
+function toText(tree, options) {
+  const options_ = options || {};
+  const children = "children" in tree ? tree.children : [];
+  const block = blockOrCaption(tree);
+  const whitespace = inferWhitespace(tree, {
+    whitespace: options_.whitespace || "normal",
+    breakBefore: false,
+    breakAfter: false
+  });
+  const results = [];
+  if (tree.type === "text" || tree.type === "comment") {
+    results.push(...collectText(tree, {
+      whitespace,
+      breakBefore: true,
+      breakAfter: true
+    }));
+  }
+  let index2 = -1;
+  while (++index2 < children.length) {
+    results.push(...renderedTextCollection(children[index2], tree, {
+      whitespace,
+      breakBefore: index2 ? undefined : block,
+      breakAfter: index2 < children.length - 1 ? br(children[index2 + 1]) : block
+    }));
+  }
+  const result = [];
+  let count;
+  index2 = -1;
+  while (++index2 < results.length) {
+    const value = results[index2];
+    if (typeof value === "number") {
+      if (count !== undefined && value > count)
+        count = value;
+    } else if (value) {
+      if (count !== undefined && count > -1) {
+        result.push(`
+`.repeat(count) || " ");
+      }
+      count = -1;
+      result.push(value);
+    }
+  }
+  return result.join("");
+}
+function renderedTextCollection(node2, parent, info) {
+  if (node2.type === "element") {
+    return collectElement(node2, parent, info);
+  }
+  if (node2.type === "text") {
+    return info.whitespace === "normal" ? collectText(node2, info) : collectPreText(node2);
+  }
+  return [];
+}
+function collectElement(node2, parent, info) {
+  const whitespace = inferWhitespace(node2, info);
+  const children = node2.children || [];
+  let index2 = -1;
+  let items = [];
+  if (notRendered(node2)) {
+    return items;
+  }
+  let prefix;
+  let suffix;
+  if (br(node2)) {
+    suffix = `
+`;
+  } else if (row(node2) && findAfter(parent, node2, row)) {
+    suffix = `
+`;
+  } else if (p(node2)) {
+    prefix = 2;
+    suffix = 2;
+  } else if (blockOrCaption(node2)) {
+    prefix = 1;
+    suffix = 1;
+  }
+  while (++index2 < children.length) {
+    items = items.concat(renderedTextCollection(children[index2], node2, {
+      whitespace,
+      breakBefore: index2 ? undefined : prefix,
+      breakAfter: index2 < children.length - 1 ? br(children[index2 + 1]) : suffix
+    }));
+  }
+  if (cell(node2) && findAfter(parent, node2, cell)) {
+    items.push("\t");
+  }
+  if (prefix)
+    items.unshift(prefix);
+  if (suffix)
+    items.push(suffix);
+  return items;
+}
+function collectText(node2, info) {
+  const value = String(node2.value);
+  const lines = [];
+  const result = [];
+  let start = 0;
+  while (start <= value.length) {
+    searchLineFeeds.lastIndex = start;
+    const match = searchLineFeeds.exec(value);
+    const end = match && "index" in match ? match.index : value.length;
+    lines.push(trimAndCollapseSpacesAndTabs(value.slice(start, end).replace(/[\u061C\u200E\u200F\u202A-\u202E\u2066-\u2069]/g, ""), start === 0 ? info.breakBefore : true, end === value.length ? info.breakAfter : true));
+    start = end + 1;
+  }
+  let index2 = -1;
+  let join;
+  while (++index2 < lines.length) {
+    if (lines[index2].charCodeAt(lines[index2].length - 1) === 8203 || index2 < lines.length - 1 && lines[index2 + 1].charCodeAt(0) === 8203) {
+      result.push(lines[index2]);
+      join = undefined;
+    } else if (lines[index2]) {
+      if (typeof join === "number")
+        result.push(join);
+      result.push(lines[index2]);
+      join = 0;
+    } else if (index2 === 0 || index2 === lines.length - 1) {
+      result.push(0);
+    }
+  }
+  return result;
+}
+function collectPreText(node2) {
+  return [String(node2.value)];
+}
+function trimAndCollapseSpacesAndTabs(value, breakBefore, breakAfter) {
+  const result = [];
+  let start = 0;
+  let end;
+  while (start < value.length) {
+    searchTabOrSpaces.lastIndex = start;
+    const match = searchTabOrSpaces.exec(value);
+    end = match ? match.index : value.length;
+    if (!start && !end && match && !breakBefore) {
+      result.push("");
+    }
+    if (start !== end) {
+      result.push(value.slice(start, end));
+    }
+    start = match ? end + match[0].length : end;
+  }
+  if (start !== end && !breakAfter) {
+    result.push("");
+  }
+  return result.join(" ");
+}
+function inferWhitespace(node2, info) {
+  if (node2.type === "element") {
+    const properties = node2.properties || {};
+    switch (node2.tagName) {
+      case "listing":
+      case "plaintext":
+      case "xmp": {
+        return "pre";
+      }
+      case "nobr": {
+        return "nowrap";
+      }
+      case "pre": {
+        return properties.wrap ? "pre-wrap" : "pre";
+      }
+      case "td":
+      case "th": {
+        return properties.noWrap ? "nowrap" : info.whitespace;
+      }
+      case "textarea": {
+        return "pre-wrap";
+      }
+      default:
+    }
+  }
+  return info.whitespace;
+}
+function hidden(node2) {
+  return Boolean((node2.properties || {}).hidden);
+}
+function isCell(node2) {
+  return node2.tagName === "td" || node2.tagName === "th";
+}
+function closedDialog(node2) {
+  return node2.tagName === "dialog" && !(node2.properties || {}).open;
+}
+// node_modules/rehype-katex/node_modules/katex/dist/katex.mjs
 class SourceLocation {
   constructor(lexer, start, end) {
     this.lexer = undefined;
@@ -10127,16 +13134,16 @@ class SourceLocation {
 }
 
 class Token {
-  constructor(text5, loc) {
+  constructor(text7, loc) {
     this.text = undefined;
     this.loc = undefined;
     this.noexpand = undefined;
     this.treatAsRelax = undefined;
-    this.text = text5;
+    this.text = text7;
     this.loc = loc;
   }
-  range(endToken, text5) {
-    return new Token(text5, SourceLocation.range(this, endToken));
+  range(endToken, text7) {
+    return new Token(text7, SourceLocation.range(this, endToken));
   }
 }
 
@@ -10186,8 +13193,8 @@ class ParseError {
   }
 }
 ParseError.prototype.__proto__ = Error.prototype;
-var contains = function contains2(list3, elem) {
-  return list3.indexOf(elem) !== -1;
+var contains = function contains2(list4, elem) {
+  return list4.indexOf(elem) !== -1;
 };
 var deflt = function deflt2(setting, defaultIfUndefined) {
   return setting === undefined ? defaultIfUndefined : setting;
@@ -10204,8 +13211,8 @@ var ESCAPE_LOOKUP = {
   "'": "&#x27;"
 };
 var ESCAPE_REGEX = /[&><"']/g;
-function escape(text5) {
-  return String(text5).replace(ESCAPE_REGEX, (match) => ESCAPE_LOOKUP[match]);
+function escape(text7) {
+  return String(text7).replace(ESCAPE_REGEX, (match) => ESCAPE_LOOKUP[match]);
 }
 var getBaseElem = function getBaseElem2(group) {
   if (group.type === "ordgroup") {
@@ -10331,7 +13338,7 @@ var SETTINGS_SCHEMA = {
     type: "number",
     default: Infinity,
     description: "If non-zero, all user-specified sizes, e.g. in " + "\\rule{500em}{500em}, will be capped to maxSize ems. Otherwise, " + "elements and spaces can be arbitrarily large",
-    processor: (s) => Math.max(0, s),
+    processor: (s2) => Math.max(0, s2),
     cli: "-s, --max-size <n>",
     cliProcessor: parseInt
   },
@@ -10536,7 +13543,7 @@ function scriptFromCodepoint(codepoint) {
   return null;
 }
 var allBlocks = [];
-scriptData.forEach((s) => s.blocks.forEach((b) => allBlocks.push(...b)));
+scriptData.forEach((s2) => s2.blocks.forEach((b) => allBlocks.push(...b)));
 function supportedCodepoint(codepoint) {
   for (var i = 0;i < allBlocks.length; i += 2) {
     if (codepoint >= allBlocks[i] && codepoint <= allBlocks[i + 1]) {
@@ -10988,8 +13995,8 @@ class DocumentFragment {
     return markup;
   }
   toText() {
-    var toText = (child) => child.toText();
-    return this.children.map(toText).join("");
+    var toText2 = (child) => child.toText();
+    return this.children.map(toText2).join("");
   }
 }
 var fontMetricsData = {
@@ -13252,8 +16259,8 @@ var sizeMultipliers = [
   2.074,
   2.488
 ];
-var sizeAtStyle = function sizeAtStyle2(size, style) {
-  return style.size < 2 ? size : sizeStyleMap[size - 1][style.size - 1];
+var sizeAtStyle = function sizeAtStyle2(size, style2) {
+  return style2.size < 2 ? size : sizeStyleMap[size - 1][style2.size - 1];
 };
 
 class Options {
@@ -13306,13 +16313,13 @@ class Options {
     }
     return new Options(data);
   }
-  havingStyle(style) {
-    if (this.style === style) {
+  havingStyle(style2) {
+    if (this.style === style2) {
       return this;
     } else {
       return this.extend({
-        style,
-        size: sizeAtStyle(this.textSize, style)
+        style: style2,
+        size: sizeAtStyle(this.textSize, style2)
       });
     }
   }
@@ -13331,14 +16338,14 @@ class Options {
       });
     }
   }
-  havingBaseStyle(style) {
-    style = style || this.style.text();
-    var wantSize = sizeAtStyle(Options.BASESIZE, style);
-    if (this.size === wantSize && this.textSize === Options.BASESIZE && this.style === style) {
+  havingBaseStyle(style2) {
+    style2 = style2 || this.style.text();
+    var wantSize = sizeAtStyle(Options.BASESIZE, style2);
+    if (this.size === wantSize && this.textSize === Options.BASESIZE && this.style === style2) {
       return this;
     } else {
       return this.extend({
-        style,
+        style: style2,
         size: wantSize
       });
     }
@@ -13481,13 +16488,13 @@ var makeEm = function makeEm2(n) {
 var createClass = function createClass2(classes) {
   return classes.filter((cls) => cls).join(" ");
 };
-var initNode = function initNode2(classes, options, style) {
+var initNode = function initNode2(classes, options, style2) {
   this.classes = classes || [];
   this.attributes = {};
   this.height = 0;
   this.depth = 0;
   this.maxFontSize = 0;
-  this.style = style || {};
+  this.style = style2 || {};
   if (options) {
     if (options.style.isTight()) {
       this.classes.push("mtight");
@@ -13501,9 +16508,9 @@ var initNode = function initNode2(classes, options, style) {
 var toNode = function toNode2(tagName) {
   var node2 = document.createElement(tagName);
   node2.className = createClass(this.classes);
-  for (var style in this.style) {
-    if (this.style.hasOwnProperty(style)) {
-      node2.style[style] = this.style[style];
+  for (var style2 in this.style) {
+    if (this.style.hasOwnProperty(style2)) {
+      node2.style[style2] = this.style[style2];
     }
   }
   for (var attr in this.attributes) {
@@ -13523,9 +16530,9 @@ var toMarkup = function toMarkup2(tagName) {
     markup += ' class="' + utils.escape(createClass(this.classes)) + '"';
   }
   var styles2 = "";
-  for (var style in this.style) {
-    if (this.style.hasOwnProperty(style)) {
-      styles2 += utils.hyphenate(style) + ":" + this.style[style] + ";";
+  for (var style2 in this.style) {
+    if (this.style.hasOwnProperty(style2)) {
+      styles2 += utils.hyphenate(style2) + ":" + this.style[style2] + ";";
     }
   }
   if (styles2) {
@@ -13548,7 +16555,7 @@ var toMarkup = function toMarkup2(tagName) {
 };
 
 class Span {
-  constructor(classes, children, options, style) {
+  constructor(classes, children, options, style2) {
     this.children = undefined;
     this.attributes = undefined;
     this.classes = undefined;
@@ -13557,7 +16564,7 @@ class Span {
     this.width = undefined;
     this.maxFontSize = undefined;
     this.style = undefined;
-    initNode.call(this, classes, options, style);
+    initNode.call(this, classes, options, style2);
     this.children = children || [];
   }
   setAttribute(attribute, value) {
@@ -13602,7 +16609,7 @@ class Anchor {
 }
 
 class Img {
-  constructor(src, alt, style) {
+  constructor(src, alt, style2) {
     this.src = undefined;
     this.alt = undefined;
     this.classes = undefined;
@@ -13613,7 +16620,7 @@ class Img {
     this.alt = alt;
     this.src = src;
     this.classes = ["mord"];
-    this.style = style;
+    this.style = style2;
   }
   hasClass(className) {
     return utils.contains(this.classes, className);
@@ -13623,9 +16630,9 @@ class Img {
     node2.src = this.src;
     node2.alt = this.alt;
     node2.className = "mord";
-    for (var style in this.style) {
-      if (this.style.hasOwnProperty(style)) {
-        node2.style[style] = this.style[style];
+    for (var style2 in this.style) {
+      if (this.style.hasOwnProperty(style2)) {
+        node2.style[style2] = this.style[style2];
       }
     }
     return node2;
@@ -13633,9 +16640,9 @@ class Img {
   toMarkup() {
     var markup = '<img src="' + utils.escape(this.src) + '"' + (' alt="' + utils.escape(this.alt) + '"');
     var styles2 = "";
-    for (var style in this.style) {
-      if (this.style.hasOwnProperty(style)) {
-        styles2 += utils.hyphenate(style) + ":" + this.style[style] + ";";
+    for (var style2 in this.style) {
+      if (this.style.hasOwnProperty(style2)) {
+        styles2 += utils.hyphenate(style2) + ":" + this.style[style2] + ";";
       }
     }
     if (styles2) {
@@ -13653,7 +16660,7 @@ var iCombinations = {
 };
 
 class SymbolNode {
-  constructor(text5, height, depth, italic, skew, width, classes, style) {
+  constructor(text7, height, depth, italic, skew, width, classes, style2) {
     this.text = undefined;
     this.height = undefined;
     this.depth = undefined;
@@ -13663,14 +16670,14 @@ class SymbolNode {
     this.maxFontSize = undefined;
     this.classes = undefined;
     this.style = undefined;
-    this.text = text5;
+    this.text = text7;
     this.height = height || 0;
     this.depth = depth || 0;
     this.italic = italic || 0;
     this.skew = skew || 0;
     this.width = width || 0;
     this.classes = classes || [];
-    this.style = style || {};
+    this.style = style2 || {};
     this.maxFontSize = 0;
     var script = scriptFromCodepoint(this.text.charCodeAt(0));
     if (script) {
@@ -13694,10 +16701,10 @@ class SymbolNode {
       span = span || document.createElement("span");
       span.className = createClass(this.classes);
     }
-    for (var style in this.style) {
-      if (this.style.hasOwnProperty(style)) {
+    for (var style2 in this.style) {
+      if (this.style.hasOwnProperty(style2)) {
         span = span || document.createElement("span");
-        span.style[style] = this.style[style];
+        span.style[style2] = this.style[style2];
       }
     }
     if (span) {
@@ -13720,9 +16727,9 @@ class SymbolNode {
     if (this.italic > 0) {
       styles2 += "margin-right:" + this.italic + "em;";
     }
-    for (var style in this.style) {
-      if (this.style.hasOwnProperty(style)) {
-        styles2 += utils.hyphenate(style) + ":" + this.style[style] + ";";
+    for (var style2 in this.style) {
+      if (this.style.hasOwnProperty(style2)) {
+        styles2 += utils.hyphenate(style2) + ":" + this.style[style2] + ";";
       }
     }
     if (styles2) {
@@ -13873,7 +16880,7 @@ function defineSymbol(mode, font, group, replace3, name, acceptUnicodeChar) {
   }
 }
 var math2 = "math";
-var text5 = "text";
+var text7 = "text";
 var main = "main";
 var ams = "ams";
 var accent = "accent-token";
@@ -13914,9 +16921,9 @@ defineSymbol(math2, main, rel, "∋", "\\owns");
 defineSymbol(math2, main, punct, ".", "\\ldotp");
 defineSymbol(math2, main, punct, "⋅", "\\cdotp");
 defineSymbol(math2, main, textord, "#", "\\#");
-defineSymbol(text5, main, textord, "#", "\\#");
+defineSymbol(text7, main, textord, "#", "\\#");
 defineSymbol(math2, main, textord, "&", "\\&");
-defineSymbol(text5, main, textord, "&", "\\&");
+defineSymbol(text7, main, textord, "&", "\\&");
 defineSymbol(math2, main, textord, "ℵ", "\\aleph", true);
 defineSymbol(math2, main, textord, "∀", "\\forall", true);
 defineSymbol(math2, main, textord, "ℏ", "\\hbar", true);
@@ -13934,15 +16941,15 @@ defineSymbol(math2, main, textord, "♡", "\\heartsuit", true);
 defineSymbol(math2, main, textord, "ℑ", "\\Im", true);
 defineSymbol(math2, main, textord, "♠", "\\spadesuit", true);
 defineSymbol(math2, main, textord, "§", "\\S", true);
-defineSymbol(text5, main, textord, "§", "\\S");
+defineSymbol(text7, main, textord, "§", "\\S");
 defineSymbol(math2, main, textord, "¶", "\\P", true);
-defineSymbol(text5, main, textord, "¶", "\\P");
+defineSymbol(text7, main, textord, "¶", "\\P");
 defineSymbol(math2, main, textord, "†", "\\dag");
-defineSymbol(text5, main, textord, "†", "\\dag");
-defineSymbol(text5, main, textord, "†", "\\textdagger");
+defineSymbol(text7, main, textord, "†", "\\dag");
+defineSymbol(text7, main, textord, "†", "\\textdagger");
 defineSymbol(math2, main, textord, "‡", "\\ddag");
-defineSymbol(text5, main, textord, "‡", "\\ddag");
-defineSymbol(text5, main, textord, "‡", "\\textdaggerdbl");
+defineSymbol(text7, main, textord, "‡", "\\ddag");
+defineSymbol(text7, main, textord, "‡", "\\textdaggerdbl");
 defineSymbol(math2, main, close, "⎱", "\\rmoustache", true);
 defineSymbol(math2, main, open, "⎰", "\\lmoustache", true);
 defineSymbol(math2, main, close, "⟯", "\\rgroup", true);
@@ -14046,7 +17053,7 @@ defineSymbol(math2, ams, textord, "▽", "\\triangledown");
 defineSymbol(math2, ams, textord, "◊", "\\lozenge");
 defineSymbol(math2, ams, textord, "Ⓢ", "\\circledS");
 defineSymbol(math2, ams, textord, "®", "\\circledR");
-defineSymbol(text5, ams, textord, "®", "\\circledR");
+defineSymbol(text7, ams, textord, "®", "\\circledR");
 defineSymbol(math2, ams, textord, "∡", "\\measuredangle", true);
 defineSymbol(math2, ams, textord, "∄", "\\nexists");
 defineSymbol(math2, ams, textord, "℧", "\\mho");
@@ -14061,16 +17068,16 @@ defineSymbol(math2, ams, textord, "★", "\\bigstar");
 defineSymbol(math2, ams, textord, "∢", "\\sphericalangle", true);
 defineSymbol(math2, ams, textord, "∁", "\\complement", true);
 defineSymbol(math2, ams, textord, "ð", "\\eth", true);
-defineSymbol(text5, main, textord, "ð", "ð");
+defineSymbol(text7, main, textord, "ð", "ð");
 defineSymbol(math2, ams, textord, "╱", "\\diagup");
 defineSymbol(math2, ams, textord, "╲", "\\diagdown");
 defineSymbol(math2, ams, textord, "□", "\\square");
 defineSymbol(math2, ams, textord, "□", "\\Box");
 defineSymbol(math2, ams, textord, "◊", "\\Diamond");
 defineSymbol(math2, ams, textord, "¥", "\\yen", true);
-defineSymbol(text5, ams, textord, "¥", "\\yen", true);
+defineSymbol(text7, ams, textord, "¥", "\\yen", true);
 defineSymbol(math2, ams, textord, "✓", "\\checkmark", true);
-defineSymbol(text5, ams, textord, "✓", "\\checkmark");
+defineSymbol(text7, ams, textord, "✓", "\\checkmark");
 defineSymbol(math2, ams, textord, "ℶ", "\\beth", true);
 defineSymbol(math2, ams, textord, "ℸ", "\\daleth", true);
 defineSymbol(math2, ams, textord, "ℷ", "\\gimel", true);
@@ -14210,13 +17217,13 @@ defineSymbol(math2, ams, rel, "⇛", "\\Rrightarrow", true);
 defineSymbol(math2, ams, rel, "↾", "\\restriction");
 defineSymbol(math2, main, textord, "‘", "`");
 defineSymbol(math2, main, textord, "$", "\\$");
-defineSymbol(text5, main, textord, "$", "\\$");
-defineSymbol(text5, main, textord, "$", "\\textdollar");
+defineSymbol(text7, main, textord, "$", "\\$");
+defineSymbol(text7, main, textord, "$", "\\textdollar");
 defineSymbol(math2, main, textord, "%", "\\%");
-defineSymbol(text5, main, textord, "%", "\\%");
+defineSymbol(text7, main, textord, "%", "\\%");
 defineSymbol(math2, main, textord, "_", "\\_");
-defineSymbol(text5, main, textord, "_", "\\_");
-defineSymbol(text5, main, textord, "_", "\\textunderscore");
+defineSymbol(text7, main, textord, "_", "\\_");
+defineSymbol(text7, main, textord, "_", "\\textunderscore");
 defineSymbol(math2, main, textord, "∠", "\\angle", true);
 defineSymbol(math2, main, textord, "∞", "\\infty", true);
 defineSymbol(math2, main, textord, "′", "\\prime");
@@ -14333,10 +17340,10 @@ defineSymbol(math2, ams, rel, "≰", "\\nleq", true);
 defineSymbol(math2, main, spacing, " ", "\\ ");
 defineSymbol(math2, main, spacing, " ", "\\space");
 defineSymbol(math2, main, spacing, " ", "\\nobreakspace");
-defineSymbol(text5, main, spacing, " ", "\\ ");
-defineSymbol(text5, main, spacing, " ", " ");
-defineSymbol(text5, main, spacing, " ", "\\space");
-defineSymbol(text5, main, spacing, " ", "\\nobreakspace");
+defineSymbol(text7, main, spacing, " ", "\\ ");
+defineSymbol(text7, main, spacing, " ", " ");
+defineSymbol(text7, main, spacing, " ", "\\space");
+defineSymbol(text7, main, spacing, " ", "\\nobreakspace");
 defineSymbol(math2, main, spacing, null, "\\nobreak");
 defineSymbol(math2, main, spacing, null, "\\allowbreak");
 defineSymbol(math2, main, punct, ",", ",");
@@ -14358,21 +17365,21 @@ defineSymbol(math2, main, bin, "⋆", "\\star");
 defineSymbol(math2, main, bin, "◃", "\\triangleleft");
 defineSymbol(math2, main, bin, "▹", "\\triangleright");
 defineSymbol(math2, main, open, "{", "\\{");
-defineSymbol(text5, main, textord, "{", "\\{");
-defineSymbol(text5, main, textord, "{", "\\textbraceleft");
+defineSymbol(text7, main, textord, "{", "\\{");
+defineSymbol(text7, main, textord, "{", "\\textbraceleft");
 defineSymbol(math2, main, close, "}", "\\}");
-defineSymbol(text5, main, textord, "}", "\\}");
-defineSymbol(text5, main, textord, "}", "\\textbraceright");
+defineSymbol(text7, main, textord, "}", "\\}");
+defineSymbol(text7, main, textord, "}", "\\textbraceright");
 defineSymbol(math2, main, open, "{", "\\lbrace");
 defineSymbol(math2, main, close, "}", "\\rbrace");
 defineSymbol(math2, main, open, "[", "\\lbrack", true);
-defineSymbol(text5, main, textord, "[", "\\lbrack", true);
+defineSymbol(text7, main, textord, "[", "\\lbrack", true);
 defineSymbol(math2, main, close, "]", "\\rbrack", true);
-defineSymbol(text5, main, textord, "]", "\\rbrack", true);
+defineSymbol(text7, main, textord, "]", "\\rbrack", true);
 defineSymbol(math2, main, open, "(", "\\lparen", true);
 defineSymbol(math2, main, close, ")", "\\rparen", true);
-defineSymbol(text5, main, textord, "<", "\\textless", true);
-defineSymbol(text5, main, textord, ">", "\\textgreater", true);
+defineSymbol(text7, main, textord, "<", "\\textless", true);
+defineSymbol(text7, main, textord, ">", "\\textgreater", true);
 defineSymbol(math2, main, open, "⌊", "\\lfloor", true);
 defineSymbol(math2, main, close, "⌋", "\\rfloor", true);
 defineSymbol(math2, main, open, "⌈", "\\lceil", true);
@@ -14380,13 +17387,13 @@ defineSymbol(math2, main, close, "⌉", "\\rceil", true);
 defineSymbol(math2, main, textord, "\\", "\\backslash");
 defineSymbol(math2, main, textord, "∣", "|");
 defineSymbol(math2, main, textord, "∣", "\\vert");
-defineSymbol(text5, main, textord, "|", "\\textbar", true);
+defineSymbol(text7, main, textord, "|", "\\textbar", true);
 defineSymbol(math2, main, textord, "∥", "\\|");
 defineSymbol(math2, main, textord, "∥", "\\Vert");
-defineSymbol(text5, main, textord, "∥", "\\textbardbl");
-defineSymbol(text5, main, textord, "~", "\\textasciitilde");
-defineSymbol(text5, main, textord, "\\", "\\textbackslash");
-defineSymbol(text5, main, textord, "^", "\\textasciicircum");
+defineSymbol(text7, main, textord, "∥", "\\textbardbl");
+defineSymbol(text7, main, textord, "~", "\\textasciitilde");
+defineSymbol(text7, main, textord, "\\", "\\textbackslash");
+defineSymbol(text7, main, textord, "^", "\\textasciicircum");
 defineSymbol(math2, main, rel, "↑", "\\uparrow", true);
 defineSymbol(math2, main, rel, "⇑", "\\Uparrow", true);
 defineSymbol(math2, main, rel, "↓", "\\downarrow", true);
@@ -14413,14 +17420,14 @@ defineSymbol(math2, main, op, "∯", "\\oiint");
 defineSymbol(math2, main, op, "∰", "\\oiiint");
 defineSymbol(math2, main, op, "⨆", "\\bigsqcup");
 defineSymbol(math2, main, op, "∫", "\\smallint");
-defineSymbol(text5, main, inner, "…", "\\textellipsis");
+defineSymbol(text7, main, inner, "…", "\\textellipsis");
 defineSymbol(math2, main, inner, "…", "\\mathellipsis");
-defineSymbol(text5, main, inner, "…", "\\ldots", true);
+defineSymbol(text7, main, inner, "…", "\\ldots", true);
 defineSymbol(math2, main, inner, "…", "\\ldots", true);
 defineSymbol(math2, main, inner, "⋯", "\\@cdots", true);
 defineSymbol(math2, main, inner, "⋱", "\\ddots", true);
 defineSymbol(math2, main, textord, "⋮", "\\varvdots");
-defineSymbol(text5, main, textord, "⋮", "\\varvdots");
+defineSymbol(text7, main, textord, "⋮", "\\varvdots");
 defineSymbol(math2, main, accent, "ˊ", "\\acute");
 defineSymbol(math2, main, accent, "ˋ", "\\grave");
 defineSymbol(math2, main, accent, "¨", "\\ddot");
@@ -14436,55 +17443,55 @@ defineSymbol(math2, main, mathord, "", "\\@imath");
 defineSymbol(math2, main, mathord, "", "\\@jmath");
 defineSymbol(math2, main, textord, "ı", "ı");
 defineSymbol(math2, main, textord, "ȷ", "ȷ");
-defineSymbol(text5, main, textord, "ı", "\\i", true);
-defineSymbol(text5, main, textord, "ȷ", "\\j", true);
-defineSymbol(text5, main, textord, "ß", "\\ss", true);
-defineSymbol(text5, main, textord, "æ", "\\ae", true);
-defineSymbol(text5, main, textord, "œ", "\\oe", true);
-defineSymbol(text5, main, textord, "ø", "\\o", true);
-defineSymbol(text5, main, textord, "Æ", "\\AE", true);
-defineSymbol(text5, main, textord, "Œ", "\\OE", true);
-defineSymbol(text5, main, textord, "Ø", "\\O", true);
-defineSymbol(text5, main, accent, "ˊ", "\\'");
-defineSymbol(text5, main, accent, "ˋ", "\\`");
-defineSymbol(text5, main, accent, "ˆ", "\\^");
-defineSymbol(text5, main, accent, "˜", "\\~");
-defineSymbol(text5, main, accent, "ˉ", "\\=");
-defineSymbol(text5, main, accent, "˘", "\\u");
-defineSymbol(text5, main, accent, "˙", "\\.");
-defineSymbol(text5, main, accent, "¸", "\\c");
-defineSymbol(text5, main, accent, "˚", "\\r");
-defineSymbol(text5, main, accent, "ˇ", "\\v");
-defineSymbol(text5, main, accent, "¨", "\\\"");
-defineSymbol(text5, main, accent, "˝", "\\H");
-defineSymbol(text5, main, accent, "◯", "\\textcircled");
+defineSymbol(text7, main, textord, "ı", "\\i", true);
+defineSymbol(text7, main, textord, "ȷ", "\\j", true);
+defineSymbol(text7, main, textord, "ß", "\\ss", true);
+defineSymbol(text7, main, textord, "æ", "\\ae", true);
+defineSymbol(text7, main, textord, "œ", "\\oe", true);
+defineSymbol(text7, main, textord, "ø", "\\o", true);
+defineSymbol(text7, main, textord, "Æ", "\\AE", true);
+defineSymbol(text7, main, textord, "Œ", "\\OE", true);
+defineSymbol(text7, main, textord, "Ø", "\\O", true);
+defineSymbol(text7, main, accent, "ˊ", "\\'");
+defineSymbol(text7, main, accent, "ˋ", "\\`");
+defineSymbol(text7, main, accent, "ˆ", "\\^");
+defineSymbol(text7, main, accent, "˜", "\\~");
+defineSymbol(text7, main, accent, "ˉ", "\\=");
+defineSymbol(text7, main, accent, "˘", "\\u");
+defineSymbol(text7, main, accent, "˙", "\\.");
+defineSymbol(text7, main, accent, "¸", "\\c");
+defineSymbol(text7, main, accent, "˚", "\\r");
+defineSymbol(text7, main, accent, "ˇ", "\\v");
+defineSymbol(text7, main, accent, "¨", "\\\"");
+defineSymbol(text7, main, accent, "˝", "\\H");
+defineSymbol(text7, main, accent, "◯", "\\textcircled");
 var ligatures = {
   "--": true,
   "---": true,
   "``": true,
   "''": true
 };
-defineSymbol(text5, main, textord, "–", "--", true);
-defineSymbol(text5, main, textord, "–", "\\textendash");
-defineSymbol(text5, main, textord, "—", "---", true);
-defineSymbol(text5, main, textord, "—", "\\textemdash");
-defineSymbol(text5, main, textord, "‘", "`", true);
-defineSymbol(text5, main, textord, "‘", "\\textquoteleft");
-defineSymbol(text5, main, textord, "’", "'", true);
-defineSymbol(text5, main, textord, "’", "\\textquoteright");
-defineSymbol(text5, main, textord, "“", "``", true);
-defineSymbol(text5, main, textord, "“", "\\textquotedblleft");
-defineSymbol(text5, main, textord, "”", "''", true);
-defineSymbol(text5, main, textord, "”", "\\textquotedblright");
+defineSymbol(text7, main, textord, "–", "--", true);
+defineSymbol(text7, main, textord, "–", "\\textendash");
+defineSymbol(text7, main, textord, "—", "---", true);
+defineSymbol(text7, main, textord, "—", "\\textemdash");
+defineSymbol(text7, main, textord, "‘", "`", true);
+defineSymbol(text7, main, textord, "‘", "\\textquoteleft");
+defineSymbol(text7, main, textord, "’", "'", true);
+defineSymbol(text7, main, textord, "’", "\\textquoteright");
+defineSymbol(text7, main, textord, "“", "``", true);
+defineSymbol(text7, main, textord, "“", "\\textquotedblleft");
+defineSymbol(text7, main, textord, "”", "''", true);
+defineSymbol(text7, main, textord, "”", "\\textquotedblright");
 defineSymbol(math2, main, textord, "°", "\\degree", true);
-defineSymbol(text5, main, textord, "°", "\\degree");
-defineSymbol(text5, main, textord, "°", "\\textdegree", true);
+defineSymbol(text7, main, textord, "°", "\\degree");
+defineSymbol(text7, main, textord, "°", "\\textdegree", true);
 defineSymbol(math2, main, textord, "£", "\\pounds");
 defineSymbol(math2, main, textord, "£", "\\mathsterling", true);
-defineSymbol(text5, main, textord, "£", "\\pounds");
-defineSymbol(text5, main, textord, "£", "\\textsterling", true);
+defineSymbol(text7, main, textord, "£", "\\pounds");
+defineSymbol(text7, main, textord, "£", "\\textsterling", true);
 defineSymbol(math2, ams, textord, "✠", "\\maltese");
-defineSymbol(text5, ams, textord, "✠", "\\maltese");
+defineSymbol(text7, ams, textord, "✠", "\\maltese");
 var mathTextSymbols = '0123456789/@."';
 for (i = 0;i < mathTextSymbols.length; i++) {
   ch = mathTextSymbols.charAt(i);
@@ -14495,7 +17502,7 @@ var i;
 var textSymbols = '0123456789!@*()-=+";:?/.,';
 for (_i = 0;_i < textSymbols.length; _i++) {
   _ch = textSymbols.charAt(_i);
-  defineSymbol(text5, main, textord, _ch, _ch);
+  defineSymbol(text7, main, textord, _ch, _ch);
 }
 var _ch;
 var _i;
@@ -14503,84 +17510,84 @@ var letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 for (_i2 = 0;_i2 < letters.length; _i2++) {
   _ch2 = letters.charAt(_i2);
   defineSymbol(math2, main, mathord, _ch2, _ch2);
-  defineSymbol(text5, main, textord, _ch2, _ch2);
+  defineSymbol(text7, main, textord, _ch2, _ch2);
 }
 var _ch2;
 var _i2;
 defineSymbol(math2, ams, textord, "C", "ℂ");
-defineSymbol(text5, ams, textord, "C", "ℂ");
+defineSymbol(text7, ams, textord, "C", "ℂ");
 defineSymbol(math2, ams, textord, "H", "ℍ");
-defineSymbol(text5, ams, textord, "H", "ℍ");
+defineSymbol(text7, ams, textord, "H", "ℍ");
 defineSymbol(math2, ams, textord, "N", "ℕ");
-defineSymbol(text5, ams, textord, "N", "ℕ");
+defineSymbol(text7, ams, textord, "N", "ℕ");
 defineSymbol(math2, ams, textord, "P", "ℙ");
-defineSymbol(text5, ams, textord, "P", "ℙ");
+defineSymbol(text7, ams, textord, "P", "ℙ");
 defineSymbol(math2, ams, textord, "Q", "ℚ");
-defineSymbol(text5, ams, textord, "Q", "ℚ");
+defineSymbol(text7, ams, textord, "Q", "ℚ");
 defineSymbol(math2, ams, textord, "R", "ℝ");
-defineSymbol(text5, ams, textord, "R", "ℝ");
+defineSymbol(text7, ams, textord, "R", "ℝ");
 defineSymbol(math2, ams, textord, "Z", "ℤ");
-defineSymbol(text5, ams, textord, "Z", "ℤ");
+defineSymbol(text7, ams, textord, "Z", "ℤ");
 defineSymbol(math2, main, mathord, "h", "ℎ");
-defineSymbol(text5, main, mathord, "h", "ℎ");
+defineSymbol(text7, main, mathord, "h", "ℎ");
 var wideChar = "";
 for (_i3 = 0;_i3 < letters.length; _i3++) {
   _ch3 = letters.charAt(_i3);
   wideChar = String.fromCharCode(55349, 56320 + _i3);
   defineSymbol(math2, main, mathord, _ch3, wideChar);
-  defineSymbol(text5, main, textord, _ch3, wideChar);
+  defineSymbol(text7, main, textord, _ch3, wideChar);
   wideChar = String.fromCharCode(55349, 56372 + _i3);
   defineSymbol(math2, main, mathord, _ch3, wideChar);
-  defineSymbol(text5, main, textord, _ch3, wideChar);
+  defineSymbol(text7, main, textord, _ch3, wideChar);
   wideChar = String.fromCharCode(55349, 56424 + _i3);
   defineSymbol(math2, main, mathord, _ch3, wideChar);
-  defineSymbol(text5, main, textord, _ch3, wideChar);
+  defineSymbol(text7, main, textord, _ch3, wideChar);
   wideChar = String.fromCharCode(55349, 56580 + _i3);
   defineSymbol(math2, main, mathord, _ch3, wideChar);
-  defineSymbol(text5, main, textord, _ch3, wideChar);
+  defineSymbol(text7, main, textord, _ch3, wideChar);
   wideChar = String.fromCharCode(55349, 56684 + _i3);
   defineSymbol(math2, main, mathord, _ch3, wideChar);
-  defineSymbol(text5, main, textord, _ch3, wideChar);
+  defineSymbol(text7, main, textord, _ch3, wideChar);
   wideChar = String.fromCharCode(55349, 56736 + _i3);
   defineSymbol(math2, main, mathord, _ch3, wideChar);
-  defineSymbol(text5, main, textord, _ch3, wideChar);
+  defineSymbol(text7, main, textord, _ch3, wideChar);
   wideChar = String.fromCharCode(55349, 56788 + _i3);
   defineSymbol(math2, main, mathord, _ch3, wideChar);
-  defineSymbol(text5, main, textord, _ch3, wideChar);
+  defineSymbol(text7, main, textord, _ch3, wideChar);
   wideChar = String.fromCharCode(55349, 56840 + _i3);
   defineSymbol(math2, main, mathord, _ch3, wideChar);
-  defineSymbol(text5, main, textord, _ch3, wideChar);
+  defineSymbol(text7, main, textord, _ch3, wideChar);
   wideChar = String.fromCharCode(55349, 56944 + _i3);
   defineSymbol(math2, main, mathord, _ch3, wideChar);
-  defineSymbol(text5, main, textord, _ch3, wideChar);
+  defineSymbol(text7, main, textord, _ch3, wideChar);
   if (_i3 < 26) {
     wideChar = String.fromCharCode(55349, 56632 + _i3);
     defineSymbol(math2, main, mathord, _ch3, wideChar);
-    defineSymbol(text5, main, textord, _ch3, wideChar);
+    defineSymbol(text7, main, textord, _ch3, wideChar);
     wideChar = String.fromCharCode(55349, 56476 + _i3);
     defineSymbol(math2, main, mathord, _ch3, wideChar);
-    defineSymbol(text5, main, textord, _ch3, wideChar);
+    defineSymbol(text7, main, textord, _ch3, wideChar);
   }
 }
 var _ch3;
 var _i3;
 wideChar = String.fromCharCode(55349, 56668);
 defineSymbol(math2, main, mathord, "k", wideChar);
-defineSymbol(text5, main, textord, "k", wideChar);
+defineSymbol(text7, main, textord, "k", wideChar);
 for (_i4 = 0;_i4 < 10; _i4++) {
   _ch4 = _i4.toString();
   wideChar = String.fromCharCode(55349, 57294 + _i4);
   defineSymbol(math2, main, mathord, _ch4, wideChar);
-  defineSymbol(text5, main, textord, _ch4, wideChar);
+  defineSymbol(text7, main, textord, _ch4, wideChar);
   wideChar = String.fromCharCode(55349, 57314 + _i4);
   defineSymbol(math2, main, mathord, _ch4, wideChar);
-  defineSymbol(text5, main, textord, _ch4, wideChar);
+  defineSymbol(text7, main, textord, _ch4, wideChar);
   wideChar = String.fromCharCode(55349, 57324 + _i4);
   defineSymbol(math2, main, mathord, _ch4, wideChar);
-  defineSymbol(text5, main, textord, _ch4, wideChar);
+  defineSymbol(text7, main, textord, _ch4, wideChar);
   wideChar = String.fromCharCode(55349, 57334 + _i4);
   defineSymbol(math2, main, mathord, _ch4, wideChar);
-  defineSymbol(text5, main, textord, _ch4, wideChar);
+  defineSymbol(text7, main, textord, _ch4, wideChar);
 }
 var _ch4;
 var _i4;
@@ -14588,7 +17595,7 @@ var extraLatin = "ÐÞþ";
 for (_i5 = 0;_i5 < extraLatin.length; _i5++) {
   _ch5 = extraLatin.charAt(_i5);
   defineSymbol(math2, main, mathord, _ch5, _ch5);
-  defineSymbol(text5, main, textord, _ch5, _ch5);
+  defineSymbol(text7, main, textord, _ch5, _ch5);
 }
 var _ch5;
 var _i5;
@@ -14709,22 +17716,22 @@ var boldsymbol = function boldsymbol2(value, mode, options, classes, type) {
 };
 var makeOrd = function makeOrd2(group, options, type) {
   var mode = group.mode;
-  var text6 = group.text;
+  var text8 = group.text;
   var classes = ["mord"];
   var isFont = mode === "math" || mode === "text" && options.font;
   var fontOrFamily = isFont ? options.font : options.fontFamily;
   var wideFontName = "";
   var wideFontClass = "";
-  if (text6.charCodeAt(0) === 55349) {
-    [wideFontName, wideFontClass] = wideCharacterFont(text6, mode);
+  if (text8.charCodeAt(0) === 55349) {
+    [wideFontName, wideFontClass] = wideCharacterFont(text8, mode);
   }
   if (wideFontName.length > 0) {
-    return makeSymbol(text6, wideFontName, mode, options, classes.concat(wideFontClass));
+    return makeSymbol(text8, wideFontName, mode, options, classes.concat(wideFontClass));
   } else if (fontOrFamily) {
     var fontName;
     var fontClasses;
     if (fontOrFamily === "boldsymbol") {
-      var fontData = boldsymbol(text6, mode, options, classes, type);
+      var fontData = boldsymbol(text8, mode, options, classes, type);
       fontName = fontData.fontName;
       fontClasses = [fontData.fontClass];
     } else if (isFont) {
@@ -14734,29 +17741,29 @@ var makeOrd = function makeOrd2(group, options, type) {
       fontName = retrieveTextFontName(fontOrFamily, options.fontWeight, options.fontShape);
       fontClasses = [fontOrFamily, options.fontWeight, options.fontShape];
     }
-    if (lookupSymbol(text6, fontName, mode).metrics) {
-      return makeSymbol(text6, fontName, mode, options, classes.concat(fontClasses));
-    } else if (ligatures.hasOwnProperty(text6) && fontName.slice(0, 10) === "Typewriter") {
+    if (lookupSymbol(text8, fontName, mode).metrics) {
+      return makeSymbol(text8, fontName, mode, options, classes.concat(fontClasses));
+    } else if (ligatures.hasOwnProperty(text8) && fontName.slice(0, 10) === "Typewriter") {
       var parts = [];
-      for (var i2 = 0;i2 < text6.length; i2++) {
-        parts.push(makeSymbol(text6[i2], fontName, mode, options, classes.concat(fontClasses)));
+      for (var i2 = 0;i2 < text8.length; i2++) {
+        parts.push(makeSymbol(text8[i2], fontName, mode, options, classes.concat(fontClasses)));
       }
       return makeFragment(parts);
     }
   }
   if (type === "mathord") {
-    return makeSymbol(text6, "Math-Italic", mode, options, classes.concat(["mathnormal"]));
+    return makeSymbol(text8, "Math-Italic", mode, options, classes.concat(["mathnormal"]));
   } else if (type === "textord") {
-    var font = symbols[mode][text6] && symbols[mode][text6].font;
+    var font = symbols[mode][text8] && symbols[mode][text8].font;
     if (font === "ams") {
       var _fontName = retrieveTextFontName("amsrm", options.fontWeight, options.fontShape);
-      return makeSymbol(text6, _fontName, mode, options, classes.concat("amsrm", options.fontWeight, options.fontShape));
+      return makeSymbol(text8, _fontName, mode, options, classes.concat("amsrm", options.fontWeight, options.fontShape));
     } else if (font === "main" || !font) {
       var _fontName2 = retrieveTextFontName("textrm", options.fontWeight, options.fontShape);
-      return makeSymbol(text6, _fontName2, mode, options, classes.concat(options.fontWeight, options.fontShape));
+      return makeSymbol(text8, _fontName2, mode, options, classes.concat(options.fontWeight, options.fontShape));
     } else {
       var _fontName3 = retrieveTextFontName(font, options.fontWeight, options.fontShape);
-      return makeSymbol(text6, _fontName3, mode, options, classes.concat(_fontName3, options.fontWeight, options.fontShape));
+      return makeSymbol(text8, _fontName3, mode, options, classes.concat(_fontName3, options.fontWeight, options.fontShape));
     }
   } else {
     throw new Error("unexpected type: " + type + " in makeOrd");
@@ -14772,8 +17779,8 @@ var canCombine = (prev, next) => {
       return false;
     }
   }
-  for (var style in prev.style) {
-    if (prev.style.hasOwnProperty(style) && prev.style[style] !== next.style[style]) {
+  for (var style2 in prev.style) {
+    if (prev.style.hasOwnProperty(style2) && prev.style[style2] !== next.style[style2]) {
       return false;
     }
   }
@@ -14819,12 +17826,12 @@ var sizeElementFromChildren = function sizeElementFromChildren2(elem) {
   elem.depth = depth;
   elem.maxFontSize = maxFontSize;
 };
-var makeSpan$2 = function makeSpan(classes, children, options, style) {
-  var span = new Span(classes, children, options, style);
+var makeSpan$2 = function makeSpan(classes, children, options, style2) {
+  var span = new Span(classes, children, options, style2);
   sizeElementFromChildren(span);
   return span;
 };
-var makeSvgSpan = (classes, children, options, style) => new Span(classes, children, options, style);
+var makeSvgSpan = (classes, children, options, style2) => new Span(classes, children, options, style2);
 var makeLineSpan = function makeLineSpan2(className, options, thickness) {
   var line = makeSpan$2([className], [], options);
   line.height = Math.max(thickness || options.fontMetrics().defaultRuleThickness, options.minRuleThickness);
@@ -14924,8 +17931,8 @@ var makeVList = function makeVList2(params, options) {
     } else {
       var _elem = _child.elem;
       var classes = _child.wrapperClasses || [];
-      var style = _child.wrapperStyle || {};
-      var childWrap = makeSpan$2(classes, [pstrut, _elem], undefined, style);
+      var style2 = _child.wrapperStyle || {};
+      var childWrap = makeSpan$2(classes, [pstrut, _elem], undefined, style2);
       childWrap.style.top = makeEm(-pstrutSize - currPos - _elem.depth);
       if (_child.marginLeft) {
         childWrap.style.marginLeft = _child.marginLeft;
@@ -15291,9 +18298,9 @@ var buildExpression$1 = function buildExpression(expression, options, isRealGrou
   traverseNonSpaceNodes(groups, (node3, prev) => {
     var prevType = getTypeOfDomTree(prev);
     var type = getTypeOfDomTree(node3);
-    var space = prevType && type ? node3.hasClass("mtight") ? tightSpacings[prevType][type] : spacings[prevType][type] : null;
-    if (space) {
-      return buildCommon.makeGlue(space, glueOptions);
+    var space2 = prevType && type ? node3.hasClass("mtight") ? tightSpacings[prevType][type] : spacings[prevType][type] : null;
+    if (space2) {
+      return buildCommon.makeGlue(space2, glueOptions);
     }
   }, {
     node: dummyPrev
@@ -15490,11 +18497,11 @@ class MathNode {
     }
     for (var i2 = 0;i2 < this.children.length; i2++) {
       if (this.children[i2] instanceof TextNode && this.children[i2 + 1] instanceof TextNode) {
-        var text6 = this.children[i2].toText() + this.children[++i2].toText();
+        var text8 = this.children[i2].toText() + this.children[++i2].toText();
         while (this.children[i2 + 1] instanceof TextNode) {
-          text6 += this.children[++i2].toText();
+          text8 += this.children[++i2].toText();
         }
-        node2.appendChild(new TextNode(text6).toNode());
+        node2.appendChild(new TextNode(text8).toNode());
       } else {
         node2.appendChild(this.children[i2].toNode());
       }
@@ -15526,9 +18533,9 @@ class MathNode {
 }
 
 class TextNode {
-  constructor(text6) {
+  constructor(text8) {
     this.text = undefined;
-    this.text = text6;
+    this.text = text8;
   }
   toNode() {
     return document.createTextNode(this.text);
@@ -15596,11 +18603,11 @@ var mathMLTree = {
   SpaceNode,
   newDocumentFragment
 };
-var makeText = function makeText2(text6, mode, options) {
-  if (symbols[mode][text6] && symbols[mode][text6].replace && text6.charCodeAt(0) !== 55349 && !(ligatures.hasOwnProperty(text6) && options && (options.fontFamily && options.fontFamily.slice(4, 6) === "tt" || options.font && options.font.slice(4, 6) === "tt"))) {
-    text6 = symbols[mode][text6].replace;
+var makeText = function makeText2(text8, mode, options) {
+  if (symbols[mode][text8] && symbols[mode][text8].replace && text8.charCodeAt(0) !== 55349 && !(ligatures.hasOwnProperty(text8) && options && (options.fontFamily && options.fontFamily.slice(4, 6) === "tt" || options.font && options.font.slice(4, 6) === "tt"))) {
+    text8 = symbols[mode][text8].replace;
   }
-  return new mathMLTree.TextNode(text6);
+  return new mathMLTree.TextNode(text8);
 };
 var makeRow = function makeRow2(body) {
   if (body.length === 1) {
@@ -15653,15 +18660,15 @@ var getVariant = function getVariant2(group, options) {
   } else if (font === "mathtt") {
     return "monospace";
   }
-  var text6 = group.text;
-  if (utils.contains(["\\imath", "\\jmath"], text6)) {
+  var text8 = group.text;
+  if (utils.contains(["\\imath", "\\jmath"], text8)) {
     return null;
   }
-  if (symbols[mode][text6] && symbols[mode][text6].replace) {
-    text6 = symbols[mode][text6].replace;
+  if (symbols[mode][text8] && symbols[mode][text8].replace) {
+    text8 = symbols[mode][text8].replace;
   }
   var fontName = buildCommon.fontMap[font].fontName;
-  if (getCharacterMetrics(text6, fontName, mode)) {
+  if (getCharacterMetrics(text8, fontName, mode)) {
     return buildCommon.fontMap[font].variant;
   }
   return null;
@@ -16237,13 +19244,13 @@ defineFunction({
   },
   handler: (_ref, args) => {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref;
     var base = args[0];
     return {
       type: "accentUnder",
-      mode: parser.mode,
+      mode: parser2.mode,
       label: funcName,
       base
     };
@@ -16317,26 +19324,26 @@ defineFunction({
   },
   handler(_ref, args, optArgs) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref;
     return {
       type: "xArrow",
-      mode: parser.mode,
+      mode: parser2.mode,
       label: funcName,
       body: args[0],
       below: optArgs[0]
     };
   },
   htmlBuilder(group, options) {
-    var style = options.style;
-    var newOptions = options.havingStyle(style.sup());
+    var style2 = options.style;
+    var newOptions = options.havingStyle(style2.sup());
     var upperGroup = buildCommon.wrapFragment(buildGroup$1(group.body, newOptions, options), options);
     var arrowPrefix = group.label.slice(0, 2) === "\\x" ? "x" : "cd";
     upperGroup.classes.push(arrowPrefix + "-arrow-pad");
     var lowerGroup;
     if (group.below) {
-      newOptions = options.havingStyle(style.sub());
+      newOptions = options.havingStyle(style2.sub());
       lowerGroup = buildCommon.wrapFragment(buildGroup$1(group.below, newOptions, options), options);
       lowerGroup.classes.push(arrowPrefix + "-arrow-pad");
     }
@@ -16453,13 +19460,13 @@ defineFunction({
   },
   handler(_ref, args) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref;
     var body = args[0];
     return {
       type: "mclass",
-      mode: parser.mode,
+      mode: parser2.mode,
       mclass: "m" + funcName.slice(5),
       body: ordargument(body),
       isCharacterBox: utils.isCharacterBox(body)
@@ -16484,11 +19491,11 @@ defineFunction({
   },
   handler(_ref2, args) {
     var {
-      parser
+      parser: parser2
     } = _ref2;
     return {
       type: "mclass",
-      mode: parser.mode,
+      mode: parser2.mode,
       mclass: binrelClass(args[0]),
       body: ordargument(args[1]),
       isCharacterBox: utils.isCharacterBox(args[1])
@@ -16503,7 +19510,7 @@ defineFunction({
   },
   handler(_ref3, args) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref3;
     var baseArg = args[1];
@@ -16533,7 +19540,7 @@ defineFunction({
     };
     return {
       type: "mclass",
-      mode: parser.mode,
+      mode: parser2.mode,
       mclass,
       body: [supsub],
       isCharacterBox: utils.isCharacterBox(supsub)
@@ -16551,11 +19558,11 @@ defineFunction({
   },
   handler(_ref, args) {
     var {
-      parser
+      parser: parser2
     } = _ref;
     return {
       type: "pmb",
-      mode: parser.mode,
+      mode: parser2.mode,
       mclass: binrelClass(args[0]),
       body: ordargument(args[0])
     };
@@ -16566,8 +19573,8 @@ defineFunction({
     node2.style.textShadow = "0.02em 0.01em 0.04px";
     return node2;
   },
-  mathmlBuilder(group, style) {
-    var inner2 = buildExpression2(group.body, style);
+  mathmlBuilder(group, style2) {
+    var inner2 = buildExpression2(group.body, style2);
     var node2 = new mathMLTree.MathNode("mstyle", inner2);
     node2.setAttribute("style", "text-shadow: 0.02em 0.01em 0.04px");
     return node2;
@@ -16596,39 +19603,39 @@ var isStartOfArrow = (node2) => {
 var isLabelEnd = (node2, endChar) => {
   return (node2.type === "mathord" || node2.type === "atom") && node2.text === endChar;
 };
-function cdArrow(arrowChar, labels, parser) {
+function cdArrow(arrowChar, labels, parser2) {
   var funcName = cdArrowFunctionName[arrowChar];
   switch (funcName) {
     case "\\\\cdrightarrow":
     case "\\\\cdleftarrow":
-      return parser.callFunction(funcName, [labels[0]], [labels[1]]);
+      return parser2.callFunction(funcName, [labels[0]], [labels[1]]);
     case "\\uparrow":
     case "\\downarrow": {
-      var leftLabel = parser.callFunction("\\\\cdleft", [labels[0]], []);
+      var leftLabel = parser2.callFunction("\\\\cdleft", [labels[0]], []);
       var bareArrow = {
         type: "atom",
         text: funcName,
         mode: "math",
         family: "rel"
       };
-      var sizedArrow = parser.callFunction("\\Big", [bareArrow], []);
-      var rightLabel = parser.callFunction("\\\\cdright", [labels[1]], []);
+      var sizedArrow = parser2.callFunction("\\Big", [bareArrow], []);
+      var rightLabel = parser2.callFunction("\\\\cdright", [labels[1]], []);
       var arrowGroup = {
         type: "ordgroup",
         mode: "math",
         body: [leftLabel, sizedArrow, rightLabel]
       };
-      return parser.callFunction("\\\\cdparent", [arrowGroup], []);
+      return parser2.callFunction("\\\\cdparent", [arrowGroup], []);
     }
     case "\\\\cdlongequal":
-      return parser.callFunction("\\\\cdlongequal", [], []);
+      return parser2.callFunction("\\\\cdlongequal", [], []);
     case "\\Vert": {
       var arrow = {
         type: "textord",
         text: "\\Vert",
         mode: "math"
       };
-      return parser.callFunction("\\Big", [arrow], []);
+      return parser2.callFunction("\\Big", [arrow], []);
     }
     default:
       return {
@@ -16638,37 +19645,37 @@ function cdArrow(arrowChar, labels, parser) {
       };
   }
 }
-function parseCD(parser) {
+function parseCD(parser2) {
   var parsedRows = [];
-  parser.gullet.beginGroup();
-  parser.gullet.macros.set("\\cr", "\\\\\\relax");
-  parser.gullet.beginGroup();
+  parser2.gullet.beginGroup();
+  parser2.gullet.macros.set("\\cr", "\\\\\\relax");
+  parser2.gullet.beginGroup();
   while (true) {
-    parsedRows.push(parser.parseExpression(false, "\\\\"));
-    parser.gullet.endGroup();
-    parser.gullet.beginGroup();
-    var next = parser.fetch().text;
+    parsedRows.push(parser2.parseExpression(false, "\\\\"));
+    parser2.gullet.endGroup();
+    parser2.gullet.beginGroup();
+    var next = parser2.fetch().text;
     if (next === "&" || next === "\\\\") {
-      parser.consume();
+      parser2.consume();
     } else if (next === "\\end") {
       if (parsedRows[parsedRows.length - 1].length === 0) {
         parsedRows.pop();
       }
       break;
     } else {
-      throw new ParseError("Expected \\\\ or \\cr or \\end", parser.nextToken);
+      throw new ParseError("Expected \\\\ or \\cr or \\end", parser2.nextToken);
     }
   }
-  var row = [];
-  var body = [row];
+  var row2 = [];
+  var body = [row2];
   for (var i2 = 0;i2 < parsedRows.length; i2++) {
     var rowNodes = parsedRows[i2];
-    var cell = newCell();
+    var cell2 = newCell();
     for (var j = 0;j < rowNodes.length; j++) {
       if (!isStartOfArrow(rowNodes[j])) {
-        cell.body.push(rowNodes[j]);
+        cell2.body.push(rowNodes[j]);
       } else {
-        row.push(cell);
+        row2.push(cell2);
         j += 1;
         var arrowChar = assertSymbolNodeType(rowNodes[j]).text;
         var labels = new Array(2);
@@ -16705,27 +19712,27 @@ function parseCD(parser) {
         } else {
           throw new ParseError('Expected one of "<>AV=|." after @', rowNodes[j]);
         }
-        var arrow = cdArrow(arrowChar, labels, parser);
+        var arrow = cdArrow(arrowChar, labels, parser2);
         var wrappedArrow = {
           type: "styling",
           body: [arrow],
           mode: "math",
           style: "display"
         };
-        row.push(wrappedArrow);
-        cell = newCell();
+        row2.push(wrappedArrow);
+        cell2 = newCell();
       }
     }
     if (i2 % 2 === 0) {
-      row.push(cell);
+      row2.push(cell2);
     } else {
-      row.shift();
+      row2.shift();
     }
-    row = [];
-    body.push(row);
+    row2 = [];
+    body.push(row2);
   }
-  parser.gullet.endGroup();
-  parser.gullet.endGroup();
+  parser2.gullet.endGroup();
+  parser2.gullet.endGroup();
   var cols = new Array(body[0].length).fill({
     type: "align",
     align: "c",
@@ -16752,12 +19759,12 @@ defineFunction({
   },
   handler(_ref, args) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref;
     return {
       type: "cdlabel",
-      mode: parser.mode,
+      mode: parser2.mode,
       side: funcName.slice(4),
       label: args[0]
     };
@@ -16793,11 +19800,11 @@ defineFunction({
   },
   handler(_ref2, args) {
     var {
-      parser
+      parser: parser2
     } = _ref2;
     return {
       type: "cdlabelparent",
-      mode: parser.mode,
+      mode: parser2.mode,
       fragment: args[0]
     };
   },
@@ -16819,31 +19826,31 @@ defineFunction({
   },
   handler(_ref, args) {
     var {
-      parser
+      parser: parser2
     } = _ref;
     var arg = assertNodeType(args[0], "ordgroup");
     var group = arg.body;
-    var number = "";
+    var number2 = "";
     for (var i2 = 0;i2 < group.length; i2++) {
       var node2 = assertNodeType(group[i2], "textord");
-      number += node2.text;
+      number2 += node2.text;
     }
-    var code3 = parseInt(number);
-    var text6;
-    if (isNaN(code3)) {
-      throw new ParseError("\\@char has non-numeric argument " + number);
-    } else if (code3 < 0 || code3 >= 1114111) {
-      throw new ParseError("\\@char with invalid code point " + number);
-    } else if (code3 <= 65535) {
-      text6 = String.fromCharCode(code3);
+    var code4 = parseInt(number2);
+    var text8;
+    if (isNaN(code4)) {
+      throw new ParseError("\\@char has non-numeric argument " + number2);
+    } else if (code4 < 0 || code4 >= 1114111) {
+      throw new ParseError("\\@char with invalid code point " + number2);
+    } else if (code4 <= 65535) {
+      text8 = String.fromCharCode(code4);
     } else {
-      code3 -= 65536;
-      text6 = String.fromCharCode((code3 >> 10) + 55296, (code3 & 1023) + 56320);
+      code4 -= 65536;
+      text8 = String.fromCharCode((code4 >> 10) + 55296, (code4 & 1023) + 56320);
     }
     return {
       type: "textord",
-      mode: parser.mode,
-      text: text6
+      mode: parser2.mode,
+      text: text8
     };
   }
 });
@@ -16867,13 +19874,13 @@ defineFunction({
   },
   handler(_ref, args) {
     var {
-      parser
+      parser: parser2
     } = _ref;
     var color2 = assertNodeType(args[0], "color-token").color;
     var body = args[1];
     return {
       type: "color",
-      mode: parser.mode,
+      mode: parser2.mode,
       color: color2,
       body: ordargument(body)
     };
@@ -16891,15 +19898,15 @@ defineFunction({
   },
   handler(_ref2, args) {
     var {
-      parser,
+      parser: parser2,
       breakOnTokenText
     } = _ref2;
     var color2 = assertNodeType(args[0], "color-token").color;
-    parser.gullet.macros.set("\\current@color", color2);
-    var body = parser.parseExpression(true, breakOnTokenText);
+    parser2.gullet.macros.set("\\current@color", color2);
+    var body = parser2.parseExpression(true, breakOnTokenText);
     return {
       type: "color",
-      mode: parser.mode,
+      mode: parser2.mode,
       color: color2,
       body
     };
@@ -16917,13 +19924,13 @@ defineFunction({
   },
   handler(_ref, args, optArgs) {
     var {
-      parser
+      parser: parser2
     } = _ref;
-    var size = parser.gullet.future().text === "[" ? parser.parseSizeGroup(true) : null;
-    var newLine = !parser.settings.displayMode || !parser.settings.useStrictBehavior("newLineInDisplayMode", "In LaTeX, \\\\ or \\newline " + "does nothing in display mode");
+    var size = parser2.gullet.future().text === "[" ? parser2.parseSizeGroup(true) : null;
+    var newLine = !parser2.settings.displayMode || !parser2.settings.useStrictBehavior("newLineInDisplayMode", "In LaTeX, \\\\ or \\newline " + "does nothing in display mode");
     return {
       type: "cr",
-      mode: parser.mode,
+      mode: parser2.mode,
       newLine,
       size: size && assertNodeType(size, "size").value
     };
@@ -16967,27 +19974,27 @@ var checkControlSequence = (tok) => {
   }
   return name;
 };
-var getRHS = (parser) => {
-  var tok = parser.gullet.popToken();
+var getRHS = (parser2) => {
+  var tok = parser2.gullet.popToken();
   if (tok.text === "=") {
-    tok = parser.gullet.popToken();
+    tok = parser2.gullet.popToken();
     if (tok.text === " ") {
-      tok = parser.gullet.popToken();
+      tok = parser2.gullet.popToken();
     }
   }
   return tok;
 };
-var letCommand = (parser, name, tok, global) => {
-  var macro = parser.gullet.macros.get(tok.text);
+var letCommand = (parser2, name, tok, global) => {
+  var macro = parser2.gullet.macros.get(tok.text);
   if (macro == null) {
     tok.noexpand = true;
     macro = {
       tokens: [tok],
       numArgs: 0,
-      unexpandable: !parser.gullet.isExpandable(tok.text)
+      unexpandable: !parser2.gullet.isExpandable(tok.text)
     };
   }
-  parser.gullet.macros.set(name, macro, global);
+  parser2.gullet.macros.set(name, macro, global);
 };
 defineFunction({
   type: "internal",
@@ -17002,16 +20009,16 @@ defineFunction({
   },
   handler(_ref) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref;
-    parser.consumeSpaces();
-    var token = parser.fetch();
+    parser2.consumeSpaces();
+    var token = parser2.fetch();
     if (globalMap[token.text]) {
       if (funcName === "\\global" || funcName === "\\\\globallong") {
         token.text = globalMap[token.text];
       }
-      return assertNodeType(parser.parseFunction(), "internal");
+      return assertNodeType(parser2.parseFunction(), "internal");
     }
     throw new ParseError("Invalid token after macro prefix", token);
   }
@@ -17026,10 +20033,10 @@ defineFunction({
   },
   handler(_ref2) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref2;
-    var tok = parser.gullet.popToken();
+    var tok = parser2.gullet.popToken();
     var name = tok.text;
     if (/^(?:[\\{}$&#^_]|EOF)$/.test(name)) {
       throw new ParseError("Expected a control sequence", tok);
@@ -17037,15 +20044,15 @@ defineFunction({
     var numArgs = 0;
     var insert;
     var delimiters = [[]];
-    while (parser.gullet.future().text !== "{") {
-      tok = parser.gullet.popToken();
+    while (parser2.gullet.future().text !== "{") {
+      tok = parser2.gullet.popToken();
       if (tok.text === "#") {
-        if (parser.gullet.future().text === "{") {
-          insert = parser.gullet.future();
+        if (parser2.gullet.future().text === "{") {
+          insert = parser2.gullet.future();
           delimiters[numArgs].push("{");
           break;
         }
-        tok = parser.gullet.popToken();
+        tok = parser2.gullet.popToken();
         if (!/^[1-9]$/.test(tok.text)) {
           throw new ParseError('Invalid argument number "' + tok.text + '"');
         }
@@ -17062,22 +20069,22 @@ defineFunction({
     }
     var {
       tokens
-    } = parser.gullet.consumeArg();
+    } = parser2.gullet.consumeArg();
     if (insert) {
       tokens.unshift(insert);
     }
     if (funcName === "\\edef" || funcName === "\\xdef") {
-      tokens = parser.gullet.expandTokens(tokens);
+      tokens = parser2.gullet.expandTokens(tokens);
       tokens.reverse();
     }
-    parser.gullet.macros.set(name, {
+    parser2.gullet.macros.set(name, {
       tokens,
       numArgs,
       delimiters
     }, funcName === globalMap[funcName]);
     return {
       type: "internal",
-      mode: parser.mode
+      mode: parser2.mode
     };
   }
 });
@@ -17094,16 +20101,16 @@ defineFunction({
   },
   handler(_ref3) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref3;
-    var name = checkControlSequence(parser.gullet.popToken());
-    parser.gullet.consumeSpaces();
-    var tok = getRHS(parser);
-    letCommand(parser, name, tok, funcName === "\\\\globallet");
+    var name = checkControlSequence(parser2.gullet.popToken());
+    parser2.gullet.consumeSpaces();
+    var tok = getRHS(parser2);
+    letCommand(parser2, name, tok, funcName === "\\\\globallet");
     return {
       type: "internal",
-      mode: parser.mode
+      mode: parser2.mode
     };
   }
 });
@@ -17120,18 +20127,18 @@ defineFunction({
   },
   handler(_ref4) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref4;
-    var name = checkControlSequence(parser.gullet.popToken());
-    var middle = parser.gullet.popToken();
-    var tok = parser.gullet.popToken();
-    letCommand(parser, name, tok, funcName === "\\\\globalfuture");
-    parser.gullet.pushToken(tok);
-    parser.gullet.pushToken(middle);
+    var name = checkControlSequence(parser2.gullet.popToken());
+    var middle = parser2.gullet.popToken();
+    var tok = parser2.gullet.popToken();
+    letCommand(parser2, name, tok, funcName === "\\\\globalfuture");
+    parser2.gullet.pushToken(tok);
+    parser2.gullet.pushToken(middle);
     return {
       type: "internal",
-      mode: parser.mode
+      mode: parser2.mode
     };
   }
 });
@@ -17152,19 +20159,19 @@ var styleWrap = function styleWrap2(delim, toStyle, options, classes) {
   span.maxFontSize = newOptions.sizeMultiplier;
   return span;
 };
-var centerSpan = function centerSpan2(span, options, style) {
-  var newOptions = options.havingBaseStyle(style);
+var centerSpan = function centerSpan2(span, options, style2) {
+  var newOptions = options.havingBaseStyle(style2);
   var shift = (1 - options.sizeMultiplier / newOptions.sizeMultiplier) * options.fontMetrics().axisHeight;
   span.classes.push("delimcenter");
   span.style.top = makeEm(shift);
   span.height -= shift;
   span.depth += shift;
 };
-var makeSmallDelim = function makeSmallDelim2(delim, style, center, options, mode, classes) {
-  var text6 = buildCommon.makeSymbol(delim, "Main-Regular", mode, options);
-  var span = styleWrap(text6, style, options, classes);
+var makeSmallDelim = function makeSmallDelim2(delim, style2, center, options, mode, classes) {
+  var text8 = buildCommon.makeSymbol(delim, "Main-Regular", mode, options);
+  var span = styleWrap(text8, style2, options, classes);
   if (center) {
-    centerSpan(span, options, style);
+    centerSpan(span, options, style2);
   }
   return span;
 };
@@ -17366,12 +20373,12 @@ var makeStackedDelim = function makeStackedDelim2(delim, heightTotal, center, op
     var path3 = new PathNode(svgLabel, pathStr);
     var width = (viewBoxWidth / 1000).toFixed(3) + "em";
     var height = (viewBoxHeight / 1000).toFixed(3) + "em";
-    var svg = new SvgNode([path3], {
+    var svg3 = new SvgNode([path3], {
       width,
       height,
       viewBox: "0 0 " + viewBoxWidth + " " + viewBoxHeight
     });
-    var wrapper = buildCommon.makeSvgSpan([], [svg], options);
+    var wrapper = buildCommon.makeSvgSpan([], [svg3], options);
     wrapper.height = viewBoxHeight / 1000;
     wrapper.style.width = width;
     wrapper.style.height = height;
@@ -17409,13 +20416,13 @@ var emPad = 0.08;
 var sqrtSvg = function sqrtSvg2(sqrtName, height, viewBoxHeight, extraVinculum, options) {
   var path3 = sqrtPath(sqrtName, extraVinculum, viewBoxHeight);
   var pathNode = new PathNode(sqrtName, path3);
-  var svg = new SvgNode([pathNode], {
+  var svg3 = new SvgNode([pathNode], {
     width: "400em",
     height: makeEm(height),
     viewBox: "0 0 400000 " + viewBoxHeight,
     preserveAspectRatio: "xMinYMin slice"
   });
-  return buildCommon.makeSvgSpan(["hide-tail"], [svg], options);
+  return buildCommon.makeSvgSpan(["hide-tail"], [svg3], options);
 };
 var makeSqrtImage = function makeSqrtImage2(height, options) {
   var newOptions = options.havingBaseSizing();
@@ -17757,15 +20764,15 @@ defineFunction({
   },
   handler: (context, args) => {
     var delim = checkDelimiter(args[0], context);
-    var parser = context.parser;
-    ++parser.leftrightDepth;
-    var body = parser.parseExpression(false);
-    --parser.leftrightDepth;
-    parser.expect("\\right", false);
-    var right = assertNodeType(parser.parseFunction(), "leftright-right");
+    var parser2 = context.parser;
+    ++parser2.leftrightDepth;
+    var body = parser2.parseExpression(false);
+    --parser2.leftrightDepth;
+    parser2.expect("\\right", false);
+    var right = assertNodeType(parser2.parseFunction(), "leftright-right");
     return {
       type: "leftright",
-      mode: parser.mode,
+      mode: parser2.mode,
       body,
       left: delim.text,
       right: right.delim,
@@ -18049,14 +21056,14 @@ defineFunction({
   },
   handler(_ref, args, optArgs) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref;
     var color2 = assertNodeType(args[0], "color-token").color;
     var body = args[1];
     return {
       type: "enclose",
-      mode: parser.mode,
+      mode: parser2.mode,
       label: funcName,
       backgroundColor: color2,
       body
@@ -18075,7 +21082,7 @@ defineFunction({
   },
   handler(_ref2, args, optArgs) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref2;
     var borderColor = assertNodeType(args[0], "color-token").color;
@@ -18083,7 +21090,7 @@ defineFunction({
     var body = args[2];
     return {
       type: "enclose",
-      mode: parser.mode,
+      mode: parser2.mode,
       label: funcName,
       backgroundColor,
       borderColor,
@@ -18103,11 +21110,11 @@ defineFunction({
   },
   handler(_ref3, args) {
     var {
-      parser
+      parser: parser2
     } = _ref3;
     return {
       type: "enclose",
-      mode: parser.mode,
+      mode: parser2.mode,
       label: "\\fbox",
       body: args[0]
     };
@@ -18121,13 +21128,13 @@ defineFunction({
   },
   handler(_ref4, args) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref4;
     var body = args[0];
     return {
       type: "enclose",
-      mode: parser.mode,
+      mode: parser2.mode,
       label: funcName,
       body
     };
@@ -18145,11 +21152,11 @@ defineFunction({
   },
   handler(_ref5, args) {
     var {
-      parser
+      parser: parser2
     } = _ref5;
     return {
       type: "enclose",
-      mode: parser.mode,
+      mode: parser2.mode,
       label: "\\angl",
       body: args[0]
     };
@@ -18186,20 +21193,20 @@ var _macros = {};
 function defineMacro(name, body) {
   _macros[name] = body;
 }
-function getHLines(parser) {
+function getHLines(parser2) {
   var hlineInfo = [];
-  parser.consumeSpaces();
-  var nxt = parser.fetch().text;
+  parser2.consumeSpaces();
+  var nxt = parser2.fetch().text;
   if (nxt === "\\relax") {
-    parser.consume();
-    parser.consumeSpaces();
-    nxt = parser.fetch().text;
+    parser2.consume();
+    parser2.consumeSpaces();
+    nxt = parser2.fetch().text;
   }
   while (nxt === "\\hline" || nxt === "\\hdashline") {
-    parser.consume();
+    parser2.consume();
     hlineInfo.push(nxt === "\\hdashline");
-    parser.consumeSpaces();
-    nxt = parser.fetch().text;
+    parser2.consumeSpaces();
+    nxt = parser2.fetch().text;
   }
   return hlineInfo;
 }
@@ -18214,7 +21221,7 @@ function getAutoTag(name) {
     return name.indexOf("*") === -1;
   }
 }
-function parseArray(parser, _ref, style) {
+function parseArray(parser2, _ref, style2) {
   var {
     hskipBeforeAndAfter,
     addJot,
@@ -18227,12 +21234,12 @@ function parseArray(parser, _ref, style) {
     maxNumCols,
     leqno
   } = _ref;
-  parser.gullet.beginGroup();
+  parser2.gullet.beginGroup();
   if (!singleRow) {
-    parser.gullet.macros.set("\\cr", "\\\\\\relax");
+    parser2.gullet.macros.set("\\cr", "\\\\\\relax");
   }
   if (!arraystretch) {
-    var stretch = parser.gullet.expandMacroAsText("\\arraystretch");
+    var stretch = parser2.gullet.expandMacroAsText("\\arraystretch");
     if (stretch == null) {
       arraystretch = 1;
     } else {
@@ -18242,60 +21249,60 @@ function parseArray(parser, _ref, style) {
       }
     }
   }
-  parser.gullet.beginGroup();
-  var row = [];
-  var body = [row];
+  parser2.gullet.beginGroup();
+  var row2 = [];
+  var body = [row2];
   var rowGaps = [];
   var hLinesBeforeRow = [];
   var tags = autoTag != null ? [] : undefined;
   function beginRow() {
     if (autoTag) {
-      parser.gullet.macros.set("\\@eqnsw", "1", true);
+      parser2.gullet.macros.set("\\@eqnsw", "1", true);
     }
   }
   function endRow() {
     if (tags) {
-      if (parser.gullet.macros.get("\\df@tag")) {
-        tags.push(parser.subparse([new Token("\\df@tag")]));
-        parser.gullet.macros.set("\\df@tag", undefined, true);
+      if (parser2.gullet.macros.get("\\df@tag")) {
+        tags.push(parser2.subparse([new Token("\\df@tag")]));
+        parser2.gullet.macros.set("\\df@tag", undefined, true);
       } else {
-        tags.push(Boolean(autoTag) && parser.gullet.macros.get("\\@eqnsw") === "1");
+        tags.push(Boolean(autoTag) && parser2.gullet.macros.get("\\@eqnsw") === "1");
       }
     }
   }
   beginRow();
-  hLinesBeforeRow.push(getHLines(parser));
+  hLinesBeforeRow.push(getHLines(parser2));
   while (true) {
-    var cell = parser.parseExpression(false, singleRow ? "\\end" : "\\\\");
-    parser.gullet.endGroup();
-    parser.gullet.beginGroup();
-    cell = {
+    var cell2 = parser2.parseExpression(false, singleRow ? "\\end" : "\\\\");
+    parser2.gullet.endGroup();
+    parser2.gullet.beginGroup();
+    cell2 = {
       type: "ordgroup",
-      mode: parser.mode,
-      body: cell
+      mode: parser2.mode,
+      body: cell2
     };
-    if (style) {
-      cell = {
+    if (style2) {
+      cell2 = {
         type: "styling",
-        mode: parser.mode,
-        style,
-        body: [cell]
+        mode: parser2.mode,
+        style: style2,
+        body: [cell2]
       };
     }
-    row.push(cell);
-    var next = parser.fetch().text;
+    row2.push(cell2);
+    var next = parser2.fetch().text;
     if (next === "&") {
-      if (maxNumCols && row.length === maxNumCols) {
+      if (maxNumCols && row2.length === maxNumCols) {
         if (singleRow || colSeparationType) {
-          throw new ParseError("Too many tab characters: &", parser.nextToken);
+          throw new ParseError("Too many tab characters: &", parser2.nextToken);
         } else {
-          parser.settings.reportNonstrict("textEnv", "Too few columns " + "specified in the {array} column argument.");
+          parser2.settings.reportNonstrict("textEnv", "Too few columns " + "specified in the {array} column argument.");
         }
       }
-      parser.consume();
+      parser2.consume();
     } else if (next === "\\end") {
       endRow();
-      if (row.length === 1 && cell.type === "styling" && cell.body[0].body.length === 0 && (body.length > 1 || !emptySingleRow)) {
+      if (row2.length === 1 && cell2.type === "styling" && cell2.body[0].body.length === 0 && (body.length > 1 || !emptySingleRow)) {
         body.pop();
       }
       if (hLinesBeforeRow.length < body.length + 1) {
@@ -18303,26 +21310,26 @@ function parseArray(parser, _ref, style) {
       }
       break;
     } else if (next === "\\\\") {
-      parser.consume();
+      parser2.consume();
       var size = undefined;
-      if (parser.gullet.future().text !== " ") {
-        size = parser.parseSizeGroup(true);
+      if (parser2.gullet.future().text !== " ") {
+        size = parser2.parseSizeGroup(true);
       }
       rowGaps.push(size ? size.value : null);
       endRow();
-      hLinesBeforeRow.push(getHLines(parser));
-      row = [];
-      body.push(row);
+      hLinesBeforeRow.push(getHLines(parser2));
+      row2 = [];
+      body.push(row2);
       beginRow();
     } else {
-      throw new ParseError("Expected & or \\\\ or \\cr or \\end", parser.nextToken);
+      throw new ParseError("Expected & or \\\\ or \\cr or \\end", parser2.nextToken);
     }
   }
-  parser.gullet.endGroup();
-  parser.gullet.endGroup();
+  parser2.gullet.endGroup();
+  parser2.gullet.endGroup();
   return {
     type: "array",
-    mode: parser.mode,
+    mode: parser2.mode,
     addJot,
     arraystretch,
     body,
@@ -18489,14 +21496,14 @@ var htmlBuilder$6 = function htmlBuilder(group, options) {
     }
     var col = [];
     for (r = 0;r < nr; ++r) {
-      var row = body[r];
-      var elem = row[c];
+      var row2 = body[r];
+      var elem = row2[c];
       if (!elem) {
         continue;
       }
-      var _shift2 = row.pos - offset;
-      elem.depth = row.depth;
-      elem.height = row.height;
+      var _shift2 = row2.pos - offset;
+      elem.depth = row2.depth;
+      elem.height = row2.height;
       col.push({
         type: "elem",
         elem,
@@ -18571,24 +21578,24 @@ var mathmlBuilder$5 = function mathmlBuilder(group, options) {
   var tag = new mathMLTree.MathNode("mtd", [], ["mml-eqn-num"]);
   for (var i2 = 0;i2 < group.body.length; i2++) {
     var rw = group.body[i2];
-    var row = [];
+    var row2 = [];
     for (var j = 0;j < rw.length; j++) {
-      row.push(new mathMLTree.MathNode("mtd", [buildGroup2(rw[j], options)]));
+      row2.push(new mathMLTree.MathNode("mtd", [buildGroup2(rw[j], options)]));
     }
     if (group.tags && group.tags[i2]) {
-      row.unshift(glue);
-      row.push(glue);
+      row2.unshift(glue);
+      row2.push(glue);
       if (group.leqno) {
-        row.unshift(tag);
+        row2.unshift(tag);
       } else {
-        row.push(tag);
+        row2.push(tag);
       }
     }
-    tbl.push(new mathMLTree.MathNode("mtr", row));
+    tbl.push(new mathMLTree.MathNode("mtr", row2));
   }
-  var table = new mathMLTree.MathNode("mtable", tbl);
+  var table2 = new mathMLTree.MathNode("mtable", tbl);
   var gap = group.arraystretch === 0.5 ? 0.1 : 0.16 + group.arraystretch - 1 + (group.addJot ? 0.09 : 0);
-  table.setAttribute("rowspacing", makeEm(gap));
+  table2.setAttribute("rowspacing", makeEm(gap));
   var menclose = "";
   var align = "";
   if (group.cols && group.cols.length > 0) {
@@ -18619,9 +21626,9 @@ var mathmlBuilder$5 = function mathmlBuilder(group, options) {
         }
       }
     }
-    table.setAttribute("columnalign", align.trim());
+    table2.setAttribute("columnalign", align.trim());
     if (/[sd]/.test(columnLines)) {
-      table.setAttribute("columnlines", columnLines.trim());
+      table2.setAttribute("columnlines", columnLines.trim());
     }
   }
   if (group.colSeparationType === "align") {
@@ -18630,15 +21637,15 @@ var mathmlBuilder$5 = function mathmlBuilder(group, options) {
     for (var _i22 = 1;_i22 < _cols.length; _i22++) {
       spacing2 += _i22 % 2 ? "0em " : "1em ";
     }
-    table.setAttribute("columnspacing", spacing2.trim());
+    table2.setAttribute("columnspacing", spacing2.trim());
   } else if (group.colSeparationType === "alignat" || group.colSeparationType === "gather") {
-    table.setAttribute("columnspacing", "0em");
+    table2.setAttribute("columnspacing", "0em");
   } else if (group.colSeparationType === "small") {
-    table.setAttribute("columnspacing", "0.2778em");
+    table2.setAttribute("columnspacing", "0.2778em");
   } else if (group.colSeparationType === "CD") {
-    table.setAttribute("columnspacing", "0.5em");
+    table2.setAttribute("columnspacing", "0.5em");
   } else {
-    table.setAttribute("columnspacing", "1em");
+    table2.setAttribute("columnspacing", "1em");
   }
   var rowLines = "";
   var hlines = group.hLinesBeforeRow;
@@ -18648,17 +21655,17 @@ var mathmlBuilder$5 = function mathmlBuilder(group, options) {
     rowLines += hlines[_i32].length === 0 ? "none " : hlines[_i32][0] ? "dashed " : "solid ";
   }
   if (/[sd]/.test(rowLines)) {
-    table.setAttribute("rowlines", rowLines.trim());
+    table2.setAttribute("rowlines", rowLines.trim());
   }
   if (menclose !== "") {
-    table = new mathMLTree.MathNode("menclose", [table]);
-    table.setAttribute("notation", menclose.trim());
+    table2 = new mathMLTree.MathNode("menclose", [table2]);
+    table2.setAttribute("notation", menclose.trim());
   }
   if (group.arraystretch && group.arraystretch < 1) {
-    table = new mathMLTree.MathNode("mstyle", [table]);
-    table.setAttribute("scriptlevel", "1");
+    table2 = new mathMLTree.MathNode("mstyle", [table2]);
+    table2.setAttribute("scriptlevel", "1");
   }
-  return table;
+  return table2;
 };
 var alignedHandler = function alignedHandler2(context, args) {
   if (context.envName.indexOf("ed") === -1) {
@@ -18693,19 +21700,19 @@ var alignedHandler = function alignedHandler2(context, args) {
     numCols = numMaths * 2;
   }
   var isAligned = !numCols;
-  res.body.forEach(function(row) {
-    for (var _i42 = 1;_i42 < row.length; _i42 += 2) {
-      var styling = assertNodeType(row[_i42], "styling");
+  res.body.forEach(function(row2) {
+    for (var _i42 = 1;_i42 < row2.length; _i42 += 2) {
+      var styling = assertNodeType(row2[_i42], "styling");
       var ordgroup = assertNodeType(styling.body[0], "ordgroup");
       ordgroup.body.unshift(emptyGroup);
     }
     if (!isAligned) {
-      var curMaths = row.length / 2;
+      var curMaths = row2.length / 2;
       if (numMaths < curMaths) {
-        throw new ParseError("Too many math in a row: " + ("expected " + numMaths + ", but got " + curMaths), row[0]);
+        throw new ParseError("Too many math in a row: " + ("expected " + numMaths + ", but got " + curMaths), row2[0]);
       }
-    } else if (numCols < row.length) {
-      numCols = row.length;
+    } else if (numCols < row2.length) {
+      numCols = row2.length;
     }
   });
   for (var _i52 = 0;_i52 < numCols; ++_i52) {
@@ -18790,19 +21797,19 @@ defineEnvironment({
       }]
     };
     if (context.envName.charAt(context.envName.length - 1) === "*") {
-      var parser = context.parser;
-      parser.consumeSpaces();
-      if (parser.fetch().text === "[") {
-        parser.consume();
-        parser.consumeSpaces();
-        colAlign = parser.fetch().text;
+      var parser2 = context.parser;
+      parser2.consumeSpaces();
+      if (parser2.fetch().text === "[") {
+        parser2.consume();
+        parser2.consumeSpaces();
+        colAlign = parser2.fetch().text;
         if ("lcr".indexOf(colAlign) === -1) {
-          throw new ParseError("Expected l or c or r", parser.nextToken);
+          throw new ParseError("Expected l or c or r", parser2.nextToken);
         }
-        parser.consume();
-        parser.consumeSpaces();
-        parser.expect("]");
-        parser.consume();
+        parser2.consume();
+        parser2.consumeSpaces();
+        parser2.expect("]");
+        parser2.consume();
         payload.cols = [{
           type: "align",
           align: colAlign
@@ -18810,7 +21817,7 @@ defineEnvironment({
       }
     }
     var res = parseArray(context.parser, payload, dCellStyle(context.envName));
-    var numCols = Math.max(0, ...res.body.map((row) => row.length));
+    var numCols = Math.max(0, ...res.body.map((row2) => row2.length));
     res.cols = new Array(numCols).fill({
       type: "align",
       align: colAlign
@@ -19018,7 +22025,7 @@ defineFunction({
   },
   handler(_ref, args) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref;
     var nameGroup = args[0];
@@ -19033,20 +22040,20 @@ defineFunction({
       if (!environments.hasOwnProperty(envName)) {
         throw new ParseError("No such environment: " + envName, nameGroup);
       }
-      var env = environments[envName];
+      var env2 = environments[envName];
       var {
         args: _args,
         optArgs
-      } = parser.parseArguments("\\begin{" + envName + "}", env);
+      } = parser2.parseArguments("\\begin{" + envName + "}", env2);
       var context = {
-        mode: parser.mode,
+        mode: parser2.mode,
         envName,
-        parser
+        parser: parser2
       };
-      var result = env.handler(context, _args, optArgs);
-      parser.expect("\\end", false);
-      var endNameToken = parser.nextToken;
-      var end = assertNodeType(parser.parseFunction(), "environment");
+      var result = env2.handler(context, _args, optArgs);
+      parser2.expect("\\end", false);
+      var endNameToken = parser2.nextToken;
+      var end = assertNodeType(parser2.parseFunction(), "environment");
       if (end.name !== envName) {
         throw new ParseError("Mismatch: \\begin{" + envName + "} matched by \\end{" + end.name + "}", endNameToken);
       }
@@ -19054,7 +22061,7 @@ defineFunction({
     }
     return {
       type: "environment",
-      mode: parser.mode,
+      mode: parser2.mode,
       name: envName,
       nameGroup
     };
@@ -19100,7 +22107,7 @@ defineFunction({
   },
   handler: (_ref, args) => {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref;
     var body = normalizeArgument(args[0]);
@@ -19110,7 +22117,7 @@ defineFunction({
     }
     return {
       type: "font",
-      mode: parser.mode,
+      mode: parser2.mode,
       font: func.slice(1),
       body
     };
@@ -19126,17 +22133,17 @@ defineFunction({
   },
   handler: (_ref2, args) => {
     var {
-      parser
+      parser: parser2
     } = _ref2;
     var body = args[0];
     var isCharacterBox3 = utils.isCharacterBox(body);
     return {
       type: "mclass",
-      mode: parser.mode,
+      mode: parser2.mode,
       mclass: binrelClass(body),
       body: [{
         type: "font",
-        mode: parser.mode,
+        mode: parser2.mode,
         font: "boldsymbol",
         body
       }],
@@ -19153,22 +22160,22 @@ defineFunction({
   },
   handler: (_ref3, args) => {
     var {
-      parser,
+      parser: parser2,
       funcName,
       breakOnTokenText
     } = _ref3;
     var {
       mode
-    } = parser;
-    var body = parser.parseExpression(true, breakOnTokenText);
-    var style = "math" + funcName.slice(1);
+    } = parser2;
+    var body = parser2.parseExpression(true, breakOnTokenText);
+    var style2 = "math" + funcName.slice(1);
     return {
       type: "font",
       mode,
-      font: style,
+      font: style2,
       body: {
         type: "ordgroup",
-        mode: parser.mode,
+        mode: parser2.mode,
         body
       }
     };
@@ -19177,22 +22184,22 @@ defineFunction({
   mathmlBuilder: mathmlBuilder$4
 });
 var adjustStyle = (size, originalStyle) => {
-  var style = originalStyle;
+  var style2 = originalStyle;
   if (size === "display") {
-    style = style.id >= Style$1.SCRIPT.id ? style.text() : Style$1.DISPLAY;
-  } else if (size === "text" && style.size === Style$1.DISPLAY.size) {
-    style = Style$1.TEXT;
+    style2 = style2.id >= Style$1.SCRIPT.id ? style2.text() : Style$1.DISPLAY;
+  } else if (size === "text" && style2.size === Style$1.DISPLAY.size) {
+    style2 = Style$1.TEXT;
   } else if (size === "script") {
-    style = Style$1.SCRIPT;
+    style2 = Style$1.SCRIPT;
   } else if (size === "scriptscript") {
-    style = Style$1.SCRIPTSCRIPT;
+    style2 = Style$1.SCRIPTSCRIPT;
   }
-  return style;
+  return style2;
 };
 var htmlBuilder$4 = (group, options) => {
-  var style = adjustStyle(group.size, options.style);
-  var nstyle = style.fracNum();
-  var dstyle = style.fracDen();
+  var style2 = adjustStyle(group.size, options.style);
+  var nstyle = style2.fracNum();
+  var dstyle = style2.fracDen();
   var newOptions;
   newOptions = options.havingStyle(nstyle);
   var numerm = buildGroup$1(group.numer, newOptions, options);
@@ -19224,7 +22231,7 @@ var htmlBuilder$4 = (group, options) => {
   var numShift;
   var clearance;
   var denomShift;
-  if (style.size === Style$1.DISPLAY.size || group.size === "display") {
+  if (style2.size === Style$1.DISPLAY.size || group.size === "display") {
     numShift = options.fontMetrics().num1;
     if (ruleWidth > 0) {
       clearance = 3 * ruleSpacing;
@@ -19287,13 +22294,13 @@ var htmlBuilder$4 = (group, options) => {
       }]
     }, options);
   }
-  newOptions = options.havingStyle(style);
+  newOptions = options.havingStyle(style2);
   frac.height *= newOptions.sizeMultiplier / options.sizeMultiplier;
   frac.depth *= newOptions.sizeMultiplier / options.sizeMultiplier;
   var delimSize;
-  if (style.size === Style$1.DISPLAY.size) {
+  if (style2.size === Style$1.DISPLAY.size) {
     delimSize = options.fontMetrics().delim1;
-  } else if (style.size === Style$1.SCRIPTSCRIPT.size) {
+  } else if (style2.size === Style$1.SCRIPTSCRIPT.size) {
     delimSize = options.havingStyle(Style$1.SCRIPT).fontMetrics().delim2;
   } else {
     delimSize = options.fontMetrics().delim2;
@@ -19303,14 +22310,14 @@ var htmlBuilder$4 = (group, options) => {
   if (group.leftDelim == null) {
     leftDelim = makeNullDelimiter(options, ["mopen"]);
   } else {
-    leftDelim = delimiter.customSizedDelim(group.leftDelim, delimSize, true, options.havingStyle(style), group.mode, ["mopen"]);
+    leftDelim = delimiter.customSizedDelim(group.leftDelim, delimSize, true, options.havingStyle(style2), group.mode, ["mopen"]);
   }
   if (group.continued) {
     rightDelim = buildCommon.makeSpan([]);
   } else if (group.rightDelim == null) {
     rightDelim = makeNullDelimiter(options, ["mclose"]);
   } else {
-    rightDelim = delimiter.customSizedDelim(group.rightDelim, delimSize, true, options.havingStyle(style), group.mode, ["mclose"]);
+    rightDelim = delimiter.customSizedDelim(group.rightDelim, delimSize, true, options.havingStyle(style2), group.mode, ["mclose"]);
   }
   return buildCommon.makeSpan(["mord"].concat(newOptions.sizingClasses(options)), [leftDelim, buildCommon.makeSpan(["mfrac"], [frac]), rightDelim], options);
 };
@@ -19322,10 +22329,10 @@ var mathmlBuilder$3 = (group, options) => {
     var ruleWidth = calculateSize(group.barSize, options);
     node2.setAttribute("linethickness", makeEm(ruleWidth));
   }
-  var style = adjustStyle(group.size, options.style);
-  if (style.size !== options.style.size) {
+  var style2 = adjustStyle(group.size, options.style);
+  if (style2.size !== options.style.size) {
     node2 = new mathMLTree.MathNode("mstyle", [node2]);
-    var isDisplay = style.size === Style$1.DISPLAY.size ? "true" : "false";
+    var isDisplay = style2.size === Style$1.DISPLAY.size ? "true" : "false";
     node2.setAttribute("displaystyle", isDisplay);
     node2.setAttribute("scriptlevel", "0");
   }
@@ -19365,7 +22372,7 @@ defineFunction({
   },
   handler: (_ref, args) => {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref;
     var numer = args[0];
@@ -19415,7 +22422,7 @@ defineFunction({
     }
     return {
       type: "genfrac",
-      mode: parser.mode,
+      mode: parser2.mode,
       continued: false,
       numer,
       denom,
@@ -19437,14 +22444,14 @@ defineFunction({
   },
   handler: (_ref2, args) => {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref2;
     var numer = args[0];
     var denom = args[1];
     return {
       type: "genfrac",
-      mode: parser.mode,
+      mode: parser2.mode,
       continued: true,
       numer,
       denom,
@@ -19465,7 +22472,7 @@ defineFunction({
   },
   handler(_ref3) {
     var {
-      parser,
+      parser: parser2,
       funcName,
       token
     } = _ref3;
@@ -19491,7 +22498,7 @@ defineFunction({
     }
     return {
       type: "infix",
-      mode: parser.mode,
+      mode: parser2.mode,
       replaceWith,
       token
     };
@@ -19516,7 +22523,7 @@ defineFunction({
   },
   handler(_ref4, args) {
     var {
-      parser
+      parser: parser2
     } = _ref4;
     var numer = args[4];
     var denom = args[5];
@@ -19546,7 +22553,7 @@ defineFunction({
     }
     return {
       type: "genfrac",
-      mode: parser.mode,
+      mode: parser2.mode,
       numer,
       denom,
       continued: false,
@@ -19570,13 +22577,13 @@ defineFunction({
   },
   handler(_ref5, args) {
     var {
-      parser,
+      parser: parser2,
       funcName,
       token
     } = _ref5;
     return {
       type: "infix",
-      mode: parser.mode,
+      mode: parser2.mode,
       replaceWith: "\\\\abovefrac",
       size: assertNodeType(args[0], "size").value,
       token
@@ -19592,7 +22599,7 @@ defineFunction({
   },
   handler: (_ref6, args) => {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref6;
     var numer = args[0];
@@ -19601,7 +22608,7 @@ defineFunction({
     var hasBarLine = barSize.number > 0;
     return {
       type: "genfrac",
-      mode: parser.mode,
+      mode: parser2.mode,
       numer,
       denom,
       continued: false,
@@ -19616,11 +22623,11 @@ defineFunction({
   mathmlBuilder: mathmlBuilder$3
 });
 var htmlBuilder$3 = (grp, options) => {
-  var style = options.style;
+  var style2 = options.style;
   var supSubGroup;
   var group;
   if (grp.type === "supsub") {
-    supSubGroup = grp.sup ? buildGroup$1(grp.sup, options.havingStyle(style.sup()), options) : buildGroup$1(grp.sub, options.havingStyle(style.sub()), options);
+    supSubGroup = grp.sup ? buildGroup$1(grp.sup, options.havingStyle(style2.sup()), options) : buildGroup$1(grp.sub, options.havingStyle(style2.sub()), options);
     group = assertNodeType(grp.base, "horizBrace");
   } else {
     group = assertNodeType(grp, "horizBrace");
@@ -19707,12 +22714,12 @@ defineFunction({
   },
   handler(_ref, args) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref;
     return {
       type: "horizBrace",
-      mode: parser.mode,
+      mode: parser2.mode,
       label: funcName,
       isOver: /^\\over/.test(funcName),
       base: args[0]
@@ -19731,19 +22738,19 @@ defineFunction({
   },
   handler: (_ref, args) => {
     var {
-      parser
+      parser: parser2
     } = _ref;
     var body = args[1];
     var href = assertNodeType(args[0], "url").url;
-    if (!parser.settings.isTrusted({
+    if (!parser2.settings.isTrusted({
       command: "\\href",
       url: href
     })) {
-      return parser.formatUnsupportedCmd("\\href");
+      return parser2.formatUnsupportedCmd("\\href");
     }
     return {
       type: "href",
-      mode: parser.mode,
+      mode: parser2.mode,
       href,
       body: ordargument(body)
     };
@@ -19771,14 +22778,14 @@ defineFunction({
   },
   handler: (_ref2, args) => {
     var {
-      parser
+      parser: parser2
     } = _ref2;
     var href = assertNodeType(args[0], "url").url;
-    if (!parser.settings.isTrusted({
+    if (!parser2.settings.isTrusted({
       command: "\\url",
       url: href
     })) {
-      return parser.formatUnsupportedCmd("\\url");
+      return parser2.formatUnsupportedCmd("\\url");
     }
     var chars = [];
     for (var i2 = 0;i2 < href.length; i2++) {
@@ -19794,13 +22801,13 @@ defineFunction({
     }
     var body = {
       type: "text",
-      mode: parser.mode,
+      mode: parser2.mode,
       font: "\\texttt",
       body: chars
     };
     return {
       type: "href",
-      mode: parser.mode,
+      mode: parser2.mode,
       href,
       body: ordargument(body)
     };
@@ -19817,11 +22824,11 @@ defineFunction({
   },
   handler(_ref, args) {
     var {
-      parser
+      parser: parser2
     } = _ref;
     return {
       type: "hbox",
-      mode: parser.mode,
+      mode: parser2.mode,
       body: ordargument(args[0])
     };
   },
@@ -19843,14 +22850,14 @@ defineFunction({
   },
   handler: (_ref, args) => {
     var {
-      parser,
+      parser: parser2,
       funcName,
       token
     } = _ref;
     var value = assertNodeType(args[0], "raw").string;
     var body = args[1];
-    if (parser.settings.strict) {
-      parser.settings.reportNonstrict("htmlExtension", "HTML extension is disabled on strict mode");
+    if (parser2.settings.strict) {
+      parser2.settings.reportNonstrict("htmlExtension", "HTML extension is disabled on strict mode");
     }
     var trustContext;
     var attributes = {};
@@ -19894,12 +22901,12 @@ defineFunction({
       default:
         throw new Error("Unrecognized html command");
     }
-    if (!parser.settings.isTrusted(trustContext)) {
-      return parser.formatUnsupportedCmd(funcName);
+    if (!parser2.settings.isTrusted(trustContext)) {
+      return parser2.formatUnsupportedCmd(funcName);
     }
     return {
       type: "html",
-      mode: parser.mode,
+      mode: parser2.mode,
       attributes,
       body: ordargument(body)
     };
@@ -19931,11 +22938,11 @@ defineFunction({
   },
   handler: (_ref, args) => {
     var {
-      parser
+      parser: parser2
     } = _ref;
     return {
       type: "htmlmathml",
-      mode: parser.mode,
+      mode: parser2.mode,
       html: ordargument(args[0]),
       mathml: ordargument(args[1])
     };
@@ -19980,7 +22987,7 @@ defineFunction({
   },
   handler: (_ref, args, optArgs) => {
     var {
-      parser
+      parser: parser2
     } = _ref;
     var width = {
       number: 0,
@@ -20027,15 +23034,15 @@ defineFunction({
       alt = alt.replace(/^.*[\\/]/, "");
       alt = alt.substring(0, alt.lastIndexOf("."));
     }
-    if (!parser.settings.isTrusted({
+    if (!parser2.settings.isTrusted({
       command: "\\includegraphics",
       url: src
     })) {
-      return parser.formatUnsupportedCmd("\\includegraphics");
+      return parser2.formatUnsupportedCmd("\\includegraphics");
     }
     return {
       type: "includegraphics",
-      mode: parser.mode,
+      mode: parser2.mode,
       alt,
       width,
       height,
@@ -20053,16 +23060,16 @@ defineFunction({
     if (group.width.number > 0) {
       width = calculateSize(group.width, options);
     }
-    var style = {
+    var style2 = {
       height: makeEm(height + depth)
     };
     if (width > 0) {
-      style.width = makeEm(width);
+      style2.width = makeEm(width);
     }
     if (depth > 0) {
-      style.verticalAlign = makeEm(-depth);
+      style2.verticalAlign = makeEm(-depth);
     }
-    var node2 = new Img(group.src, group.alt, style);
+    var node2 = new Img(group.src, group.alt, style2);
     node2.height = height;
     node2.depth = depth;
     return node2;
@@ -20096,29 +23103,29 @@ defineFunction({
   },
   handler(_ref, args) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref;
     var size = assertNodeType(args[0], "size");
-    if (parser.settings.strict) {
+    if (parser2.settings.strict) {
       var mathFunction = funcName[1] === "m";
       var muUnit = size.value.unit === "mu";
       if (mathFunction) {
         if (!muUnit) {
-          parser.settings.reportNonstrict("mathVsTextUnits", "LaTeX's " + funcName + " supports only mu units, " + ("not " + size.value.unit + " units"));
+          parser2.settings.reportNonstrict("mathVsTextUnits", "LaTeX's " + funcName + " supports only mu units, " + ("not " + size.value.unit + " units"));
         }
-        if (parser.mode !== "math") {
-          parser.settings.reportNonstrict("mathVsTextUnits", "LaTeX's " + funcName + " works only in math mode");
+        if (parser2.mode !== "math") {
+          parser2.settings.reportNonstrict("mathVsTextUnits", "LaTeX's " + funcName + " works only in math mode");
         }
       } else {
         if (muUnit) {
-          parser.settings.reportNonstrict("mathVsTextUnits", "LaTeX's " + funcName + " doesn't support mu units");
+          parser2.settings.reportNonstrict("mathVsTextUnits", "LaTeX's " + funcName + " doesn't support mu units");
         }
       }
     }
     return {
       type: "kern",
-      mode: parser.mode,
+      mode: parser2.mode,
       dimension: size.value
     };
   },
@@ -20139,13 +23146,13 @@ defineFunction({
   },
   handler: (_ref, args) => {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref;
     var body = args[0];
     return {
       type: "lap",
-      mode: parser.mode,
+      mode: parser2.mode,
       alignment: funcName.slice(5),
       body
     };
@@ -20190,17 +23197,17 @@ defineFunction({
   handler(_ref, args) {
     var {
       funcName,
-      parser
+      parser: parser2
     } = _ref;
-    var outerMode = parser.mode;
-    parser.switchMode("math");
+    var outerMode = parser2.mode;
+    parser2.switchMode("math");
     var close2 = funcName === "\\(" ? "\\)" : "$";
-    var body = parser.parseExpression(false, close2);
-    parser.expect(close2);
-    parser.switchMode(outerMode);
+    var body = parser2.parseExpression(false, close2);
+    parser2.expect(close2);
+    parser2.switchMode(outerMode);
     return {
       type: "styling",
-      mode: parser.mode,
+      mode: parser2.mode,
       style: "text",
       body
     };
@@ -20241,11 +23248,11 @@ defineFunction({
   },
   handler: (_ref, args) => {
     var {
-      parser
+      parser: parser2
     } = _ref;
     return {
       type: "mathchoice",
-      mode: parser.mode,
+      mode: parser2.mode,
       display: ordargument(args[0]),
       text: ordargument(args[1]),
       script: ordargument(args[2]),
@@ -20262,20 +23269,20 @@ defineFunction({
     return buildExpressionRow(body, options);
   }
 });
-var assembleSupSub = (base, supGroup, subGroup, options, style, slant, baseShift) => {
+var assembleSupSub = (base, supGroup, subGroup, options, style2, slant, baseShift) => {
   base = buildCommon.makeSpan([], [base]);
   var subIsSingleCharacter = subGroup && utils.isCharacterBox(subGroup);
   var sub2;
   var sup2;
   if (supGroup) {
-    var elem = buildGroup$1(supGroup, options.havingStyle(style.sup()), options);
+    var elem = buildGroup$1(supGroup, options.havingStyle(style2.sup()), options);
     sup2 = {
       elem,
       kern: Math.max(options.fontMetrics().bigOpSpacing1, options.fontMetrics().bigOpSpacing3 - elem.depth)
     };
   }
   if (subGroup) {
-    var _elem = buildGroup$1(subGroup, options.havingStyle(style.sub()), options);
+    var _elem = buildGroup$1(subGroup, options.havingStyle(style2.sub()), options);
     sub2 = {
       elem: _elem,
       kern: Math.max(options.fontMetrics().bigOpSpacing2, options.fontMetrics().bigOpSpacing4 - _elem.height)
@@ -20377,9 +23384,9 @@ var htmlBuilder$2 = (grp, options) => {
   } else {
     group = assertNodeType(grp, "op");
   }
-  var style = options.style;
+  var style2 = options.style;
   var large = false;
-  if (style.size === Style$1.DISPLAY.size && group.symbol && !utils.contains(noSuccessor, group.name)) {
+  if (style2.size === Style$1.DISPLAY.size && group.symbol && !utils.contains(noSuccessor, group.name)) {
     large = true;
   }
   var base;
@@ -20432,7 +23439,7 @@ var htmlBuilder$2 = (grp, options) => {
     slant = base.italic;
   }
   if (hasLimits) {
-    return assembleSupSub(base, supGroup, subGroup, options, style, slant, baseShift);
+    return assembleSupSub(base, supGroup, subGroup, options, style2, slant, baseShift);
   } else {
     if (baseShift) {
       base.style.position = "relative";
@@ -20483,7 +23490,7 @@ defineFunction({
   },
   handler: (_ref, args) => {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref;
     var fName = funcName;
@@ -20492,7 +23499,7 @@ defineFunction({
     }
     return {
       type: "op",
-      mode: parser.mode,
+      mode: parser2.mode,
       limits: true,
       parentIsSupSub: false,
       symbol: true,
@@ -20511,12 +23518,12 @@ defineFunction({
   },
   handler: (_ref2, args) => {
     var {
-      parser
+      parser: parser2
     } = _ref2;
     var body = args[0];
     return {
       type: "op",
-      mode: parser.mode,
+      mode: parser2.mode,
       limits: false,
       parentIsSupSub: false,
       symbol: false,
@@ -20542,12 +23549,12 @@ defineFunction({
   },
   handler(_ref3) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref3;
     return {
       type: "op",
-      mode: parser.mode,
+      mode: parser2.mode,
       limits: false,
       parentIsSupSub: false,
       symbol: false,
@@ -20565,12 +23572,12 @@ defineFunction({
   },
   handler(_ref4) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref4;
     return {
       type: "op",
-      mode: parser.mode,
+      mode: parser2.mode,
       limits: true,
       parentIsSupSub: false,
       symbol: false,
@@ -20588,7 +23595,7 @@ defineFunction({
   },
   handler(_ref5) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref5;
     var fName = funcName;
@@ -20597,7 +23604,7 @@ defineFunction({
     }
     return {
       type: "op",
-      mode: parser.mode,
+      mode: parser2.mode,
       limits: false,
       parentIsSupSub: false,
       symbol: true,
@@ -20703,13 +23710,13 @@ defineFunction({
   },
   handler: (_ref, args) => {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref;
     var body = args[0];
     return {
       type: "operatorname",
-      mode: parser.mode,
+      mode: parser2.mode,
       body: ordargument(body),
       alwaysHandleSupSub: funcName === "\\operatornamewithlimits",
       limits: false,
@@ -20740,12 +23747,12 @@ defineFunction({
   },
   handler(_ref, args) {
     var {
-      parser
+      parser: parser2
     } = _ref;
     var body = args[0];
     return {
       type: "overline",
-      mode: parser.mode,
+      mode: parser2.mode,
       body
     };
   },
@@ -20788,12 +23795,12 @@ defineFunction({
   },
   handler: (_ref, args) => {
     var {
-      parser
+      parser: parser2
     } = _ref;
     var body = args[0];
     return {
       type: "phantom",
-      mode: parser.mode,
+      mode: parser2.mode,
       body: ordargument(body)
     };
   },
@@ -20815,12 +23822,12 @@ defineFunction({
   },
   handler: (_ref2, args) => {
     var {
-      parser
+      parser: parser2
     } = _ref2;
     var body = args[0];
     return {
       type: "hphantom",
-      mode: parser.mode,
+      mode: parser2.mode,
       body
     };
   },
@@ -20861,12 +23868,12 @@ defineFunction({
   },
   handler: (_ref3, args) => {
     var {
-      parser
+      parser: parser2
     } = _ref3;
     var body = args[0];
     return {
       type: "vphantom",
-      mode: parser.mode,
+      mode: parser2.mode,
       body
     };
   },
@@ -20893,13 +23900,13 @@ defineFunction({
   },
   handler(_ref, args) {
     var {
-      parser
+      parser: parser2
     } = _ref;
     var amount = assertNodeType(args[0], "size").value;
     var body = args[1];
     return {
       type: "raisebox",
-      mode: parser.mode,
+      mode: parser2.mode,
       dy: amount,
       body
     };
@@ -20932,11 +23939,11 @@ defineFunction({
   },
   handler(_ref) {
     var {
-      parser
+      parser: parser2
     } = _ref;
     return {
       type: "internal",
-      mode: parser.mode
+      mode: parser2.mode
     };
   }
 });
@@ -20952,14 +23959,14 @@ defineFunction({
   },
   handler(_ref, args, optArgs) {
     var {
-      parser
+      parser: parser2
     } = _ref;
     var shift = optArgs[0];
     var width = assertNodeType(args[0], "size");
     var height = assertNodeType(args[1], "size");
     return {
       type: "rule",
-      mode: parser.mode,
+      mode: parser2.mode,
       shift: shift && assertNodeType(shift, "size").value,
       width: width.value,
       height: height.value
@@ -21030,12 +24037,12 @@ defineFunction({
     var {
       breakOnTokenText,
       funcName,
-      parser
+      parser: parser2
     } = _ref;
-    var body = parser.parseExpression(false, breakOnTokenText);
+    var body = parser2.parseExpression(false, breakOnTokenText);
     return {
       type: "sizing",
-      mode: parser.mode,
+      mode: parser2.mode,
       size: sizeFuncs.indexOf(funcName) + 1,
       body
     };
@@ -21059,7 +24066,7 @@ defineFunction({
   },
   handler: (_ref, args, optArgs) => {
     var {
-      parser
+      parser: parser2
     } = _ref;
     var smashHeight = false;
     var smashDepth = false;
@@ -21086,7 +24093,7 @@ defineFunction({
     var body = args[0];
     return {
       type: "smash",
-      mode: parser.mode,
+      mode: parser2.mode,
       body,
       smashHeight,
       smashDepth
@@ -21142,13 +24149,13 @@ defineFunction({
   },
   handler(_ref, args, optArgs) {
     var {
-      parser
+      parser: parser2
     } = _ref;
     var index2 = optArgs[0];
     var body = args[0];
     return {
       type: "sqrt",
-      mode: parser.mode,
+      mode: parser2.mode,
       body,
       index: index2
     };
@@ -21239,14 +24246,14 @@ defineFunction({
     var {
       breakOnTokenText,
       funcName,
-      parser
+      parser: parser2
     } = _ref;
-    var body = parser.parseExpression(true, breakOnTokenText);
-    var style = funcName.slice(1, funcName.length - 5);
+    var body = parser2.parseExpression(true, breakOnTokenText);
+    var style2 = funcName.slice(1, funcName.length - 5);
     return {
       type: "styling",
-      mode: parser.mode,
-      style,
+      mode: parser2.mode,
+      style: style2,
       body
     };
   },
@@ -21501,17 +24508,17 @@ defineFunctionBuilders({
     return buildCommon.makeOrd(group, options, "textord");
   },
   mathmlBuilder(group, options) {
-    var text6 = makeText(group.text, group.mode, options);
+    var text8 = makeText(group.text, group.mode, options);
     var variant = getVariant(group, options) || "normal";
     var node2;
     if (group.mode === "text") {
-      node2 = new mathMLTree.MathNode("mtext", [text6]);
+      node2 = new mathMLTree.MathNode("mtext", [text8]);
     } else if (/[0-9]/.test(group.text)) {
-      node2 = new mathMLTree.MathNode("mn", [text6]);
+      node2 = new mathMLTree.MathNode("mn", [text8]);
     } else if (group.text === "\\prime") {
-      node2 = new mathMLTree.MathNode("mo", [text6]);
+      node2 = new mathMLTree.MathNode("mo", [text8]);
     } else {
-      node2 = new mathMLTree.MathNode("mi", [text6]);
+      node2 = new mathMLTree.MathNode("mi", [text8]);
     }
     if (variant !== defaultVariant[node2.type]) {
       node2.setAttribute("mathvariant", variant);
@@ -21572,9 +24579,9 @@ var pad = () => {
 defineFunctionBuilders({
   type: "tag",
   mathmlBuilder(group, options) {
-    var table = new mathMLTree.MathNode("mtable", [new mathMLTree.MathNode("mtr", [pad(), new mathMLTree.MathNode("mtd", [buildExpressionRow(group.body, options)]), pad(), new mathMLTree.MathNode("mtd", [buildExpressionRow(group.tag, options)])])]);
-    table.setAttribute("width", "100%");
-    return table;
+    var table2 = new mathMLTree.MathNode("mtable", [new mathMLTree.MathNode("mtr", [pad(), new mathMLTree.MathNode("mtd", [buildExpressionRow(group.body, options)]), pad(), new mathMLTree.MathNode("mtd", [buildExpressionRow(group.tag, options)])])]);
+    table2.setAttribute("width", "100%");
+    return table2;
   }
 });
 var textFontFamilies = {
@@ -21627,13 +24634,13 @@ defineFunction({
   },
   handler(_ref, args) {
     var {
-      parser,
+      parser: parser2,
       funcName
     } = _ref;
     var body = args[0];
     return {
       type: "text",
-      mode: parser.mode,
+      mode: parser2.mode,
       body: ordargument(body),
       font: funcName
     };
@@ -21657,11 +24664,11 @@ defineFunction({
   },
   handler(_ref, args) {
     var {
-      parser
+      parser: parser2
     } = _ref;
     return {
       type: "underline",
-      mode: parser.mode,
+      mode: parser2.mode,
       body: args[0]
     };
   },
@@ -21706,11 +24713,11 @@ defineFunction({
   },
   handler(_ref, args) {
     var {
-      parser
+      parser: parser2
     } = _ref;
     return {
       type: "vcenter",
-      mode: parser.mode,
+      mode: parser2.mode,
       body: args[0]
     };
   },
@@ -21742,11 +24749,11 @@ defineFunction({
     throw new ParseError("\\verb ended by end of line instead of matching delimiter");
   },
   htmlBuilder(group, options) {
-    var text6 = makeVerb(group);
+    var text8 = makeVerb(group);
     var body = [];
     var newOptions = options.havingStyle(options.style.text());
-    for (var i2 = 0;i2 < text6.length; i2++) {
-      var c = text6[i2];
+    for (var i2 = 0;i2 < text8.length; i2++) {
+      var c = text8[i2];
       if (c === "~") {
         c = "\\textasciitilde";
       }
@@ -21755,8 +24762,8 @@ defineFunction({
     return buildCommon.makeSpan(["mord", "text"].concat(newOptions.sizingClasses(options)), buildCommon.tryCombineChars(body), newOptions);
   },
   mathmlBuilder(group, options) {
-    var text6 = new mathMLTree.TextNode(makeVerb(group));
-    var node2 = new mathMLTree.MathNode("mtext", [text6]);
+    var text8 = new mathMLTree.TextNode(makeVerb(group));
+    var node2 = new mathMLTree.MathNode("mtext", [text8]);
     node2.setAttribute("mathvariant", "monospace");
     return node2;
   }
@@ -21789,8 +24796,8 @@ class Lexer {
       "~": 13
     };
   }
-  setCatcode(char, code3) {
-    this.catcodes[char] = code3;
+  setCatcode(char, code4) {
+    this.catcodes[char] = code4;
   }
   lex() {
     var input = this.input;
@@ -21802,8 +24809,8 @@ class Lexer {
     if (match === null || match.index !== pos) {
       throw new ParseError("Unexpected character: '" + input[pos] + "'", new Token(input[pos], new SourceLocation(this, pos, pos + 1)));
     }
-    var text6 = match[6] || match[3] || (match[2] ? "\\ " : " ");
-    if (this.catcodes[text6] === 14) {
+    var text8 = match[6] || match[3] || (match[2] ? "\\ " : " ");
+    if (this.catcodes[text8] === 14) {
       var nlIndex = input.indexOf(`
 `, this.tokenRegex.lastIndex);
       if (nlIndex === -1) {
@@ -21814,7 +24821,7 @@ class Lexer {
       }
       return this.lex();
     }
-    return new Token(text6, new SourceLocation(this, pos, this.tokenRegex.lastIndex));
+    return new Token(text8, new SourceLocation(this, pos, this.tokenRegex.lastIndex));
   }
 }
 
@@ -21982,7 +24989,7 @@ var digitToNumber = {
 defineMacro("\\char", function(context) {
   var token = context.popToken();
   var base;
-  var number = "";
+  var number2 = "";
   if (token.text === "'") {
     base = 8;
     token = context.popToken();
@@ -21992,28 +24999,28 @@ defineMacro("\\char", function(context) {
   } else if (token.text === "`") {
     token = context.popToken();
     if (token.text[0] === "\\") {
-      number = token.text.charCodeAt(1);
+      number2 = token.text.charCodeAt(1);
     } else if (token.text === "EOF") {
       throw new ParseError("\\char` missing argument");
     } else {
-      number = token.text.charCodeAt(0);
+      number2 = token.text.charCodeAt(0);
     }
   } else {
     base = 10;
   }
   if (base) {
-    number = digitToNumber[token.text];
-    if (number == null || number >= base) {
+    number2 = digitToNumber[token.text];
+    if (number2 == null || number2 >= base) {
       throw new ParseError("Invalid base-" + base + " digit " + token.text);
     }
     var digit;
     while ((digit = digitToNumber[context.future().text]) != null && digit < base) {
-      number *= base;
-      number += digit;
+      number2 *= base;
+      number2 += digit;
       context.popToken();
     }
   }
-  return "\\@char{" + number + "}";
+  return "\\@char{" + number2 + "}";
 });
 var newcommand = (context, existsOK, nonexistsOK, skipIfExists) => {
   var arg = context.consumeArg().tokens;
@@ -22439,7 +25446,7 @@ defineMacro("\\ket", "\\mathinner{|{#1}\\rangle}");
 defineMacro("\\braket", "\\mathinner{\\langle{#1}\\rangle}");
 defineMacro("\\Bra", "\\left\\langle#1\\right|");
 defineMacro("\\Ket", "\\left|#1\\right\\rangle");
-var braketHelper = (one2) => (context) => {
+var braketHelper = (one4) => (context) => {
   var left = context.consumeArg().tokens;
   var middle = context.consumeArg().tokens;
   var middleDouble = context.consumeArg().tokens;
@@ -22448,7 +25455,7 @@ var braketHelper = (one2) => (context) => {
   var oldMiddleDouble = context.macros.get("\\|");
   context.macros.beginGroup();
   var midMacro = (double) => (context2) => {
-    if (one2) {
+    if (one4) {
       context2.macros.set("|", oldMiddle);
       if (middleDouble.length) {
         context2.macros.set("\\|", oldMiddleDouble);
@@ -23340,12 +26347,12 @@ class Parser {
     this.settings = settings;
     this.leftrightDepth = 0;
   }
-  expect(text6, consume) {
+  expect(text8, consume) {
     if (consume === undefined) {
       consume = true;
     }
-    if (this.fetch().text !== text6) {
-      throw new ParseError("Expected '" + text6 + "', got '" + this.fetch().text + "'", this.fetch());
+    if (this.fetch().text !== text8) {
+      throw new ParseError("Expected '" + text8 + "', got '" + this.fetch().text + "'", this.fetch());
     }
     if (consume) {
       this.consume();
@@ -23372,12 +26379,12 @@ class Parser {
       this.gullet.macros.set("\\color", "\\textcolor");
     }
     try {
-      var parse2 = this.parseExpression(false);
+      var parse4 = this.parseExpression(false);
       this.expect("EOF");
       if (!this.settings.globalGroup) {
         this.gullet.endGroup();
       }
-      return parse2;
+      return parse4;
     } finally {
       this.gullet.endGroups();
     }
@@ -23387,10 +26394,10 @@ class Parser {
     this.consume();
     this.gullet.pushToken(new Token("}"));
     this.gullet.pushTokens(tokens);
-    var parse2 = this.parseExpression(false);
+    var parse4 = this.parseExpression(false);
     this.expect("}");
     this.nextToken = oldToken;
-    return parse2;
+    return parse4;
   }
   parseExpression(breakOnInfix, breakOnTokenText) {
     var body = [];
@@ -23478,13 +26485,13 @@ class Parser {
     }
     return group;
   }
-  formatUnsupportedCmd(text6) {
+  formatUnsupportedCmd(text8) {
     var textordArray = [];
-    for (var i2 = 0;i2 < text6.length; i2++) {
+    for (var i2 = 0;i2 < text8.length; i2++) {
       textordArray.push({
         type: "textord",
         mode: "text",
-        text: text6[i2]
+        text: text8[i2]
       });
     }
     var textNode = {
@@ -23733,12 +26740,12 @@ class Parser {
     argToken.text = str;
     return argToken;
   }
-  parseRegexGroup(regex, modeName) {
+  parseRegexGroup(regex2, modeName) {
     var firstToken = this.fetch();
     var lastToken = firstToken;
     var str = "";
     var nextToken;
-    while ((nextToken = this.fetch()).text !== "EOF" && regex.test(str + nextToken.text)) {
+    while ((nextToken = this.fetch()).text !== "EOF" && regex2.test(str + nextToken.text)) {
       lastToken = nextToken;
       str += lastToken.text;
       this.consume();
@@ -23843,11 +26850,11 @@ class Parser {
   }
   parseGroup(name, breakOnTokenText) {
     var firstToken = this.fetch();
-    var text6 = firstToken.text;
+    var text8 = firstToken.text;
     var result;
-    if (text6 === "{" || text6 === "\\begingroup") {
+    if (text8 === "{" || text8 === "\\begingroup") {
       this.consume();
-      var groupEnd = text6 === "{" ? "}" : "\\endgroup";
+      var groupEnd = text8 === "{" ? "}" : "\\endgroup";
       this.gullet.beginGroup();
       var expression = this.parseExpression(false, groupEnd);
       var lastToken = this.fetch();
@@ -23858,15 +26865,15 @@ class Parser {
         mode: this.mode,
         loc: SourceLocation.range(firstToken, lastToken),
         body: expression,
-        semisimple: text6 === "\\begingroup" || undefined
+        semisimple: text8 === "\\begingroup" || undefined
       };
     } else {
       result = this.parseFunction(breakOnTokenText, name) || this.parseSymbol();
-      if (result == null && text6[0] === "\\" && !implicitCommands.hasOwnProperty(text6)) {
+      if (result == null && text8[0] === "\\" && !implicitCommands.hasOwnProperty(text8)) {
         if (this.settings.throwOnError) {
-          throw new ParseError("Undefined control sequence: " + text6, firstToken);
+          throw new ParseError("Undefined control sequence: " + text8, firstToken);
         }
-        result = this.formatUnsupportedCmd(text6);
+        result = this.formatUnsupportedCmd(text8);
         this.consume();
       }
     }
@@ -23909,10 +26916,10 @@ class Parser {
   }
   parseSymbol() {
     var nucleus = this.fetch();
-    var text6 = nucleus.text;
-    if (/^\\verb[^a-zA-Z]/.test(text6)) {
+    var text8 = nucleus.text;
+    if (/^\\verb[^a-zA-Z]/.test(text8)) {
       this.consume();
-      var arg = text6.slice(5);
+      var arg = text8.slice(5);
       var star = arg.charAt(0) === "*";
       if (star) {
         arg = arg.slice(1);
@@ -23929,60 +26936,60 @@ class Parser {
         star
       };
     }
-    if (unicodeSymbols.hasOwnProperty(text6[0]) && !symbols[this.mode][text6[0]]) {
+    if (unicodeSymbols.hasOwnProperty(text8[0]) && !symbols[this.mode][text8[0]]) {
       if (this.settings.strict && this.mode === "math") {
-        this.settings.reportNonstrict("unicodeTextInMathMode", 'Accented Unicode text character "' + text6[0] + '" used in ' + "math mode", nucleus);
+        this.settings.reportNonstrict("unicodeTextInMathMode", 'Accented Unicode text character "' + text8[0] + '" used in ' + "math mode", nucleus);
       }
-      text6 = unicodeSymbols[text6[0]] + text6.slice(1);
+      text8 = unicodeSymbols[text8[0]] + text8.slice(1);
     }
-    var match = combiningDiacriticalMarksEndRegex.exec(text6);
+    var match = combiningDiacriticalMarksEndRegex.exec(text8);
     if (match) {
-      text6 = text6.substring(0, match.index);
-      if (text6 === "i") {
-        text6 = "ı";
-      } else if (text6 === "j") {
-        text6 = "ȷ";
+      text8 = text8.substring(0, match.index);
+      if (text8 === "i") {
+        text8 = "ı";
+      } else if (text8 === "j") {
+        text8 = "ȷ";
       }
     }
     var symbol;
-    if (symbols[this.mode][text6]) {
-      if (this.settings.strict && this.mode === "math" && extraLatin.indexOf(text6) >= 0) {
-        this.settings.reportNonstrict("unicodeTextInMathMode", 'Latin-1/Unicode text character "' + text6[0] + '" used in ' + "math mode", nucleus);
+    if (symbols[this.mode][text8]) {
+      if (this.settings.strict && this.mode === "math" && extraLatin.indexOf(text8) >= 0) {
+        this.settings.reportNonstrict("unicodeTextInMathMode", 'Latin-1/Unicode text character "' + text8[0] + '" used in ' + "math mode", nucleus);
       }
-      var group = symbols[this.mode][text6].group;
+      var group = symbols[this.mode][text8].group;
       var loc = SourceLocation.range(nucleus);
-      var s;
+      var s2;
       if (ATOMS.hasOwnProperty(group)) {
         var family = group;
-        s = {
+        s2 = {
           type: "atom",
           mode: this.mode,
           family,
           loc,
-          text: text6
+          text: text8
         };
       } else {
-        s = {
+        s2 = {
           type: group,
           mode: this.mode,
           loc,
-          text: text6
+          text: text8
         };
       }
-      symbol = s;
-    } else if (text6.charCodeAt(0) >= 128) {
+      symbol = s2;
+    } else if (text8.charCodeAt(0) >= 128) {
       if (this.settings.strict) {
-        if (!supportedCodepoint(text6.charCodeAt(0))) {
-          this.settings.reportNonstrict("unknownSymbol", 'Unrecognized Unicode character "' + text6[0] + '"' + (" (" + text6.charCodeAt(0) + ")"), nucleus);
+        if (!supportedCodepoint(text8.charCodeAt(0))) {
+          this.settings.reportNonstrict("unknownSymbol", 'Unrecognized Unicode character "' + text8[0] + '"' + (" (" + text8.charCodeAt(0) + ")"), nucleus);
         } else if (this.mode === "math") {
-          this.settings.reportNonstrict("unicodeTextInMathMode", 'Unicode text character "' + text6[0] + '" used in math mode', nucleus);
+          this.settings.reportNonstrict("unicodeTextInMathMode", 'Unicode text character "' + text8[0] + '" used in math mode', nucleus);
         }
       }
       symbol = {
         type: "textord",
         mode: "text",
         loc: SourceLocation.range(nucleus),
-        text: text6
+        text: text8
       };
     } else {
       return null;
@@ -24017,12 +27024,12 @@ var parseTree = function parseTree2(toParse, settings) {
   if (!(typeof toParse === "string" || toParse instanceof String)) {
     throw new TypeError("KaTeX can only parse string typed expression");
   }
-  var parser = new Parser(toParse, settings);
-  delete parser.gullet.macros.current["\\df@tag"];
-  var tree = parser.parse();
-  delete parser.gullet.macros.current["\\current@color"];
-  delete parser.gullet.macros.current["\\color"];
-  if (parser.gullet.macros.get("\\df@tag")) {
+  var parser2 = new Parser(toParse, settings);
+  delete parser2.gullet.macros.current["\\df@tag"];
+  var tree = parser2.parse();
+  delete parser2.gullet.macros.current["\\current@color"];
+  delete parser2.gullet.macros.current["\\color"];
+  if (parser2.gullet.macros.get("\\df@tag")) {
     if (!settings.displayMode) {
       throw new ParseError("\\tag works only in display equations");
     }
@@ -24030,7 +27037,7 @@ var parseTree = function parseTree2(toParse, settings) {
       type: "tag",
       mode: "text",
       body: tree,
-      tag: parser.subparse([new Token("\\df@tag")])
+      tag: parser2.subparse([new Token("\\df@tag")])
     }];
   }
   return tree;
@@ -24108,3013 +27115,6 @@ var katex = {
   __domTree
 };
 
-// node_modules/remark-math/lib/index.js
-var emptyOptions3 = {};
-function remarkMath(options) {
-  const self2 = this;
-  const settings = options || emptyOptions3;
-  const data = self2.data();
-  const micromarkExtensions = data.micromarkExtensions || (data.micromarkExtensions = []);
-  const fromMarkdownExtensions = data.fromMarkdownExtensions || (data.fromMarkdownExtensions = []);
-  const toMarkdownExtensions = data.toMarkdownExtensions || (data.toMarkdownExtensions = []);
-  micromarkExtensions.push(math(settings));
-  fromMarkdownExtensions.push(mathFromMarkdown());
-  toMarkdownExtensions.push(mathToMarkdown(settings));
-}
-// node_modules/mdast-util-to-hast/lib/handlers/blockquote.js
-"";
-function blockquote2(state, node2) {
-  const result = {
-    type: "element",
-    tagName: "blockquote",
-    properties: {},
-    children: state.wrap(state.all(node2), true)
-  };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/break.js
-"";
-function hardBreak2(state, node2) {
-  const result = { type: "element", tagName: "br", properties: {}, children: [] };
-  state.patch(node2, result);
-  return [state.applyData(node2, result), { type: "text", value: `
-` }];
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/code.js
-"";
-function code3(state, node2) {
-  const value = node2.value ? node2.value + `
-` : "";
-  const properties = {};
-  if (node2.lang) {
-    properties.className = ["language-" + node2.lang];
-  }
-  let result = {
-    type: "element",
-    tagName: "code",
-    properties,
-    children: [{ type: "text", value }]
-  };
-  if (node2.meta) {
-    result.data = { meta: node2.meta };
-  }
-  state.patch(node2, result);
-  result = state.applyData(node2, result);
-  result = { type: "element", tagName: "pre", properties: {}, children: [result] };
-  state.patch(node2, result);
-  return result;
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/delete.js
-"";
-function strikethrough(state, node2) {
-  const result = {
-    type: "element",
-    tagName: "del",
-    properties: {},
-    children: state.all(node2)
-  };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/emphasis.js
-"";
-function emphasis2(state, node2) {
-  const result = {
-    type: "element",
-    tagName: "em",
-    properties: {},
-    children: state.all(node2)
-  };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/footnote-reference.js
-function footnoteReference2(state, node2) {
-  const clobberPrefix = typeof state.options.clobberPrefix === "string" ? state.options.clobberPrefix : "user-content-";
-  const id = String(node2.identifier).toUpperCase();
-  const safeId = normalizeUri(id.toLowerCase());
-  const index2 = state.footnoteOrder.indexOf(id);
-  let counter;
-  let reuseCounter = state.footnoteCounts.get(id);
-  if (reuseCounter === undefined) {
-    reuseCounter = 0;
-    state.footnoteOrder.push(id);
-    counter = state.footnoteOrder.length;
-  } else {
-    counter = index2 + 1;
-  }
-  reuseCounter += 1;
-  state.footnoteCounts.set(id, reuseCounter);
-  const link2 = {
-    type: "element",
-    tagName: "a",
-    properties: {
-      href: "#" + clobberPrefix + "fn-" + safeId,
-      id: clobberPrefix + "fnref-" + safeId + (reuseCounter > 1 ? "-" + reuseCounter : ""),
-      dataFootnoteRef: true,
-      ariaDescribedBy: ["footnote-label"]
-    },
-    children: [{ type: "text", value: String(counter) }]
-  };
-  state.patch(node2, link2);
-  const sup2 = {
-    type: "element",
-    tagName: "sup",
-    properties: {},
-    children: [link2]
-  };
-  state.patch(node2, sup2);
-  return state.applyData(node2, sup2);
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/heading.js
-"";
-function heading2(state, node2) {
-  const result = {
-    type: "element",
-    tagName: "h" + node2.depth,
-    properties: {},
-    children: state.all(node2)
-  };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/html.js
-"";
-function html2(state, node2) {
-  if (state.options.allowDangerousHtml) {
-    const result = { type: "raw", value: node2.value };
-    state.patch(node2, result);
-    return state.applyData(node2, result);
-  }
-  return;
-}
-
-// node_modules/mdast-util-to-hast/lib/revert.js
-"";
-function revert(state, node2) {
-  const subtype = node2.referenceType;
-  let suffix = "]";
-  if (subtype === "collapsed") {
-    suffix += "[]";
-  } else if (subtype === "full") {
-    suffix += "[" + (node2.label || node2.identifier) + "]";
-  }
-  if (node2.type === "imageReference") {
-    return [{ type: "text", value: "![" + node2.alt + suffix }];
-  }
-  const contents = state.all(node2);
-  const head = contents[0];
-  if (head && head.type === "text") {
-    head.value = "[" + head.value;
-  } else {
-    contents.unshift({ type: "text", value: "[" });
-  }
-  const tail = contents[contents.length - 1];
-  if (tail && tail.type === "text") {
-    tail.value += suffix;
-  } else {
-    contents.push({ type: "text", value: suffix });
-  }
-  return contents;
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/image-reference.js
-function imageReference2(state, node2) {
-  const id = String(node2.identifier).toUpperCase();
-  const definition3 = state.definitionById.get(id);
-  if (!definition3) {
-    return revert(state, node2);
-  }
-  const properties = { src: normalizeUri(definition3.url || ""), alt: node2.alt };
-  if (definition3.title !== null && definition3.title !== undefined) {
-    properties.title = definition3.title;
-  }
-  const result = { type: "element", tagName: "img", properties, children: [] };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/image.js
-function image2(state, node2) {
-  const properties = { src: normalizeUri(node2.url) };
-  if (node2.alt !== null && node2.alt !== undefined) {
-    properties.alt = node2.alt;
-  }
-  if (node2.title !== null && node2.title !== undefined) {
-    properties.title = node2.title;
-  }
-  const result = { type: "element", tagName: "img", properties, children: [] };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/inline-code.js
-"";
-function inlineCode2(state, node2) {
-  const text6 = { type: "text", value: node2.value.replace(/\r?\n|\r/g, " ") };
-  state.patch(node2, text6);
-  const result = {
-    type: "element",
-    tagName: "code",
-    properties: {},
-    children: [text6]
-  };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/link-reference.js
-function linkReference2(state, node2) {
-  const id = String(node2.identifier).toUpperCase();
-  const definition3 = state.definitionById.get(id);
-  if (!definition3) {
-    return revert(state, node2);
-  }
-  const properties = { href: normalizeUri(definition3.url || "") };
-  if (definition3.title !== null && definition3.title !== undefined) {
-    properties.title = definition3.title;
-  }
-  const result = {
-    type: "element",
-    tagName: "a",
-    properties,
-    children: state.all(node2)
-  };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/link.js
-function link2(state, node2) {
-  const properties = { href: normalizeUri(node2.url) };
-  if (node2.title !== null && node2.title !== undefined) {
-    properties.title = node2.title;
-  }
-  const result = {
-    type: "element",
-    tagName: "a",
-    properties,
-    children: state.all(node2)
-  };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/list-item.js
-"";
-function listItem2(state, node2, parent) {
-  const results = state.all(node2);
-  const loose = parent ? listLoose(parent) : listItemLoose(node2);
-  const properties = {};
-  const children = [];
-  if (typeof node2.checked === "boolean") {
-    const head = results[0];
-    let paragraph2;
-    if (head && head.type === "element" && head.tagName === "p") {
-      paragraph2 = head;
-    } else {
-      paragraph2 = { type: "element", tagName: "p", properties: {}, children: [] };
-      results.unshift(paragraph2);
-    }
-    if (paragraph2.children.length > 0) {
-      paragraph2.children.unshift({ type: "text", value: " " });
-    }
-    paragraph2.children.unshift({
-      type: "element",
-      tagName: "input",
-      properties: { type: "checkbox", checked: node2.checked, disabled: true },
-      children: []
-    });
-    properties.className = ["task-list-item"];
-  }
-  let index2 = -1;
-  while (++index2 < results.length) {
-    const child = results[index2];
-    if (loose || index2 !== 0 || child.type !== "element" || child.tagName !== "p") {
-      children.push({ type: "text", value: `
-` });
-    }
-    if (child.type === "element" && child.tagName === "p" && !loose) {
-      children.push(...child.children);
-    } else {
-      children.push(child);
-    }
-  }
-  const tail = results[results.length - 1];
-  if (tail && (loose || tail.type !== "element" || tail.tagName !== "p")) {
-    children.push({ type: "text", value: `
-` });
-  }
-  const result = { type: "element", tagName: "li", properties, children };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-function listLoose(node2) {
-  let loose = false;
-  if (node2.type === "list") {
-    loose = node2.spread || false;
-    const children = node2.children;
-    let index2 = -1;
-    while (!loose && ++index2 < children.length) {
-      loose = listItemLoose(children[index2]);
-    }
-  }
-  return loose;
-}
-function listItemLoose(node2) {
-  const spread = node2.spread;
-  return spread === null || spread === undefined ? node2.children.length > 1 : spread;
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/list.js
-"";
-function list3(state, node2) {
-  const properties = {};
-  const results = state.all(node2);
-  let index2 = -1;
-  if (typeof node2.start === "number" && node2.start !== 1) {
-    properties.start = node2.start;
-  }
-  while (++index2 < results.length) {
-    const child = results[index2];
-    if (child.type === "element" && child.tagName === "li" && child.properties && Array.isArray(child.properties.className) && child.properties.className.includes("task-list-item")) {
-      properties.className = ["contains-task-list"];
-      break;
-    }
-  }
-  const result = {
-    type: "element",
-    tagName: node2.ordered ? "ol" : "ul",
-    properties,
-    children: state.wrap(results, true)
-  };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/paragraph.js
-"";
-function paragraph2(state, node2) {
-  const result = {
-    type: "element",
-    tagName: "p",
-    properties: {},
-    children: state.all(node2)
-  };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/root.js
-"";
-function root2(state, node2) {
-  const result = { type: "root", children: state.wrap(state.all(node2)) };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/strong.js
-"";
-function strong2(state, node2) {
-  const result = {
-    type: "element",
-    tagName: "strong",
-    properties: {},
-    children: state.all(node2)
-  };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/unist-util-position/lib/index.js
-var pointEnd = point3("end");
-var pointStart = point3("start");
-function point3(type) {
-  return point4;
-  function point4(node2) {
-    const point5 = node2 && node2.position && node2.position[type] || {};
-    if (typeof point5.line === "number" && point5.line > 0 && typeof point5.column === "number" && point5.column > 0) {
-      return {
-        line: point5.line,
-        column: point5.column,
-        offset: typeof point5.offset === "number" && point5.offset > -1 ? point5.offset : undefined
-      };
-    }
-  }
-}
-function position2(node2) {
-  const start = pointStart(node2);
-  const end = pointEnd(node2);
-  if (start && end) {
-    return { start, end };
-  }
-}
-// node_modules/mdast-util-to-hast/lib/handlers/table.js
-function table(state, node2) {
-  const rows = state.all(node2);
-  const firstRow = rows.shift();
-  const tableContent = [];
-  if (firstRow) {
-    const head = {
-      type: "element",
-      tagName: "thead",
-      properties: {},
-      children: state.wrap([firstRow], true)
-    };
-    state.patch(node2.children[0], head);
-    tableContent.push(head);
-  }
-  if (rows.length > 0) {
-    const body = {
-      type: "element",
-      tagName: "tbody",
-      properties: {},
-      children: state.wrap(rows, true)
-    };
-    const start = pointStart(node2.children[1]);
-    const end = pointEnd(node2.children[node2.children.length - 1]);
-    if (start && end)
-      body.position = { start, end };
-    tableContent.push(body);
-  }
-  const result = {
-    type: "element",
-    tagName: "table",
-    properties: {},
-    children: state.wrap(tableContent, true)
-  };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/table-row.js
-"";
-function tableRow(state, node2, parent) {
-  const siblings = parent ? parent.children : undefined;
-  const rowIndex = siblings ? siblings.indexOf(node2) : 1;
-  const tagName = rowIndex === 0 ? "th" : "td";
-  const align = parent && parent.type === "table" ? parent.align : undefined;
-  const length = align ? align.length : node2.children.length;
-  let cellIndex = -1;
-  const cells = [];
-  while (++cellIndex < length) {
-    const cell = node2.children[cellIndex];
-    const properties = {};
-    const alignValue = align ? align[cellIndex] : undefined;
-    if (alignValue) {
-      properties.align = alignValue;
-    }
-    let result2 = { type: "element", tagName, properties, children: [] };
-    if (cell) {
-      result2.children = state.all(cell);
-      state.patch(cell, result2);
-      result2 = state.applyData(cell, result2);
-    }
-    cells.push(result2);
-  }
-  const result = {
-    type: "element",
-    tagName: "tr",
-    properties: {},
-    children: state.wrap(cells, true)
-  };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/table-cell.js
-"";
-function tableCell(state, node2) {
-  const result = {
-    type: "element",
-    tagName: "td",
-    properties: {},
-    children: state.all(node2)
-  };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/trim-lines/index.js
-var tab = 9;
-var space = 32;
-function trimLines(value) {
-  const source = String(value);
-  const search2 = /\r?\n|\r/g;
-  let match = search2.exec(source);
-  let last = 0;
-  const lines = [];
-  while (match) {
-    lines.push(trimLine(source.slice(last, match.index), last > 0, true), match[0]);
-    last = match.index + match[0].length;
-    match = search2.exec(source);
-  }
-  lines.push(trimLine(source.slice(last), last > 0, false));
-  return lines.join("");
-}
-function trimLine(value, start, end) {
-  let startIndex = 0;
-  let endIndex = value.length;
-  if (start) {
-    let code4 = value.codePointAt(startIndex);
-    while (code4 === tab || code4 === space) {
-      startIndex++;
-      code4 = value.codePointAt(startIndex);
-    }
-  }
-  if (end) {
-    let code4 = value.codePointAt(endIndex - 1);
-    while (code4 === tab || code4 === space) {
-      endIndex--;
-      code4 = value.codePointAt(endIndex - 1);
-    }
-  }
-  return endIndex > startIndex ? value.slice(startIndex, endIndex) : "";
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/text.js
-function text6(state, node2) {
-  const result = { type: "text", value: trimLines(String(node2.value)) };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/thematic-break.js
-"";
-function thematicBreak3(state, node2) {
-  const result = {
-    type: "element",
-    tagName: "hr",
-    properties: {},
-    children: []
-  };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-
-// node_modules/mdast-util-to-hast/lib/handlers/index.js
-var handlers = {
-  blockquote: blockquote2,
-  break: hardBreak2,
-  code: code3,
-  delete: strikethrough,
-  emphasis: emphasis2,
-  footnoteReference: footnoteReference2,
-  heading: heading2,
-  html: html2,
-  imageReference: imageReference2,
-  image: image2,
-  inlineCode: inlineCode2,
-  linkReference: linkReference2,
-  link: link2,
-  listItem: listItem2,
-  list: list3,
-  paragraph: paragraph2,
-  root: root2,
-  strong: strong2,
-  table,
-  tableCell,
-  tableRow,
-  text: text6,
-  thematicBreak: thematicBreak3,
-  toml: ignore,
-  yaml: ignore,
-  definition: ignore,
-  footnoteDefinition: ignore
-};
-function ignore() {
-  return;
-}
-
-// node_modules/@ungap/structured-clone/esm/types.js
-var VOID = -1;
-var PRIMITIVE = 0;
-var ARRAY = 1;
-var OBJECT = 2;
-var DATE = 3;
-var REGEXP = 4;
-var MAP = 5;
-var SET = 6;
-var ERROR = 7;
-var BIGINT = 8;
-
-// node_modules/@ungap/structured-clone/esm/deserialize.js
-var env = typeof self === "object" ? self : globalThis;
-var deserializer = ($, _) => {
-  const as = (out, index2) => {
-    $.set(index2, out);
-    return out;
-  };
-  const unpair = (index2) => {
-    if ($.has(index2))
-      return $.get(index2);
-    const [type, value] = _[index2];
-    switch (type) {
-      case PRIMITIVE:
-      case VOID:
-        return as(value, index2);
-      case ARRAY: {
-        const arr = as([], index2);
-        for (const index3 of value)
-          arr.push(unpair(index3));
-        return arr;
-      }
-      case OBJECT: {
-        const object = as({}, index2);
-        for (const [key, index3] of value)
-          object[unpair(key)] = unpair(index3);
-        return object;
-      }
-      case DATE:
-        return as(new Date(value), index2);
-      case REGEXP: {
-        const { source, flags } = value;
-        return as(new RegExp(source, flags), index2);
-      }
-      case MAP: {
-        const map3 = as(new Map, index2);
-        for (const [key, index3] of value)
-          map3.set(unpair(key), unpair(index3));
-        return map3;
-      }
-      case SET: {
-        const set = as(new Set, index2);
-        for (const index3 of value)
-          set.add(unpair(index3));
-        return set;
-      }
-      case ERROR: {
-        const { name, message } = value;
-        return as(new env[name](message), index2);
-      }
-      case BIGINT:
-        return as(BigInt(value), index2);
-      case "BigInt":
-        return as(Object(BigInt(value)), index2);
-      case "ArrayBuffer":
-        return as(new Uint8Array(value).buffer, value);
-      case "DataView": {
-        const { buffer } = new Uint8Array(value);
-        return as(new DataView(buffer), value);
-      }
-    }
-    return as(new env[type](value), index2);
-  };
-  return unpair;
-};
-var deserialize = (serialized) => deserializer(new Map, serialized)(0);
-
-// node_modules/@ungap/structured-clone/esm/serialize.js
-var EMPTY = "";
-var { toString: toString2 } = {};
-var { keys } = Object;
-var typeOf = (value) => {
-  const type = typeof value;
-  if (type !== "object" || !value)
-    return [PRIMITIVE, type];
-  const asString = toString2.call(value).slice(8, -1);
-  switch (asString) {
-    case "Array":
-      return [ARRAY, EMPTY];
-    case "Object":
-      return [OBJECT, EMPTY];
-    case "Date":
-      return [DATE, EMPTY];
-    case "RegExp":
-      return [REGEXP, EMPTY];
-    case "Map":
-      return [MAP, EMPTY];
-    case "Set":
-      return [SET, EMPTY];
-    case "DataView":
-      return [ARRAY, asString];
-  }
-  if (asString.includes("Array"))
-    return [ARRAY, asString];
-  if (asString.includes("Error"))
-    return [ERROR, asString];
-  return [OBJECT, asString];
-};
-var shouldSkip = ([TYPE, type]) => TYPE === PRIMITIVE && (type === "function" || type === "symbol");
-var serializer = (strict, json, $, _) => {
-  const as = (out, value) => {
-    const index2 = _.push(out) - 1;
-    $.set(value, index2);
-    return index2;
-  };
-  const pair = (value) => {
-    if ($.has(value))
-      return $.get(value);
-    let [TYPE, type] = typeOf(value);
-    switch (TYPE) {
-      case PRIMITIVE: {
-        let entry = value;
-        switch (type) {
-          case "bigint":
-            TYPE = BIGINT;
-            entry = value.toString();
-            break;
-          case "function":
-          case "symbol":
-            if (strict)
-              throw new TypeError("unable to serialize " + type);
-            entry = null;
-            break;
-          case "undefined":
-            return as([VOID], value);
-        }
-        return as([TYPE, entry], value);
-      }
-      case ARRAY: {
-        if (type) {
-          let spread = value;
-          if (type === "DataView") {
-            spread = new Uint8Array(value.buffer);
-          } else if (type === "ArrayBuffer") {
-            spread = new Uint8Array(value);
-          }
-          return as([type, [...spread]], value);
-        }
-        const arr = [];
-        const index2 = as([TYPE, arr], value);
-        for (const entry of value)
-          arr.push(pair(entry));
-        return index2;
-      }
-      case OBJECT: {
-        if (type) {
-          switch (type) {
-            case "BigInt":
-              return as([type, value.toString()], value);
-            case "Boolean":
-            case "Number":
-            case "String":
-              return as([type, value.valueOf()], value);
-          }
-        }
-        if (json && "toJSON" in value)
-          return pair(value.toJSON());
-        const entries = [];
-        const index2 = as([TYPE, entries], value);
-        for (const key of keys(value)) {
-          if (strict || !shouldSkip(typeOf(value[key])))
-            entries.push([pair(key), pair(value[key])]);
-        }
-        return index2;
-      }
-      case DATE:
-        return as([TYPE, value.toISOString()], value);
-      case REGEXP: {
-        const { source, flags } = value;
-        return as([TYPE, { source, flags }], value);
-      }
-      case MAP: {
-        const entries = [];
-        const index2 = as([TYPE, entries], value);
-        for (const [key, entry] of value) {
-          if (strict || !(shouldSkip(typeOf(key)) || shouldSkip(typeOf(entry))))
-            entries.push([pair(key), pair(entry)]);
-        }
-        return index2;
-      }
-      case SET: {
-        const entries = [];
-        const index2 = as([TYPE, entries], value);
-        for (const entry of value) {
-          if (strict || !shouldSkip(typeOf(entry)))
-            entries.push(pair(entry));
-        }
-        return index2;
-      }
-    }
-    const { message } = value;
-    return as([TYPE, { name: type, message }], value);
-  };
-  return pair;
-};
-var serialize2 = (value, { json, lossy } = {}) => {
-  const _ = [];
-  return serializer(!(json || lossy), !!json, new Map, _)(value), _;
-};
-
-// node_modules/@ungap/structured-clone/esm/index.js
-var esm_default = typeof structuredClone === "function" ? (any, options) => options && (("json" in options) || ("lossy" in options)) ? deserialize(serialize2(any, options)) : structuredClone(any) : (any, options) => deserialize(serialize2(any, options));
-
-// node_modules/mdast-util-to-hast/lib/footer.js
-function defaultFootnoteBackContent(_, rereferenceIndex) {
-  const result = [{ type: "text", value: "↩" }];
-  if (rereferenceIndex > 1) {
-    result.push({
-      type: "element",
-      tagName: "sup",
-      properties: {},
-      children: [{ type: "text", value: String(rereferenceIndex) }]
-    });
-  }
-  return result;
-}
-function defaultFootnoteBackLabel(referenceIndex, rereferenceIndex) {
-  return "Back to reference " + (referenceIndex + 1) + (rereferenceIndex > 1 ? "-" + rereferenceIndex : "");
-}
-function footer(state) {
-  const clobberPrefix = typeof state.options.clobberPrefix === "string" ? state.options.clobberPrefix : "user-content-";
-  const footnoteBackContent = state.options.footnoteBackContent || defaultFootnoteBackContent;
-  const footnoteBackLabel = state.options.footnoteBackLabel || defaultFootnoteBackLabel;
-  const footnoteLabel = state.options.footnoteLabel || "Footnotes";
-  const footnoteLabelTagName = state.options.footnoteLabelTagName || "h2";
-  const footnoteLabelProperties = state.options.footnoteLabelProperties || {
-    className: ["sr-only"]
-  };
-  const listItems = [];
-  let referenceIndex = -1;
-  while (++referenceIndex < state.footnoteOrder.length) {
-    const definition3 = state.footnoteById.get(state.footnoteOrder[referenceIndex]);
-    if (!definition3) {
-      continue;
-    }
-    const content3 = state.all(definition3);
-    const id = String(definition3.identifier).toUpperCase();
-    const safeId = normalizeUri(id.toLowerCase());
-    let rereferenceIndex = 0;
-    const backReferences = [];
-    const counts = state.footnoteCounts.get(id);
-    while (counts !== undefined && ++rereferenceIndex <= counts) {
-      if (backReferences.length > 0) {
-        backReferences.push({ type: "text", value: " " });
-      }
-      let children = typeof footnoteBackContent === "string" ? footnoteBackContent : footnoteBackContent(referenceIndex, rereferenceIndex);
-      if (typeof children === "string") {
-        children = { type: "text", value: children };
-      }
-      backReferences.push({
-        type: "element",
-        tagName: "a",
-        properties: {
-          href: "#" + clobberPrefix + "fnref-" + safeId + (rereferenceIndex > 1 ? "-" + rereferenceIndex : ""),
-          dataFootnoteBackref: "",
-          ariaLabel: typeof footnoteBackLabel === "string" ? footnoteBackLabel : footnoteBackLabel(referenceIndex, rereferenceIndex),
-          className: ["data-footnote-backref"]
-        },
-        children: Array.isArray(children) ? children : [children]
-      });
-    }
-    const tail = content3[content3.length - 1];
-    if (tail && tail.type === "element" && tail.tagName === "p") {
-      const tailTail = tail.children[tail.children.length - 1];
-      if (tailTail && tailTail.type === "text") {
-        tailTail.value += " ";
-      } else {
-        tail.children.push({ type: "text", value: " " });
-      }
-      tail.children.push(...backReferences);
-    } else {
-      content3.push(...backReferences);
-    }
-    const listItem3 = {
-      type: "element",
-      tagName: "li",
-      properties: { id: clobberPrefix + "fn-" + safeId },
-      children: state.wrap(content3, true)
-    };
-    state.patch(definition3, listItem3);
-    listItems.push(listItem3);
-  }
-  if (listItems.length === 0) {
-    return;
-  }
-  return {
-    type: "element",
-    tagName: "section",
-    properties: { dataFootnotes: true, className: ["footnotes"] },
-    children: [
-      {
-        type: "element",
-        tagName: footnoteLabelTagName,
-        properties: {
-          ...esm_default(footnoteLabelProperties),
-          id: "footnote-label"
-        },
-        children: [{ type: "text", value: footnoteLabel }]
-      },
-      { type: "text", value: `
-` },
-      {
-        type: "element",
-        tagName: "ol",
-        properties: {},
-        children: state.wrap(listItems, true)
-      },
-      { type: "text", value: `
-` }
-    ]
-  };
-}
-
-// node_modules/mdast-util-to-hast/lib/state.js
-var own3 = {}.hasOwnProperty;
-var emptyOptions4 = {};
-function createState(tree, options) {
-  const settings = options || emptyOptions4;
-  const definitionById = new Map;
-  const footnoteById = new Map;
-  const footnoteCounts = new Map;
-  const handlers2 = { ...handlers, ...settings.handlers };
-  const state = {
-    all: all2,
-    applyData,
-    definitionById,
-    footnoteById,
-    footnoteCounts,
-    footnoteOrder: [],
-    handlers: handlers2,
-    one: one2,
-    options: settings,
-    patch,
-    wrap
-  };
-  visit(tree, function(node2) {
-    if (node2.type === "definition" || node2.type === "footnoteDefinition") {
-      const map3 = node2.type === "definition" ? definitionById : footnoteById;
-      const id = String(node2.identifier).toUpperCase();
-      if (!map3.has(id)) {
-        map3.set(id, node2);
-      }
-    }
-  });
-  return state;
-  function one2(node2, parent) {
-    const type = node2.type;
-    const handle2 = state.handlers[type];
-    if (own3.call(state.handlers, type) && handle2) {
-      return handle2(state, node2, parent);
-    }
-    if (state.options.passThrough && state.options.passThrough.includes(type)) {
-      if ("children" in node2) {
-        const { children, ...shallow } = node2;
-        const result = esm_default(shallow);
-        result.children = state.all(node2);
-        return result;
-      }
-      return esm_default(node2);
-    }
-    const unknown = state.options.unknownHandler || defaultUnknownHandler;
-    return unknown(state, node2, parent);
-  }
-  function all2(parent) {
-    const values2 = [];
-    if ("children" in parent) {
-      const nodes = parent.children;
-      let index2 = -1;
-      while (++index2 < nodes.length) {
-        const result = state.one(nodes[index2], parent);
-        if (result) {
-          if (index2 && nodes[index2 - 1].type === "break") {
-            if (!Array.isArray(result) && result.type === "text") {
-              result.value = trimMarkdownSpaceStart(result.value);
-            }
-            if (!Array.isArray(result) && result.type === "element") {
-              const head = result.children[0];
-              if (head && head.type === "text") {
-                head.value = trimMarkdownSpaceStart(head.value);
-              }
-            }
-          }
-          if (Array.isArray(result)) {
-            values2.push(...result);
-          } else {
-            values2.push(result);
-          }
-        }
-      }
-    }
-    return values2;
-  }
-}
-function patch(from, to) {
-  if (from.position)
-    to.position = position2(from);
-}
-function applyData(from, to) {
-  let result = to;
-  if (from && from.data) {
-    const hName = from.data.hName;
-    const hChildren = from.data.hChildren;
-    const hProperties = from.data.hProperties;
-    if (typeof hName === "string") {
-      if (result.type === "element") {
-        result.tagName = hName;
-      } else {
-        const children = "children" in result ? result.children : [result];
-        result = { type: "element", tagName: hName, properties: {}, children };
-      }
-    }
-    if (result.type === "element" && hProperties) {
-      Object.assign(result.properties, esm_default(hProperties));
-    }
-    if ("children" in result && result.children && hChildren !== null && hChildren !== undefined) {
-      result.children = hChildren;
-    }
-  }
-  return result;
-}
-function defaultUnknownHandler(state, node2) {
-  const data = node2.data || {};
-  const result = "value" in node2 && !(own3.call(data, "hProperties") || own3.call(data, "hChildren")) ? { type: "text", value: node2.value } : {
-    type: "element",
-    tagName: "div",
-    properties: {},
-    children: state.all(node2)
-  };
-  state.patch(node2, result);
-  return state.applyData(node2, result);
-}
-function wrap(nodes, loose) {
-  const result = [];
-  let index2 = -1;
-  if (loose) {
-    result.push({ type: "text", value: `
-` });
-  }
-  while (++index2 < nodes.length) {
-    if (index2)
-      result.push({ type: "text", value: `
-` });
-    result.push(nodes[index2]);
-  }
-  if (loose && nodes.length > 0) {
-    result.push({ type: "text", value: `
-` });
-  }
-  return result;
-}
-function trimMarkdownSpaceStart(value) {
-  let index2 = 0;
-  let code4 = value.charCodeAt(index2);
-  while (code4 === 9 || code4 === 32) {
-    index2++;
-    code4 = value.charCodeAt(index2);
-  }
-  return value.slice(index2);
-}
-
-// node_modules/mdast-util-to-hast/lib/index.js
-function toHast(tree, options) {
-  const state = createState(tree, options);
-  const node2 = state.one(tree, undefined);
-  const foot = footer(state);
-  const result = Array.isArray(node2) ? { type: "root", children: node2 } : node2 || { type: "root", children: [] };
-  if (foot) {
-    ok("children" in result);
-    result.children.push({ type: "text", value: `
-` }, foot);
-  }
-  return result;
-}
-// node_modules/remark-rehype/lib/index.js
-function remarkRehype(destination, options) {
-  if (destination && "run" in destination) {
-    return async function(tree, file) {
-      const hastTree = toHast(tree, { file, ...options });
-      await destination.run(hastTree, file);
-    };
-  }
-  return function(tree, file) {
-    return toHast(tree, { file, ...destination || options });
-  };
-}
-// node_modules/github-slugger/regex.js
-var regex = /[\0-\x1F!-,\.\/:-@\[-\^`\{-\xA9\xAB-\xB4\xB6-\xB9\xBB-\xBF\xD7\xF7\u02C2-\u02C5\u02D2-\u02DF\u02E5-\u02EB\u02ED\u02EF-\u02FF\u0375\u0378\u0379\u037E\u0380-\u0385\u0387\u038B\u038D\u03A2\u03F6\u0482\u0530\u0557\u0558\u055A-\u055F\u0589-\u0590\u05BE\u05C0\u05C3\u05C6\u05C8-\u05CF\u05EB-\u05EE\u05F3-\u060F\u061B-\u061F\u066A-\u066D\u06D4\u06DD\u06DE\u06E9\u06FD\u06FE\u0700-\u070F\u074B\u074C\u07B2-\u07BF\u07F6-\u07F9\u07FB\u07FC\u07FE\u07FF\u082E-\u083F\u085C-\u085F\u086B-\u089F\u08B5\u08C8-\u08D2\u08E2\u0964\u0965\u0970\u0984\u098D\u098E\u0991\u0992\u09A9\u09B1\u09B3-\u09B5\u09BA\u09BB\u09C5\u09C6\u09C9\u09CA\u09CF-\u09D6\u09D8-\u09DB\u09DE\u09E4\u09E5\u09F2-\u09FB\u09FD\u09FF\u0A00\u0A04\u0A0B-\u0A0E\u0A11\u0A12\u0A29\u0A31\u0A34\u0A37\u0A3A\u0A3B\u0A3D\u0A43-\u0A46\u0A49\u0A4A\u0A4E-\u0A50\u0A52-\u0A58\u0A5D\u0A5F-\u0A65\u0A76-\u0A80\u0A84\u0A8E\u0A92\u0AA9\u0AB1\u0AB4\u0ABA\u0ABB\u0AC6\u0ACA\u0ACE\u0ACF\u0AD1-\u0ADF\u0AE4\u0AE5\u0AF0-\u0AF8\u0B00\u0B04\u0B0D\u0B0E\u0B11\u0B12\u0B29\u0B31\u0B34\u0B3A\u0B3B\u0B45\u0B46\u0B49\u0B4A\u0B4E-\u0B54\u0B58-\u0B5B\u0B5E\u0B64\u0B65\u0B70\u0B72-\u0B81\u0B84\u0B8B-\u0B8D\u0B91\u0B96-\u0B98\u0B9B\u0B9D\u0BA0-\u0BA2\u0BA5-\u0BA7\u0BAB-\u0BAD\u0BBA-\u0BBD\u0BC3-\u0BC5\u0BC9\u0BCE\u0BCF\u0BD1-\u0BD6\u0BD8-\u0BE5\u0BF0-\u0BFF\u0C0D\u0C11\u0C29\u0C3A-\u0C3C\u0C45\u0C49\u0C4E-\u0C54\u0C57\u0C5B-\u0C5F\u0C64\u0C65\u0C70-\u0C7F\u0C84\u0C8D\u0C91\u0CA9\u0CB4\u0CBA\u0CBB\u0CC5\u0CC9\u0CCE-\u0CD4\u0CD7-\u0CDD\u0CDF\u0CE4\u0CE5\u0CF0\u0CF3-\u0CFF\u0D0D\u0D11\u0D45\u0D49\u0D4F-\u0D53\u0D58-\u0D5E\u0D64\u0D65\u0D70-\u0D79\u0D80\u0D84\u0D97-\u0D99\u0DB2\u0DBC\u0DBE\u0DBF\u0DC7-\u0DC9\u0DCB-\u0DCE\u0DD5\u0DD7\u0DE0-\u0DE5\u0DF0\u0DF1\u0DF4-\u0E00\u0E3B-\u0E3F\u0E4F\u0E5A-\u0E80\u0E83\u0E85\u0E8B\u0EA4\u0EA6\u0EBE\u0EBF\u0EC5\u0EC7\u0ECE\u0ECF\u0EDA\u0EDB\u0EE0-\u0EFF\u0F01-\u0F17\u0F1A-\u0F1F\u0F2A-\u0F34\u0F36\u0F38\u0F3A-\u0F3D\u0F48\u0F6D-\u0F70\u0F85\u0F98\u0FBD-\u0FC5\u0FC7-\u0FFF\u104A-\u104F\u109E\u109F\u10C6\u10C8-\u10CC\u10CE\u10CF\u10FB\u1249\u124E\u124F\u1257\u1259\u125E\u125F\u1289\u128E\u128F\u12B1\u12B6\u12B7\u12BF\u12C1\u12C6\u12C7\u12D7\u1311\u1316\u1317\u135B\u135C\u1360-\u137F\u1390-\u139F\u13F6\u13F7\u13FE-\u1400\u166D\u166E\u1680\u169B-\u169F\u16EB-\u16ED\u16F9-\u16FF\u170D\u1715-\u171F\u1735-\u173F\u1754-\u175F\u176D\u1771\u1774-\u177F\u17D4-\u17D6\u17D8-\u17DB\u17DE\u17DF\u17EA-\u180A\u180E\u180F\u181A-\u181F\u1879-\u187F\u18AB-\u18AF\u18F6-\u18FF\u191F\u192C-\u192F\u193C-\u1945\u196E\u196F\u1975-\u197F\u19AC-\u19AF\u19CA-\u19CF\u19DA-\u19FF\u1A1C-\u1A1F\u1A5F\u1A7D\u1A7E\u1A8A-\u1A8F\u1A9A-\u1AA6\u1AA8-\u1AAF\u1AC1-\u1AFF\u1B4C-\u1B4F\u1B5A-\u1B6A\u1B74-\u1B7F\u1BF4-\u1BFF\u1C38-\u1C3F\u1C4A-\u1C4C\u1C7E\u1C7F\u1C89-\u1C8F\u1CBB\u1CBC\u1CC0-\u1CCF\u1CD3\u1CFB-\u1CFF\u1DFA\u1F16\u1F17\u1F1E\u1F1F\u1F46\u1F47\u1F4E\u1F4F\u1F58\u1F5A\u1F5C\u1F5E\u1F7E\u1F7F\u1FB5\u1FBD\u1FBF-\u1FC1\u1FC5\u1FCD-\u1FCF\u1FD4\u1FD5\u1FDC-\u1FDF\u1FED-\u1FF1\u1FF5\u1FFD-\u203E\u2041-\u2053\u2055-\u2070\u2072-\u207E\u2080-\u208F\u209D-\u20CF\u20F1-\u2101\u2103-\u2106\u2108\u2109\u2114\u2116-\u2118\u211E-\u2123\u2125\u2127\u2129\u212E\u213A\u213B\u2140-\u2144\u214A-\u214D\u214F-\u215F\u2189-\u24B5\u24EA-\u2BFF\u2C2F\u2C5F\u2CE5-\u2CEA\u2CF4-\u2CFF\u2D26\u2D28-\u2D2C\u2D2E\u2D2F\u2D68-\u2D6E\u2D70-\u2D7E\u2D97-\u2D9F\u2DA7\u2DAF\u2DB7\u2DBF\u2DC7\u2DCF\u2DD7\u2DDF\u2E00-\u2E2E\u2E30-\u3004\u3008-\u3020\u3030\u3036\u3037\u303D-\u3040\u3097\u3098\u309B\u309C\u30A0\u30FB\u3100-\u3104\u3130\u318F-\u319F\u31C0-\u31EF\u3200-\u33FF\u4DC0-\u4DFF\u9FFD-\u9FFF\uA48D-\uA4CF\uA4FE\uA4FF\uA60D-\uA60F\uA62C-\uA63F\uA673\uA67E\uA6F2-\uA716\uA720\uA721\uA789\uA78A\uA7C0\uA7C1\uA7CB-\uA7F4\uA828-\uA82B\uA82D-\uA83F\uA874-\uA87F\uA8C6-\uA8CF\uA8DA-\uA8DF\uA8F8-\uA8FA\uA8FC\uA92E\uA92F\uA954-\uA95F\uA97D-\uA97F\uA9C1-\uA9CE\uA9DA-\uA9DF\uA9FF\uAA37-\uAA3F\uAA4E\uAA4F\uAA5A-\uAA5F\uAA77-\uAA79\uAAC3-\uAADA\uAADE\uAADF\uAAF0\uAAF1\uAAF7-\uAB00\uAB07\uAB08\uAB0F\uAB10\uAB17-\uAB1F\uAB27\uAB2F\uAB5B\uAB6A-\uAB6F\uABEB\uABEE\uABEF\uABFA-\uABFF\uD7A4-\uD7AF\uD7C7-\uD7CA\uD7FC-\uD7FF\uE000-\uF8FF\uFA6E\uFA6F\uFADA-\uFAFF\uFB07-\uFB12\uFB18-\uFB1C\uFB29\uFB37\uFB3D\uFB3F\uFB42\uFB45\uFBB2-\uFBD2\uFD3E-\uFD4F\uFD90\uFD91\uFDC8-\uFDEF\uFDFC-\uFDFF\uFE10-\uFE1F\uFE30-\uFE32\uFE35-\uFE4C\uFE50-\uFE6F\uFE75\uFEFD-\uFF0F\uFF1A-\uFF20\uFF3B-\uFF3E\uFF40\uFF5B-\uFF65\uFFBF-\uFFC1\uFFC8\uFFC9\uFFD0\uFFD1\uFFD8\uFFD9\uFFDD-\uFFFF]|\uD800[\uDC0C\uDC27\uDC3B\uDC3E\uDC4E\uDC4F\uDC5E-\uDC7F\uDCFB-\uDD3F\uDD75-\uDDFC\uDDFE-\uDE7F\uDE9D-\uDE9F\uDED1-\uDEDF\uDEE1-\uDEFF\uDF20-\uDF2C\uDF4B-\uDF4F\uDF7B-\uDF7F\uDF9E\uDF9F\uDFC4-\uDFC7\uDFD0\uDFD6-\uDFFF]|\uD801[\uDC9E\uDC9F\uDCAA-\uDCAF\uDCD4-\uDCD7\uDCFC-\uDCFF\uDD28-\uDD2F\uDD64-\uDDFF\uDF37-\uDF3F\uDF56-\uDF5F\uDF68-\uDFFF]|\uD802[\uDC06\uDC07\uDC09\uDC36\uDC39-\uDC3B\uDC3D\uDC3E\uDC56-\uDC5F\uDC77-\uDC7F\uDC9F-\uDCDF\uDCF3\uDCF6-\uDCFF\uDD16-\uDD1F\uDD3A-\uDD7F\uDDB8-\uDDBD\uDDC0-\uDDFF\uDE04\uDE07-\uDE0B\uDE14\uDE18\uDE36\uDE37\uDE3B-\uDE3E\uDE40-\uDE5F\uDE7D-\uDE7F\uDE9D-\uDEBF\uDEC8\uDEE7-\uDEFF\uDF36-\uDF3F\uDF56-\uDF5F\uDF73-\uDF7F\uDF92-\uDFFF]|\uD803[\uDC49-\uDC7F\uDCB3-\uDCBF\uDCF3-\uDCFF\uDD28-\uDD2F\uDD3A-\uDE7F\uDEAA\uDEAD-\uDEAF\uDEB2-\uDEFF\uDF1D-\uDF26\uDF28-\uDF2F\uDF51-\uDFAF\uDFC5-\uDFDF\uDFF7-\uDFFF]|\uD804[\uDC47-\uDC65\uDC70-\uDC7E\uDCBB-\uDCCF\uDCE9-\uDCEF\uDCFA-\uDCFF\uDD35\uDD40-\uDD43\uDD48-\uDD4F\uDD74\uDD75\uDD77-\uDD7F\uDDC5-\uDDC8\uDDCD\uDDDB\uDDDD-\uDDFF\uDE12\uDE38-\uDE3D\uDE3F-\uDE7F\uDE87\uDE89\uDE8E\uDE9E\uDEA9-\uDEAF\uDEEB-\uDEEF\uDEFA-\uDEFF\uDF04\uDF0D\uDF0E\uDF11\uDF12\uDF29\uDF31\uDF34\uDF3A\uDF45\uDF46\uDF49\uDF4A\uDF4E\uDF4F\uDF51-\uDF56\uDF58-\uDF5C\uDF64\uDF65\uDF6D-\uDF6F\uDF75-\uDFFF]|\uD805[\uDC4B-\uDC4F\uDC5A-\uDC5D\uDC62-\uDC7F\uDCC6\uDCC8-\uDCCF\uDCDA-\uDD7F\uDDB6\uDDB7\uDDC1-\uDDD7\uDDDE-\uDDFF\uDE41-\uDE43\uDE45-\uDE4F\uDE5A-\uDE7F\uDEB9-\uDEBF\uDECA-\uDEFF\uDF1B\uDF1C\uDF2C-\uDF2F\uDF3A-\uDFFF]|\uD806[\uDC3B-\uDC9F\uDCEA-\uDCFE\uDD07\uDD08\uDD0A\uDD0B\uDD14\uDD17\uDD36\uDD39\uDD3A\uDD44-\uDD4F\uDD5A-\uDD9F\uDDA8\uDDA9\uDDD8\uDDD9\uDDE2\uDDE5-\uDDFF\uDE3F-\uDE46\uDE48-\uDE4F\uDE9A-\uDE9C\uDE9E-\uDEBF\uDEF9-\uDFFF]|\uD807[\uDC09\uDC37\uDC41-\uDC4F\uDC5A-\uDC71\uDC90\uDC91\uDCA8\uDCB7-\uDCFF\uDD07\uDD0A\uDD37-\uDD39\uDD3B\uDD3E\uDD48-\uDD4F\uDD5A-\uDD5F\uDD66\uDD69\uDD8F\uDD92\uDD99-\uDD9F\uDDAA-\uDEDF\uDEF7-\uDFAF\uDFB1-\uDFFF]|\uD808[\uDF9A-\uDFFF]|\uD809[\uDC6F-\uDC7F\uDD44-\uDFFF]|[\uD80A\uD80B\uD80E-\uD810\uD812-\uD819\uD824-\uD82B\uD82D\uD82E\uD830-\uD833\uD837\uD839\uD83D\uD83F\uD87B-\uD87D\uD87F\uD885-\uDB3F\uDB41-\uDBFF][\uDC00-\uDFFF]|\uD80D[\uDC2F-\uDFFF]|\uD811[\uDE47-\uDFFF]|\uD81A[\uDE39-\uDE3F\uDE5F\uDE6A-\uDECF\uDEEE\uDEEF\uDEF5-\uDEFF\uDF37-\uDF3F\uDF44-\uDF4F\uDF5A-\uDF62\uDF78-\uDF7C\uDF90-\uDFFF]|\uD81B[\uDC00-\uDE3F\uDE80-\uDEFF\uDF4B-\uDF4E\uDF88-\uDF8E\uDFA0-\uDFDF\uDFE2\uDFE5-\uDFEF\uDFF2-\uDFFF]|\uD821[\uDFF8-\uDFFF]|\uD823[\uDCD6-\uDCFF\uDD09-\uDFFF]|\uD82C[\uDD1F-\uDD4F\uDD53-\uDD63\uDD68-\uDD6F\uDEFC-\uDFFF]|\uD82F[\uDC6B-\uDC6F\uDC7D-\uDC7F\uDC89-\uDC8F\uDC9A-\uDC9C\uDC9F-\uDFFF]|\uD834[\uDC00-\uDD64\uDD6A-\uDD6C\uDD73-\uDD7A\uDD83\uDD84\uDD8C-\uDDA9\uDDAE-\uDE41\uDE45-\uDFFF]|\uD835[\uDC55\uDC9D\uDCA0\uDCA1\uDCA3\uDCA4\uDCA7\uDCA8\uDCAD\uDCBA\uDCBC\uDCC4\uDD06\uDD0B\uDD0C\uDD15\uDD1D\uDD3A\uDD3F\uDD45\uDD47-\uDD49\uDD51\uDEA6\uDEA7\uDEC1\uDEDB\uDEFB\uDF15\uDF35\uDF4F\uDF6F\uDF89\uDFA9\uDFC3\uDFCC\uDFCD]|\uD836[\uDC00-\uDDFF\uDE37-\uDE3A\uDE6D-\uDE74\uDE76-\uDE83\uDE85-\uDE9A\uDEA0\uDEB0-\uDFFF]|\uD838[\uDC07\uDC19\uDC1A\uDC22\uDC25\uDC2B-\uDCFF\uDD2D-\uDD2F\uDD3E\uDD3F\uDD4A-\uDD4D\uDD4F-\uDEBF\uDEFA-\uDFFF]|\uD83A[\uDCC5-\uDCCF\uDCD7-\uDCFF\uDD4C-\uDD4F\uDD5A-\uDFFF]|\uD83B[\uDC00-\uDDFF\uDE04\uDE20\uDE23\uDE25\uDE26\uDE28\uDE33\uDE38\uDE3A\uDE3C-\uDE41\uDE43-\uDE46\uDE48\uDE4A\uDE4C\uDE50\uDE53\uDE55\uDE56\uDE58\uDE5A\uDE5C\uDE5E\uDE60\uDE63\uDE65\uDE66\uDE6B\uDE73\uDE78\uDE7D\uDE7F\uDE8A\uDE9C-\uDEA0\uDEA4\uDEAA\uDEBC-\uDFFF]|\uD83C[\uDC00-\uDD2F\uDD4A-\uDD4F\uDD6A-\uDD6F\uDD8A-\uDFFF]|\uD83E[\uDC00-\uDFEF\uDFFA-\uDFFF]|\uD869[\uDEDE-\uDEFF]|\uD86D[\uDF35-\uDF3F]|\uD86E[\uDC1E\uDC1F]|\uD873[\uDEA2-\uDEAF]|\uD87A[\uDFE1-\uDFFF]|\uD87E[\uDE1E-\uDFFF]|\uD884[\uDF4B-\uDFFF]|\uDB40[\uDC00-\uDCFF\uDDF0-\uDFFF]/g;
-
-// node_modules/github-slugger/index.js
-var own4 = Object.hasOwnProperty;
-
-class BananaSlug {
-  constructor() {
-    this.occurrences;
-    this.reset();
-  }
-  slug(value, maintainCase) {
-    const self2 = this;
-    let result = slug(value, maintainCase === true);
-    const originalSlug = result;
-    while (own4.call(self2.occurrences, result)) {
-      self2.occurrences[originalSlug]++;
-      result = originalSlug + "-" + self2.occurrences[originalSlug];
-    }
-    self2.occurrences[result] = 0;
-    return result;
-  }
-  reset() {
-    this.occurrences = Object.create(null);
-  }
-}
-function slug(value, maintainCase) {
-  if (typeof value !== "string")
-    return "";
-  if (!maintainCase)
-    value = value.toLowerCase();
-  return value.replace(regex, "").replace(/ /g, "-");
-}
-
-// node_modules/hast-util-heading-rank/lib/index.js
-function headingRank(node2) {
-  const name = node2.type === "element" ? node2.tagName.toLowerCase() : "";
-  const code4 = name.length === 2 && name.charCodeAt(0) === 104 ? name.charCodeAt(1) : 0;
-  return code4 > 48 && code4 < 55 ? code4 - 48 : undefined;
-}
-// node_modules/hast-util-to-string/lib/index.js
-function toString3(node2) {
-  if ("children" in node2) {
-    return all2(node2);
-  }
-  return "value" in node2 ? node2.value : "";
-}
-function one2(node2) {
-  if (node2.type === "text") {
-    return node2.value;
-  }
-  return "children" in node2 ? all2(node2) : "";
-}
-function all2(node2) {
-  let index2 = -1;
-  const result = [];
-  while (++index2 < node2.children.length) {
-    result[index2] = one2(node2.children[index2]);
-  }
-  return result.join("");
-}
-// node_modules/rehype-slug/lib/index.js
-var emptyOptions5 = {};
-var slugs = new BananaSlug;
-function rehypeSlug(options) {
-  const settings = options || emptyOptions5;
-  const prefix = settings.prefix || "";
-  return function(tree) {
-    slugs.reset();
-    visit(tree, "element", function(node2) {
-      if (headingRank(node2) && !node2.properties.id) {
-        node2.properties.id = prefix + slugs.slug(toString3(node2));
-      }
-    });
-  };
-}
-// node_modules/hast-util-is-element/lib/index.js
-var convertElement = function(test) {
-  if (test === null || test === undefined) {
-    return element2;
-  }
-  if (typeof test === "string") {
-    return tagNameFactory(test);
-  }
-  if (typeof test === "object") {
-    return anyFactory2(test);
-  }
-  if (typeof test === "function") {
-    return castFactory2(test);
-  }
-  throw new Error("Expected function, string, or array as `test`");
-};
-function anyFactory2(tests) {
-  const checks = [];
-  let index2 = -1;
-  while (++index2 < tests.length) {
-    checks[index2] = convertElement(tests[index2]);
-  }
-  return castFactory2(any);
-  function any(...parameters) {
-    let index3 = -1;
-    while (++index3 < checks.length) {
-      if (checks[index3].apply(this, parameters))
-        return true;
-    }
-    return false;
-  }
-}
-function tagNameFactory(check) {
-  return castFactory2(tagName);
-  function tagName(element2) {
-    return element2.tagName === check;
-  }
-}
-function castFactory2(testFunction) {
-  return check;
-  function check(value, index2, parent) {
-    return Boolean(looksLikeAnElement(value) && testFunction.call(this, value, typeof index2 === "number" ? index2 : undefined, parent || undefined));
-  }
-}
-function element2(element3) {
-  return Boolean(element3 && typeof element3 === "object" && "type" in element3 && element3.type === "element" && "tagName" in element3 && typeof element3.tagName === "string");
-}
-function looksLikeAnElement(value) {
-  return value !== null && typeof value === "object" && "type" in value && "tagName" in value;
-}
-// node_modules/is-absolute-url/index.js
-var ABSOLUTE_URL_REGEX = /^[a-zA-Z][a-zA-Z\d+\-.]*?:/;
-var WINDOWS_PATH_REGEX = /^[a-zA-Z]:\\/;
-function isAbsoluteUrl(url) {
-  if (typeof url !== "string") {
-    throw new TypeError(`Expected a \`string\`, got \`${typeof url}\``);
-  }
-  if (WINDOWS_PATH_REGEX.test(url)) {
-    return false;
-  }
-  return ABSOLUTE_URL_REGEX.test(url);
-}
-
-// node_modules/space-separated-tokens/index.js
-function parse2(value) {
-  const input = String(value || "").trim();
-  return input ? input.split(/[ \t\n\r\f]+/g) : [];
-}
-function stringify(values2) {
-  return values2.join(" ").trim();
-}
-
-// node_modules/rehype-external-links/lib/index.js
-var defaultProtocols = ["http", "https"];
-var defaultRel = ["nofollow"];
-var emptyOptions6 = {};
-function rehypeExternalLinks(options) {
-  const settings = options || emptyOptions6;
-  const protocols = settings.protocols || defaultProtocols;
-  const is2 = convertElement(settings.test);
-  return function(tree) {
-    visit(tree, "element", function(node2, index2, parent) {
-      if (node2.tagName === "a" && typeof node2.properties.href === "string" && is2(node2, index2, parent)) {
-        const url = node2.properties.href;
-        if (isAbsoluteUrl(url) ? protocols.includes(url.slice(0, url.indexOf(":"))) : url.startsWith("//")) {
-          const contentRaw = createIfNeeded(settings.content, node2);
-          const content3 = contentRaw && !Array.isArray(contentRaw) ? [contentRaw] : contentRaw;
-          const relRaw = createIfNeeded(settings.rel, node2) || defaultRel;
-          const rel2 = typeof relRaw === "string" ? parse2(relRaw) : relRaw;
-          const target = createIfNeeded(settings.target, node2);
-          const properties = createIfNeeded(settings.properties, node2);
-          if (properties) {
-            Object.assign(node2.properties, esm_default(properties));
-          }
-          if (rel2.length > 0) {
-            node2.properties.rel = [...rel2];
-          }
-          if (target) {
-            node2.properties.target = target;
-          }
-          if (content3) {
-            const properties2 = createIfNeeded(settings.contentProperties, node2) || {};
-            node2.children.push({
-              type: "element",
-              tagName: "span",
-              properties: esm_default(properties2),
-              children: esm_default(content3)
-            });
-          }
-        }
-      }
-    });
-  };
-}
-function createIfNeeded(value, element3) {
-  return typeof value === "function" ? value(element3) : value;
-}
-// src/editor/MarkdownEditor.ts
-var import_rehype_figure = __toESM(require_rehype_figure(), 1);
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/util/schema.js
-class Schema {
-  constructor(property, normal, space2) {
-    this.normal = normal;
-    this.property = property;
-    if (space2) {
-      this.space = space2;
-    }
-  }
-}
-Schema.prototype.normal = {};
-Schema.prototype.property = {};
-Schema.prototype.space = undefined;
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/util/merge.js
-function merge(definitions, space2) {
-  const property = {};
-  const normal = {};
-  for (const definition3 of definitions) {
-    Object.assign(property, definition3.property);
-    Object.assign(normal, definition3.normal);
-  }
-  return new Schema(property, normal, space2);
-}
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/normalize.js
-function normalize(value) {
-  return value.toLowerCase();
-}
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/util/info.js
-class Info {
-  constructor(property, attribute) {
-    this.attribute = attribute;
-    this.property = property;
-  }
-}
-Info.prototype.attribute = "";
-Info.prototype.booleanish = false;
-Info.prototype.boolean = false;
-Info.prototype.commaOrSpaceSeparated = false;
-Info.prototype.commaSeparated = false;
-Info.prototype.defined = false;
-Info.prototype.mustUseProperty = false;
-Info.prototype.number = false;
-Info.prototype.overloadedBoolean = false;
-Info.prototype.property = "";
-Info.prototype.spaceSeparated = false;
-Info.prototype.space = undefined;
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/util/types.js
-var exports_types = {};
-__export(exports_types, {
-  spaceSeparated: () => spaceSeparated,
-  overloadedBoolean: () => overloadedBoolean,
-  number: () => number,
-  commaSeparated: () => commaSeparated,
-  commaOrSpaceSeparated: () => commaOrSpaceSeparated,
-  booleanish: () => booleanish,
-  boolean: () => boolean
-});
-var powers = 0;
-var boolean = increment();
-var booleanish = increment();
-var overloadedBoolean = increment();
-var number = increment();
-var spaceSeparated = increment();
-var commaSeparated = increment();
-var commaOrSpaceSeparated = increment();
-function increment() {
-  return 2 ** ++powers;
-}
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/util/defined-info.js
-var checks = Object.keys(exports_types);
-
-class DefinedInfo extends Info {
-  constructor(property, attribute, mask, space2) {
-    let index2 = -1;
-    super(property, attribute);
-    mark(this, "space", space2);
-    if (typeof mask === "number") {
-      while (++index2 < checks.length) {
-        const check = checks[index2];
-        mark(this, checks[index2], (mask & exports_types[check]) === exports_types[check]);
-      }
-    }
-  }
-}
-DefinedInfo.prototype.defined = true;
-function mark(values2, key, value) {
-  if (value) {
-    values2[key] = value;
-  }
-}
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/util/create.js
-function create(definition3) {
-  const properties = {};
-  const normals = {};
-  for (const [property, value] of Object.entries(definition3.properties)) {
-    const info = new DefinedInfo(property, definition3.transform(definition3.attributes || {}, property), value, definition3.space);
-    if (definition3.mustUseProperty && definition3.mustUseProperty.includes(property)) {
-      info.mustUseProperty = true;
-    }
-    properties[property] = info;
-    normals[normalize(property)] = property;
-    normals[normalize(info.attribute)] = property;
-  }
-  return new Schema(properties, normals, definition3.space);
-}
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/aria.js
-var aria = create({
-  properties: {
-    ariaActiveDescendant: null,
-    ariaAtomic: booleanish,
-    ariaAutoComplete: null,
-    ariaBusy: booleanish,
-    ariaChecked: booleanish,
-    ariaColCount: number,
-    ariaColIndex: number,
-    ariaColSpan: number,
-    ariaControls: spaceSeparated,
-    ariaCurrent: null,
-    ariaDescribedBy: spaceSeparated,
-    ariaDetails: null,
-    ariaDisabled: booleanish,
-    ariaDropEffect: spaceSeparated,
-    ariaErrorMessage: null,
-    ariaExpanded: booleanish,
-    ariaFlowTo: spaceSeparated,
-    ariaGrabbed: booleanish,
-    ariaHasPopup: null,
-    ariaHidden: booleanish,
-    ariaInvalid: null,
-    ariaKeyShortcuts: null,
-    ariaLabel: null,
-    ariaLabelledBy: spaceSeparated,
-    ariaLevel: number,
-    ariaLive: null,
-    ariaModal: booleanish,
-    ariaMultiLine: booleanish,
-    ariaMultiSelectable: booleanish,
-    ariaOrientation: null,
-    ariaOwns: spaceSeparated,
-    ariaPlaceholder: null,
-    ariaPosInSet: number,
-    ariaPressed: booleanish,
-    ariaReadOnly: booleanish,
-    ariaRelevant: null,
-    ariaRequired: booleanish,
-    ariaRoleDescription: spaceSeparated,
-    ariaRowCount: number,
-    ariaRowIndex: number,
-    ariaRowSpan: number,
-    ariaSelected: booleanish,
-    ariaSetSize: number,
-    ariaSort: null,
-    ariaValueMax: number,
-    ariaValueMin: number,
-    ariaValueNow: number,
-    ariaValueText: null,
-    role: null
-  },
-  transform(_, property) {
-    return property === "role" ? property : "aria-" + property.slice(4).toLowerCase();
-  }
-});
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/util/case-sensitive-transform.js
-function caseSensitiveTransform(attributes, attribute) {
-  return attribute in attributes ? attributes[attribute] : attribute;
-}
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/util/case-insensitive-transform.js
-function caseInsensitiveTransform(attributes, property) {
-  return caseSensitiveTransform(attributes, property.toLowerCase());
-}
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/html.js
-var html3 = create({
-  attributes: {
-    acceptcharset: "accept-charset",
-    classname: "class",
-    htmlfor: "for",
-    httpequiv: "http-equiv"
-  },
-  mustUseProperty: ["checked", "multiple", "muted", "selected"],
-  properties: {
-    abbr: null,
-    accept: commaSeparated,
-    acceptCharset: spaceSeparated,
-    accessKey: spaceSeparated,
-    action: null,
-    allow: null,
-    allowFullScreen: boolean,
-    allowPaymentRequest: boolean,
-    allowUserMedia: boolean,
-    alt: null,
-    as: null,
-    async: boolean,
-    autoCapitalize: null,
-    autoComplete: spaceSeparated,
-    autoFocus: boolean,
-    autoPlay: boolean,
-    blocking: spaceSeparated,
-    capture: null,
-    charSet: null,
-    checked: boolean,
-    cite: null,
-    className: spaceSeparated,
-    cols: number,
-    colSpan: null,
-    content: null,
-    contentEditable: booleanish,
-    controls: boolean,
-    controlsList: spaceSeparated,
-    coords: number | commaSeparated,
-    crossOrigin: null,
-    data: null,
-    dateTime: null,
-    decoding: null,
-    default: boolean,
-    defer: boolean,
-    dir: null,
-    dirName: null,
-    disabled: boolean,
-    download: overloadedBoolean,
-    draggable: booleanish,
-    encType: null,
-    enterKeyHint: null,
-    fetchPriority: null,
-    form: null,
-    formAction: null,
-    formEncType: null,
-    formMethod: null,
-    formNoValidate: boolean,
-    formTarget: null,
-    headers: spaceSeparated,
-    height: number,
-    hidden: boolean,
-    high: number,
-    href: null,
-    hrefLang: null,
-    htmlFor: spaceSeparated,
-    httpEquiv: spaceSeparated,
-    id: null,
-    imageSizes: null,
-    imageSrcSet: null,
-    inert: boolean,
-    inputMode: null,
-    integrity: null,
-    is: null,
-    isMap: boolean,
-    itemId: null,
-    itemProp: spaceSeparated,
-    itemRef: spaceSeparated,
-    itemScope: boolean,
-    itemType: spaceSeparated,
-    kind: null,
-    label: null,
-    lang: null,
-    language: null,
-    list: null,
-    loading: null,
-    loop: boolean,
-    low: number,
-    manifest: null,
-    max: null,
-    maxLength: number,
-    media: null,
-    method: null,
-    min: null,
-    minLength: number,
-    multiple: boolean,
-    muted: boolean,
-    name: null,
-    nonce: null,
-    noModule: boolean,
-    noValidate: boolean,
-    onAbort: null,
-    onAfterPrint: null,
-    onAuxClick: null,
-    onBeforeMatch: null,
-    onBeforePrint: null,
-    onBeforeToggle: null,
-    onBeforeUnload: null,
-    onBlur: null,
-    onCancel: null,
-    onCanPlay: null,
-    onCanPlayThrough: null,
-    onChange: null,
-    onClick: null,
-    onClose: null,
-    onContextLost: null,
-    onContextMenu: null,
-    onContextRestored: null,
-    onCopy: null,
-    onCueChange: null,
-    onCut: null,
-    onDblClick: null,
-    onDrag: null,
-    onDragEnd: null,
-    onDragEnter: null,
-    onDragExit: null,
-    onDragLeave: null,
-    onDragOver: null,
-    onDragStart: null,
-    onDrop: null,
-    onDurationChange: null,
-    onEmptied: null,
-    onEnded: null,
-    onError: null,
-    onFocus: null,
-    onFormData: null,
-    onHashChange: null,
-    onInput: null,
-    onInvalid: null,
-    onKeyDown: null,
-    onKeyPress: null,
-    onKeyUp: null,
-    onLanguageChange: null,
-    onLoad: null,
-    onLoadedData: null,
-    onLoadedMetadata: null,
-    onLoadEnd: null,
-    onLoadStart: null,
-    onMessage: null,
-    onMessageError: null,
-    onMouseDown: null,
-    onMouseEnter: null,
-    onMouseLeave: null,
-    onMouseMove: null,
-    onMouseOut: null,
-    onMouseOver: null,
-    onMouseUp: null,
-    onOffline: null,
-    onOnline: null,
-    onPageHide: null,
-    onPageShow: null,
-    onPaste: null,
-    onPause: null,
-    onPlay: null,
-    onPlaying: null,
-    onPopState: null,
-    onProgress: null,
-    onRateChange: null,
-    onRejectionHandled: null,
-    onReset: null,
-    onResize: null,
-    onScroll: null,
-    onScrollEnd: null,
-    onSecurityPolicyViolation: null,
-    onSeeked: null,
-    onSeeking: null,
-    onSelect: null,
-    onSlotChange: null,
-    onStalled: null,
-    onStorage: null,
-    onSubmit: null,
-    onSuspend: null,
-    onTimeUpdate: null,
-    onToggle: null,
-    onUnhandledRejection: null,
-    onUnload: null,
-    onVolumeChange: null,
-    onWaiting: null,
-    onWheel: null,
-    open: boolean,
-    optimum: number,
-    pattern: null,
-    ping: spaceSeparated,
-    placeholder: null,
-    playsInline: boolean,
-    popover: null,
-    popoverTarget: null,
-    popoverTargetAction: null,
-    poster: null,
-    preload: null,
-    readOnly: boolean,
-    referrerPolicy: null,
-    rel: spaceSeparated,
-    required: boolean,
-    reversed: boolean,
-    rows: number,
-    rowSpan: number,
-    sandbox: spaceSeparated,
-    scope: null,
-    scoped: boolean,
-    seamless: boolean,
-    selected: boolean,
-    shadowRootClonable: boolean,
-    shadowRootDelegatesFocus: boolean,
-    shadowRootMode: null,
-    shape: null,
-    size: number,
-    sizes: null,
-    slot: null,
-    span: number,
-    spellCheck: booleanish,
-    src: null,
-    srcDoc: null,
-    srcLang: null,
-    srcSet: null,
-    start: number,
-    step: null,
-    style: null,
-    tabIndex: number,
-    target: null,
-    title: null,
-    translate: null,
-    type: null,
-    typeMustMatch: boolean,
-    useMap: null,
-    value: booleanish,
-    width: number,
-    wrap: null,
-    writingSuggestions: null,
-    align: null,
-    aLink: null,
-    archive: spaceSeparated,
-    axis: null,
-    background: null,
-    bgColor: null,
-    border: number,
-    borderColor: null,
-    bottomMargin: number,
-    cellPadding: null,
-    cellSpacing: null,
-    char: null,
-    charOff: null,
-    classId: null,
-    clear: null,
-    code: null,
-    codeBase: null,
-    codeType: null,
-    color: null,
-    compact: boolean,
-    declare: boolean,
-    event: null,
-    face: null,
-    frame: null,
-    frameBorder: null,
-    hSpace: number,
-    leftMargin: number,
-    link: null,
-    longDesc: null,
-    lowSrc: null,
-    marginHeight: number,
-    marginWidth: number,
-    noResize: boolean,
-    noHref: boolean,
-    noShade: boolean,
-    noWrap: boolean,
-    object: null,
-    profile: null,
-    prompt: null,
-    rev: null,
-    rightMargin: number,
-    rules: null,
-    scheme: null,
-    scrolling: booleanish,
-    standby: null,
-    summary: null,
-    text: null,
-    topMargin: number,
-    valueType: null,
-    version: null,
-    vAlign: null,
-    vLink: null,
-    vSpace: number,
-    allowTransparency: null,
-    autoCorrect: null,
-    autoSave: null,
-    disablePictureInPicture: boolean,
-    disableRemotePlayback: boolean,
-    prefix: null,
-    property: null,
-    results: number,
-    security: null,
-    unselectable: null
-  },
-  space: "html",
-  transform: caseInsensitiveTransform
-});
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/svg.js
-var svg = create({
-  attributes: {
-    accentHeight: "accent-height",
-    alignmentBaseline: "alignment-baseline",
-    arabicForm: "arabic-form",
-    baselineShift: "baseline-shift",
-    capHeight: "cap-height",
-    className: "class",
-    clipPath: "clip-path",
-    clipRule: "clip-rule",
-    colorInterpolation: "color-interpolation",
-    colorInterpolationFilters: "color-interpolation-filters",
-    colorProfile: "color-profile",
-    colorRendering: "color-rendering",
-    crossOrigin: "crossorigin",
-    dataType: "datatype",
-    dominantBaseline: "dominant-baseline",
-    enableBackground: "enable-background",
-    fillOpacity: "fill-opacity",
-    fillRule: "fill-rule",
-    floodColor: "flood-color",
-    floodOpacity: "flood-opacity",
-    fontFamily: "font-family",
-    fontSize: "font-size",
-    fontSizeAdjust: "font-size-adjust",
-    fontStretch: "font-stretch",
-    fontStyle: "font-style",
-    fontVariant: "font-variant",
-    fontWeight: "font-weight",
-    glyphName: "glyph-name",
-    glyphOrientationHorizontal: "glyph-orientation-horizontal",
-    glyphOrientationVertical: "glyph-orientation-vertical",
-    hrefLang: "hreflang",
-    horizAdvX: "horiz-adv-x",
-    horizOriginX: "horiz-origin-x",
-    horizOriginY: "horiz-origin-y",
-    imageRendering: "image-rendering",
-    letterSpacing: "letter-spacing",
-    lightingColor: "lighting-color",
-    markerEnd: "marker-end",
-    markerMid: "marker-mid",
-    markerStart: "marker-start",
-    navDown: "nav-down",
-    navDownLeft: "nav-down-left",
-    navDownRight: "nav-down-right",
-    navLeft: "nav-left",
-    navNext: "nav-next",
-    navPrev: "nav-prev",
-    navRight: "nav-right",
-    navUp: "nav-up",
-    navUpLeft: "nav-up-left",
-    navUpRight: "nav-up-right",
-    onAbort: "onabort",
-    onActivate: "onactivate",
-    onAfterPrint: "onafterprint",
-    onBeforePrint: "onbeforeprint",
-    onBegin: "onbegin",
-    onCancel: "oncancel",
-    onCanPlay: "oncanplay",
-    onCanPlayThrough: "oncanplaythrough",
-    onChange: "onchange",
-    onClick: "onclick",
-    onClose: "onclose",
-    onCopy: "oncopy",
-    onCueChange: "oncuechange",
-    onCut: "oncut",
-    onDblClick: "ondblclick",
-    onDrag: "ondrag",
-    onDragEnd: "ondragend",
-    onDragEnter: "ondragenter",
-    onDragExit: "ondragexit",
-    onDragLeave: "ondragleave",
-    onDragOver: "ondragover",
-    onDragStart: "ondragstart",
-    onDrop: "ondrop",
-    onDurationChange: "ondurationchange",
-    onEmptied: "onemptied",
-    onEnd: "onend",
-    onEnded: "onended",
-    onError: "onerror",
-    onFocus: "onfocus",
-    onFocusIn: "onfocusin",
-    onFocusOut: "onfocusout",
-    onHashChange: "onhashchange",
-    onInput: "oninput",
-    onInvalid: "oninvalid",
-    onKeyDown: "onkeydown",
-    onKeyPress: "onkeypress",
-    onKeyUp: "onkeyup",
-    onLoad: "onload",
-    onLoadedData: "onloadeddata",
-    onLoadedMetadata: "onloadedmetadata",
-    onLoadStart: "onloadstart",
-    onMessage: "onmessage",
-    onMouseDown: "onmousedown",
-    onMouseEnter: "onmouseenter",
-    onMouseLeave: "onmouseleave",
-    onMouseMove: "onmousemove",
-    onMouseOut: "onmouseout",
-    onMouseOver: "onmouseover",
-    onMouseUp: "onmouseup",
-    onMouseWheel: "onmousewheel",
-    onOffline: "onoffline",
-    onOnline: "ononline",
-    onPageHide: "onpagehide",
-    onPageShow: "onpageshow",
-    onPaste: "onpaste",
-    onPause: "onpause",
-    onPlay: "onplay",
-    onPlaying: "onplaying",
-    onPopState: "onpopstate",
-    onProgress: "onprogress",
-    onRateChange: "onratechange",
-    onRepeat: "onrepeat",
-    onReset: "onreset",
-    onResize: "onresize",
-    onScroll: "onscroll",
-    onSeeked: "onseeked",
-    onSeeking: "onseeking",
-    onSelect: "onselect",
-    onShow: "onshow",
-    onStalled: "onstalled",
-    onStorage: "onstorage",
-    onSubmit: "onsubmit",
-    onSuspend: "onsuspend",
-    onTimeUpdate: "ontimeupdate",
-    onToggle: "ontoggle",
-    onUnload: "onunload",
-    onVolumeChange: "onvolumechange",
-    onWaiting: "onwaiting",
-    onZoom: "onzoom",
-    overlinePosition: "overline-position",
-    overlineThickness: "overline-thickness",
-    paintOrder: "paint-order",
-    panose1: "panose-1",
-    pointerEvents: "pointer-events",
-    referrerPolicy: "referrerpolicy",
-    renderingIntent: "rendering-intent",
-    shapeRendering: "shape-rendering",
-    stopColor: "stop-color",
-    stopOpacity: "stop-opacity",
-    strikethroughPosition: "strikethrough-position",
-    strikethroughThickness: "strikethrough-thickness",
-    strokeDashArray: "stroke-dasharray",
-    strokeDashOffset: "stroke-dashoffset",
-    strokeLineCap: "stroke-linecap",
-    strokeLineJoin: "stroke-linejoin",
-    strokeMiterLimit: "stroke-miterlimit",
-    strokeOpacity: "stroke-opacity",
-    strokeWidth: "stroke-width",
-    tabIndex: "tabindex",
-    textAnchor: "text-anchor",
-    textDecoration: "text-decoration",
-    textRendering: "text-rendering",
-    transformOrigin: "transform-origin",
-    typeOf: "typeof",
-    underlinePosition: "underline-position",
-    underlineThickness: "underline-thickness",
-    unicodeBidi: "unicode-bidi",
-    unicodeRange: "unicode-range",
-    unitsPerEm: "units-per-em",
-    vAlphabetic: "v-alphabetic",
-    vHanging: "v-hanging",
-    vIdeographic: "v-ideographic",
-    vMathematical: "v-mathematical",
-    vectorEffect: "vector-effect",
-    vertAdvY: "vert-adv-y",
-    vertOriginX: "vert-origin-x",
-    vertOriginY: "vert-origin-y",
-    wordSpacing: "word-spacing",
-    writingMode: "writing-mode",
-    xHeight: "x-height",
-    playbackOrder: "playbackorder",
-    timelineBegin: "timelinebegin"
-  },
-  properties: {
-    about: commaOrSpaceSeparated,
-    accentHeight: number,
-    accumulate: null,
-    additive: null,
-    alignmentBaseline: null,
-    alphabetic: number,
-    amplitude: number,
-    arabicForm: null,
-    ascent: number,
-    attributeName: null,
-    attributeType: null,
-    azimuth: number,
-    bandwidth: null,
-    baselineShift: null,
-    baseFrequency: null,
-    baseProfile: null,
-    bbox: null,
-    begin: null,
-    bias: number,
-    by: null,
-    calcMode: null,
-    capHeight: number,
-    className: spaceSeparated,
-    clip: null,
-    clipPath: null,
-    clipPathUnits: null,
-    clipRule: null,
-    color: null,
-    colorInterpolation: null,
-    colorInterpolationFilters: null,
-    colorProfile: null,
-    colorRendering: null,
-    content: null,
-    contentScriptType: null,
-    contentStyleType: null,
-    crossOrigin: null,
-    cursor: null,
-    cx: null,
-    cy: null,
-    d: null,
-    dataType: null,
-    defaultAction: null,
-    descent: number,
-    diffuseConstant: number,
-    direction: null,
-    display: null,
-    dur: null,
-    divisor: number,
-    dominantBaseline: null,
-    download: boolean,
-    dx: null,
-    dy: null,
-    edgeMode: null,
-    editable: null,
-    elevation: number,
-    enableBackground: null,
-    end: null,
-    event: null,
-    exponent: number,
-    externalResourcesRequired: null,
-    fill: null,
-    fillOpacity: number,
-    fillRule: null,
-    filter: null,
-    filterRes: null,
-    filterUnits: null,
-    floodColor: null,
-    floodOpacity: null,
-    focusable: null,
-    focusHighlight: null,
-    fontFamily: null,
-    fontSize: null,
-    fontSizeAdjust: null,
-    fontStretch: null,
-    fontStyle: null,
-    fontVariant: null,
-    fontWeight: null,
-    format: null,
-    fr: null,
-    from: null,
-    fx: null,
-    fy: null,
-    g1: commaSeparated,
-    g2: commaSeparated,
-    glyphName: commaSeparated,
-    glyphOrientationHorizontal: null,
-    glyphOrientationVertical: null,
-    glyphRef: null,
-    gradientTransform: null,
-    gradientUnits: null,
-    handler: null,
-    hanging: number,
-    hatchContentUnits: null,
-    hatchUnits: null,
-    height: null,
-    href: null,
-    hrefLang: null,
-    horizAdvX: number,
-    horizOriginX: number,
-    horizOriginY: number,
-    id: null,
-    ideographic: number,
-    imageRendering: null,
-    initialVisibility: null,
-    in: null,
-    in2: null,
-    intercept: number,
-    k: number,
-    k1: number,
-    k2: number,
-    k3: number,
-    k4: number,
-    kernelMatrix: commaOrSpaceSeparated,
-    kernelUnitLength: null,
-    keyPoints: null,
-    keySplines: null,
-    keyTimes: null,
-    kerning: null,
-    lang: null,
-    lengthAdjust: null,
-    letterSpacing: null,
-    lightingColor: null,
-    limitingConeAngle: number,
-    local: null,
-    markerEnd: null,
-    markerMid: null,
-    markerStart: null,
-    markerHeight: null,
-    markerUnits: null,
-    markerWidth: null,
-    mask: null,
-    maskContentUnits: null,
-    maskUnits: null,
-    mathematical: null,
-    max: null,
-    media: null,
-    mediaCharacterEncoding: null,
-    mediaContentEncodings: null,
-    mediaSize: number,
-    mediaTime: null,
-    method: null,
-    min: null,
-    mode: null,
-    name: null,
-    navDown: null,
-    navDownLeft: null,
-    navDownRight: null,
-    navLeft: null,
-    navNext: null,
-    navPrev: null,
-    navRight: null,
-    navUp: null,
-    navUpLeft: null,
-    navUpRight: null,
-    numOctaves: null,
-    observer: null,
-    offset: null,
-    onAbort: null,
-    onActivate: null,
-    onAfterPrint: null,
-    onBeforePrint: null,
-    onBegin: null,
-    onCancel: null,
-    onCanPlay: null,
-    onCanPlayThrough: null,
-    onChange: null,
-    onClick: null,
-    onClose: null,
-    onCopy: null,
-    onCueChange: null,
-    onCut: null,
-    onDblClick: null,
-    onDrag: null,
-    onDragEnd: null,
-    onDragEnter: null,
-    onDragExit: null,
-    onDragLeave: null,
-    onDragOver: null,
-    onDragStart: null,
-    onDrop: null,
-    onDurationChange: null,
-    onEmptied: null,
-    onEnd: null,
-    onEnded: null,
-    onError: null,
-    onFocus: null,
-    onFocusIn: null,
-    onFocusOut: null,
-    onHashChange: null,
-    onInput: null,
-    onInvalid: null,
-    onKeyDown: null,
-    onKeyPress: null,
-    onKeyUp: null,
-    onLoad: null,
-    onLoadedData: null,
-    onLoadedMetadata: null,
-    onLoadStart: null,
-    onMessage: null,
-    onMouseDown: null,
-    onMouseEnter: null,
-    onMouseLeave: null,
-    onMouseMove: null,
-    onMouseOut: null,
-    onMouseOver: null,
-    onMouseUp: null,
-    onMouseWheel: null,
-    onOffline: null,
-    onOnline: null,
-    onPageHide: null,
-    onPageShow: null,
-    onPaste: null,
-    onPause: null,
-    onPlay: null,
-    onPlaying: null,
-    onPopState: null,
-    onProgress: null,
-    onRateChange: null,
-    onRepeat: null,
-    onReset: null,
-    onResize: null,
-    onScroll: null,
-    onSeeked: null,
-    onSeeking: null,
-    onSelect: null,
-    onShow: null,
-    onStalled: null,
-    onStorage: null,
-    onSubmit: null,
-    onSuspend: null,
-    onTimeUpdate: null,
-    onToggle: null,
-    onUnload: null,
-    onVolumeChange: null,
-    onWaiting: null,
-    onZoom: null,
-    opacity: null,
-    operator: null,
-    order: null,
-    orient: null,
-    orientation: null,
-    origin: null,
-    overflow: null,
-    overlay: null,
-    overlinePosition: number,
-    overlineThickness: number,
-    paintOrder: null,
-    panose1: null,
-    path: null,
-    pathLength: number,
-    patternContentUnits: null,
-    patternTransform: null,
-    patternUnits: null,
-    phase: null,
-    ping: spaceSeparated,
-    pitch: null,
-    playbackOrder: null,
-    pointerEvents: null,
-    points: null,
-    pointsAtX: number,
-    pointsAtY: number,
-    pointsAtZ: number,
-    preserveAlpha: null,
-    preserveAspectRatio: null,
-    primitiveUnits: null,
-    propagate: null,
-    property: commaOrSpaceSeparated,
-    r: null,
-    radius: null,
-    referrerPolicy: null,
-    refX: null,
-    refY: null,
-    rel: commaOrSpaceSeparated,
-    rev: commaOrSpaceSeparated,
-    renderingIntent: null,
-    repeatCount: null,
-    repeatDur: null,
-    requiredExtensions: commaOrSpaceSeparated,
-    requiredFeatures: commaOrSpaceSeparated,
-    requiredFonts: commaOrSpaceSeparated,
-    requiredFormats: commaOrSpaceSeparated,
-    resource: null,
-    restart: null,
-    result: null,
-    rotate: null,
-    rx: null,
-    ry: null,
-    scale: null,
-    seed: null,
-    shapeRendering: null,
-    side: null,
-    slope: null,
-    snapshotTime: null,
-    specularConstant: number,
-    specularExponent: number,
-    spreadMethod: null,
-    spacing: null,
-    startOffset: null,
-    stdDeviation: null,
-    stemh: null,
-    stemv: null,
-    stitchTiles: null,
-    stopColor: null,
-    stopOpacity: null,
-    strikethroughPosition: number,
-    strikethroughThickness: number,
-    string: null,
-    stroke: null,
-    strokeDashArray: commaOrSpaceSeparated,
-    strokeDashOffset: null,
-    strokeLineCap: null,
-    strokeLineJoin: null,
-    strokeMiterLimit: number,
-    strokeOpacity: number,
-    strokeWidth: null,
-    style: null,
-    surfaceScale: number,
-    syncBehavior: null,
-    syncBehaviorDefault: null,
-    syncMaster: null,
-    syncTolerance: null,
-    syncToleranceDefault: null,
-    systemLanguage: commaOrSpaceSeparated,
-    tabIndex: number,
-    tableValues: null,
-    target: null,
-    targetX: number,
-    targetY: number,
-    textAnchor: null,
-    textDecoration: null,
-    textRendering: null,
-    textLength: null,
-    timelineBegin: null,
-    title: null,
-    transformBehavior: null,
-    type: null,
-    typeOf: commaOrSpaceSeparated,
-    to: null,
-    transform: null,
-    transformOrigin: null,
-    u1: null,
-    u2: null,
-    underlinePosition: number,
-    underlineThickness: number,
-    unicode: null,
-    unicodeBidi: null,
-    unicodeRange: null,
-    unitsPerEm: number,
-    values: null,
-    vAlphabetic: number,
-    vMathematical: number,
-    vectorEffect: null,
-    vHanging: number,
-    vIdeographic: number,
-    version: null,
-    vertAdvY: number,
-    vertOriginX: number,
-    vertOriginY: number,
-    viewBox: null,
-    viewTarget: null,
-    visibility: null,
-    width: null,
-    widths: null,
-    wordSpacing: null,
-    writingMode: null,
-    x: null,
-    x1: null,
-    x2: null,
-    xChannelSelector: null,
-    xHeight: number,
-    y: null,
-    y1: null,
-    y2: null,
-    yChannelSelector: null,
-    z: null,
-    zoomAndPan: null
-  },
-  space: "svg",
-  transform: caseSensitiveTransform
-});
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/xlink.js
-var xlink = create({
-  properties: {
-    xLinkActuate: null,
-    xLinkArcRole: null,
-    xLinkHref: null,
-    xLinkRole: null,
-    xLinkShow: null,
-    xLinkTitle: null,
-    xLinkType: null
-  },
-  space: "xlink",
-  transform(_, property) {
-    return "xlink:" + property.slice(5).toLowerCase();
-  }
-});
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/xmlns.js
-var xmlns = create({
-  attributes: { xmlnsxlink: "xmlns:xlink" },
-  properties: { xmlnsXLink: null, xmlns: null },
-  space: "xmlns",
-  transform: caseInsensitiveTransform
-});
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/xml.js
-var xml = create({
-  properties: { xmlBase: null, xmlLang: null, xmlSpace: null },
-  space: "xml",
-  transform(_, property) {
-    return "xml:" + property.slice(3).toLowerCase();
-  }
-});
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/lib/find.js
-var cap = /[A-Z]/g;
-var dash = /-[a-z]/g;
-var valid = /^data[-\w.:]+$/i;
-function find(schema, value) {
-  const normal = normalize(value);
-  let property = value;
-  let Type = Info;
-  if (normal in schema.normal) {
-    return schema.property[schema.normal[normal]];
-  }
-  if (normal.length > 4 && normal.slice(0, 4) === "data" && valid.test(value)) {
-    if (value.charAt(4) === "-") {
-      const rest = value.slice(5).replace(dash, camelcase);
-      property = "data" + rest.charAt(0).toUpperCase() + rest.slice(1);
-    } else {
-      const rest = value.slice(4);
-      if (!dash.test(rest)) {
-        let dashes = rest.replace(cap, kebab);
-        if (dashes.charAt(0) !== "-") {
-          dashes = "-" + dashes;
-        }
-        value = "data" + dashes;
-      }
-    }
-    Type = DefinedInfo;
-  }
-  return new Type(property, value);
-}
-function kebab($0) {
-  return "-" + $0.toLowerCase();
-}
-function camelcase($0) {
-  return $0.charAt(1).toUpperCase();
-}
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/property-information/index.js
-var html4 = merge([aria, html3, xlink, xmlns, xml], "html");
-var svg2 = merge([aria, svg, xlink, xmlns, xml], "svg");
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/comma-separated-tokens/index.js
-function parse3(value) {
-  const tokens = [];
-  const input = String(value || "");
-  let index2 = input.indexOf(",");
-  let start = 0;
-  let end = false;
-  while (!end) {
-    if (index2 === -1) {
-      index2 = input.length;
-      end = true;
-    }
-    const token = input.slice(start, index2).trim();
-    if (token || !end) {
-      tokens.push(token);
-    }
-    start = index2 + 1;
-    index2 = input.indexOf(",", start);
-  }
-  return tokens;
-}
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/node_modules/hast-util-parse-selector/lib/index.js
-var search2 = /[#.]/g;
-function parseSelector(selector, defaultTagName) {
-  const value = selector || "";
-  const props = {};
-  let start = 0;
-  let previous4;
-  let tagName;
-  while (start < value.length) {
-    search2.lastIndex = start;
-    const match = search2.exec(value);
-    const subvalue = value.slice(start, match ? match.index : value.length);
-    if (subvalue) {
-      if (!previous4) {
-        tagName = subvalue;
-      } else if (previous4 === "#") {
-        props.id = subvalue;
-      } else if (Array.isArray(props.className)) {
-        props.className.push(subvalue);
-      } else {
-        props.className = [subvalue];
-      }
-      start += subvalue.length;
-    }
-    if (match) {
-      previous4 = match[0];
-      start++;
-    }
-  }
-  return {
-    type: "element",
-    tagName: tagName || defaultTagName || "div",
-    properties: props,
-    children: []
-  };
-}
-// node_modules/hast-util-from-dom/node_modules/hastscript/lib/create-h.js
-function createH(schema, defaultTagName, caseSensitive) {
-  const adjust = caseSensitive ? createAdjustMap(caseSensitive) : undefined;
-  function h(selector, properties, ...children) {
-    let node2;
-    if (selector === null || selector === undefined) {
-      node2 = { type: "root", children: [] };
-      const child = properties;
-      children.unshift(child);
-    } else {
-      node2 = parseSelector(selector, defaultTagName);
-      const lower = node2.tagName.toLowerCase();
-      const adjusted = adjust ? adjust.get(lower) : undefined;
-      node2.tagName = adjusted || lower;
-      if (isChild(properties)) {
-        children.unshift(properties);
-      } else {
-        for (const [key, value] of Object.entries(properties)) {
-          addProperty(schema, node2.properties, key, value);
-        }
-      }
-    }
-    for (const child of children) {
-      addChild(node2.children, child);
-    }
-    if (node2.type === "element" && node2.tagName === "template") {
-      node2.content = { type: "root", children: node2.children };
-      node2.children = [];
-    }
-    return node2;
-  }
-  return h;
-}
-function isChild(value) {
-  if (value === null || typeof value !== "object" || Array.isArray(value)) {
-    return true;
-  }
-  if (typeof value.type !== "string")
-    return false;
-  const record = value;
-  const keys2 = Object.keys(value);
-  for (const key of keys2) {
-    const value2 = record[key];
-    if (value2 && typeof value2 === "object") {
-      if (!Array.isArray(value2))
-        return true;
-      const list4 = value2;
-      for (const item of list4) {
-        if (typeof item !== "number" && typeof item !== "string") {
-          return true;
-        }
-      }
-    }
-  }
-  if ("children" in value && Array.isArray(value.children)) {
-    return true;
-  }
-  return false;
-}
-function addProperty(schema, properties, key, value) {
-  const info = find(schema, key);
-  let result;
-  if (value === null || value === undefined)
-    return;
-  if (typeof value === "number") {
-    if (Number.isNaN(value))
-      return;
-    result = value;
-  } else if (typeof value === "boolean") {
-    result = value;
-  } else if (typeof value === "string") {
-    if (info.spaceSeparated) {
-      result = parse2(value);
-    } else if (info.commaSeparated) {
-      result = parse3(value);
-    } else if (info.commaOrSpaceSeparated) {
-      result = parse2(parse3(value).join(" "));
-    } else {
-      result = parsePrimitive(info, info.property, value);
-    }
-  } else if (Array.isArray(value)) {
-    result = [...value];
-  } else {
-    result = info.property === "style" ? style(value) : String(value);
-  }
-  if (Array.isArray(result)) {
-    const finalResult = [];
-    for (const item of result) {
-      finalResult.push(parsePrimitive(info, info.property, item));
-    }
-    result = finalResult;
-  }
-  if (info.property === "className" && Array.isArray(properties.className)) {
-    result = properties.className.concat(result);
-  }
-  properties[info.property] = result;
-}
-function addChild(nodes, value) {
-  if (value === null || value === undefined) {} else if (typeof value === "number" || typeof value === "string") {
-    nodes.push({ type: "text", value: String(value) });
-  } else if (Array.isArray(value)) {
-    for (const child of value) {
-      addChild(nodes, child);
-    }
-  } else if (typeof value === "object" && "type" in value) {
-    if (value.type === "root") {
-      addChild(nodes, value.children);
-    } else {
-      nodes.push(value);
-    }
-  } else {
-    throw new Error("Expected node, nodes, or string, got `" + value + "`");
-  }
-}
-function parsePrimitive(info, name, value) {
-  if (typeof value === "string") {
-    if (info.number && value && !Number.isNaN(Number(value))) {
-      return Number(value);
-    }
-    if ((info.boolean || info.overloadedBoolean) && (value === "" || normalize(value) === normalize(name))) {
-      return true;
-    }
-  }
-  return value;
-}
-function style(styles2) {
-  const result = [];
-  for (const [key, value] of Object.entries(styles2)) {
-    result.push([key, value].join(": "));
-  }
-  return result.join("; ");
-}
-function createAdjustMap(values2) {
-  const result = new Map;
-  for (const value of values2) {
-    result.set(value.toLowerCase(), value);
-  }
-  return result;
-}
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/lib/svg-case-sensitive-tag-names.js
-var svgCaseSensitiveTagNames = [
-  "altGlyph",
-  "altGlyphDef",
-  "altGlyphItem",
-  "animateColor",
-  "animateMotion",
-  "animateTransform",
-  "clipPath",
-  "feBlend",
-  "feColorMatrix",
-  "feComponentTransfer",
-  "feComposite",
-  "feConvolveMatrix",
-  "feDiffuseLighting",
-  "feDisplacementMap",
-  "feDistantLight",
-  "feDropShadow",
-  "feFlood",
-  "feFuncA",
-  "feFuncB",
-  "feFuncG",
-  "feFuncR",
-  "feGaussianBlur",
-  "feImage",
-  "feMerge",
-  "feMergeNode",
-  "feMorphology",
-  "feOffset",
-  "fePointLight",
-  "feSpecularLighting",
-  "feSpotLight",
-  "feTile",
-  "feTurbulence",
-  "foreignObject",
-  "glyphRef",
-  "linearGradient",
-  "radialGradient",
-  "solidColor",
-  "textArea",
-  "textPath"
-];
-
-// node_modules/hast-util-from-dom/node_modules/hastscript/lib/index.js
-var h = createH(html4, "div");
-var s = createH(svg2, "g", svgCaseSensitiveTagNames);
-// node_modules/web-namespaces/index.js
-var webNamespaces = {
-  html: "http://www.w3.org/1999/xhtml",
-  mathml: "http://www.w3.org/1998/Math/MathML",
-  svg: "http://www.w3.org/2000/svg",
-  xlink: "http://www.w3.org/1999/xlink",
-  xml: "http://www.w3.org/XML/1998/namespace",
-  xmlns: "http://www.w3.org/2000/xmlns/"
-};
-
-// node_modules/hast-util-from-dom/lib/index.js
-function fromDom(tree, options) {
-  return transform(tree, options || {}) || { type: "root", children: [] };
-}
-function transform(node2, options) {
-  const transformed = one3(node2, options);
-  if (transformed && options.afterTransform)
-    options.afterTransform(node2, transformed);
-  return transformed;
-}
-function one3(node2, options) {
-  switch (node2.nodeType) {
-    case 1: {
-      const domNode = node2;
-      return element3(domNode, options);
-    }
-    case 3: {
-      const domNode = node2;
-      return text7(domNode);
-    }
-    case 8: {
-      const domNode = node2;
-      return comment(domNode);
-    }
-    case 9: {
-      const domNode = node2;
-      return root3(domNode, options);
-    }
-    case 10: {
-      return doctype();
-    }
-    case 11: {
-      const domNode = node2;
-      return root3(domNode, options);
-    }
-    default: {
-      return;
-    }
-  }
-}
-function root3(node2, options) {
-  return { type: "root", children: all3(node2, options) };
-}
-function doctype() {
-  return { type: "doctype" };
-}
-function text7(node2) {
-  return { type: "text", value: node2.nodeValue || "" };
-}
-function comment(node2) {
-  return { type: "comment", value: node2.nodeValue || "" };
-}
-function element3(node2, options) {
-  const space2 = node2.namespaceURI;
-  const x = space2 === webNamespaces.svg ? s : h;
-  const tagName = space2 === webNamespaces.html ? node2.tagName.toLowerCase() : node2.tagName;
-  const content3 = space2 === webNamespaces.html && tagName === "template" ? node2.content : node2;
-  const attributes = node2.getAttributeNames();
-  const properties = {};
-  let index2 = -1;
-  while (++index2 < attributes.length) {
-    properties[attributes[index2]] = node2.getAttribute(attributes[index2]) || "";
-  }
-  return x(tagName, properties, all3(content3, options));
-}
-function all3(node2, options) {
-  const nodes = node2.childNodes;
-  const children = [];
-  let index2 = -1;
-  while (++index2 < nodes.length) {
-    const child = transform(nodes[index2], options);
-    if (child !== undefined) {
-      children.push(child);
-    }
-  }
-  return children;
-}
-// node_modules/hast-util-from-html-isomorphic/lib/browser.js
-var parser = new DOMParser;
-function fromHtmlIsomorphic(value, options) {
-  const node2 = options?.fragment ? parseFragment(value) : parser.parseFromString(value, "text/html");
-  return fromDom(node2);
-}
-function parseFragment(value) {
-  const template = document.createElement("template");
-  template.innerHTML = value;
-  return template.content;
-}
-
-// node_modules/unist-util-find-after/lib/index.js
-var findAfter = function(parent, index2, test) {
-  const is2 = convert(test);
-  if (!parent || !parent.type || !parent.children) {
-    throw new Error("Expected parent node");
-  }
-  if (typeof index2 === "number") {
-    if (index2 < 0 || index2 === Number.POSITIVE_INFINITY) {
-      throw new Error("Expected positive finite number as index");
-    }
-  } else {
-    index2 = parent.children.indexOf(index2);
-    if (index2 < 0) {
-      throw new Error("Expected child node or index");
-    }
-  }
-  while (++index2 < parent.children.length) {
-    if (is2(parent.children[index2], index2, parent)) {
-      return parent.children[index2];
-    }
-  }
-  return;
-};
-// node_modules/hast-util-to-text/lib/index.js
-var searchLineFeeds = /\n/g;
-var searchTabOrSpaces = /[\t ]+/g;
-var br = convertElement("br");
-var cell = convertElement(isCell);
-var p = convertElement("p");
-var row = convertElement("tr");
-var notRendered = convertElement([
-  "datalist",
-  "head",
-  "noembed",
-  "noframes",
-  "noscript",
-  "rp",
-  "script",
-  "style",
-  "template",
-  "title",
-  hidden,
-  closedDialog
-]);
-var blockOrCaption = convertElement([
-  "address",
-  "article",
-  "aside",
-  "blockquote",
-  "body",
-  "caption",
-  "center",
-  "dd",
-  "dialog",
-  "dir",
-  "dl",
-  "dt",
-  "div",
-  "figure",
-  "figcaption",
-  "footer",
-  "form,",
-  "h1",
-  "h2",
-  "h3",
-  "h4",
-  "h5",
-  "h6",
-  "header",
-  "hgroup",
-  "hr",
-  "html",
-  "legend",
-  "li",
-  "listing",
-  "main",
-  "menu",
-  "nav",
-  "ol",
-  "p",
-  "plaintext",
-  "pre",
-  "section",
-  "ul",
-  "xmp"
-]);
-function toText(tree, options) {
-  const options_ = options || {};
-  const children = "children" in tree ? tree.children : [];
-  const block = blockOrCaption(tree);
-  const whitespace = inferWhitespace(tree, {
-    whitespace: options_.whitespace || "normal",
-    breakBefore: false,
-    breakAfter: false
-  });
-  const results = [];
-  if (tree.type === "text" || tree.type === "comment") {
-    results.push(...collectText(tree, {
-      whitespace,
-      breakBefore: true,
-      breakAfter: true
-    }));
-  }
-  let index2 = -1;
-  while (++index2 < children.length) {
-    results.push(...renderedTextCollection(children[index2], tree, {
-      whitespace,
-      breakBefore: index2 ? undefined : block,
-      breakAfter: index2 < children.length - 1 ? br(children[index2 + 1]) : block
-    }));
-  }
-  const result = [];
-  let count;
-  index2 = -1;
-  while (++index2 < results.length) {
-    const value = results[index2];
-    if (typeof value === "number") {
-      if (count !== undefined && value > count)
-        count = value;
-    } else if (value) {
-      if (count !== undefined && count > -1) {
-        result.push(`
-`.repeat(count) || " ");
-      }
-      count = -1;
-      result.push(value);
-    }
-  }
-  return result.join("");
-}
-function renderedTextCollection(node2, parent, info) {
-  if (node2.type === "element") {
-    return collectElement(node2, parent, info);
-  }
-  if (node2.type === "text") {
-    return info.whitespace === "normal" ? collectText(node2, info) : collectPreText(node2);
-  }
-  return [];
-}
-function collectElement(node2, parent, info) {
-  const whitespace = inferWhitespace(node2, info);
-  const children = node2.children || [];
-  let index2 = -1;
-  let items = [];
-  if (notRendered(node2)) {
-    return items;
-  }
-  let prefix;
-  let suffix;
-  if (br(node2)) {
-    suffix = `
-`;
-  } else if (row(node2) && findAfter(parent, node2, row)) {
-    suffix = `
-`;
-  } else if (p(node2)) {
-    prefix = 2;
-    suffix = 2;
-  } else if (blockOrCaption(node2)) {
-    prefix = 1;
-    suffix = 1;
-  }
-  while (++index2 < children.length) {
-    items = items.concat(renderedTextCollection(children[index2], node2, {
-      whitespace,
-      breakBefore: index2 ? undefined : prefix,
-      breakAfter: index2 < children.length - 1 ? br(children[index2 + 1]) : suffix
-    }));
-  }
-  if (cell(node2) && findAfter(parent, node2, cell)) {
-    items.push("\t");
-  }
-  if (prefix)
-    items.unshift(prefix);
-  if (suffix)
-    items.push(suffix);
-  return items;
-}
-function collectText(node2, info) {
-  const value = String(node2.value);
-  const lines = [];
-  const result = [];
-  let start = 0;
-  while (start <= value.length) {
-    searchLineFeeds.lastIndex = start;
-    const match = searchLineFeeds.exec(value);
-    const end = match && "index" in match ? match.index : value.length;
-    lines.push(trimAndCollapseSpacesAndTabs(value.slice(start, end).replace(/[\u061C\u200E\u200F\u202A-\u202E\u2066-\u2069]/g, ""), start === 0 ? info.breakBefore : true, end === value.length ? info.breakAfter : true));
-    start = end + 1;
-  }
-  let index2 = -1;
-  let join;
-  while (++index2 < lines.length) {
-    if (lines[index2].charCodeAt(lines[index2].length - 1) === 8203 || index2 < lines.length - 1 && lines[index2 + 1].charCodeAt(0) === 8203) {
-      result.push(lines[index2]);
-      join = undefined;
-    } else if (lines[index2]) {
-      if (typeof join === "number")
-        result.push(join);
-      result.push(lines[index2]);
-      join = 0;
-    } else if (index2 === 0 || index2 === lines.length - 1) {
-      result.push(0);
-    }
-  }
-  return result;
-}
-function collectPreText(node2) {
-  return [String(node2.value)];
-}
-function trimAndCollapseSpacesAndTabs(value, breakBefore, breakAfter) {
-  const result = [];
-  let start = 0;
-  let end;
-  while (start < value.length) {
-    searchTabOrSpaces.lastIndex = start;
-    const match = searchTabOrSpaces.exec(value);
-    end = match ? match.index : value.length;
-    if (!start && !end && match && !breakBefore) {
-      result.push("");
-    }
-    if (start !== end) {
-      result.push(value.slice(start, end));
-    }
-    start = match ? end + match[0].length : end;
-  }
-  if (start !== end && !breakAfter) {
-    result.push("");
-  }
-  return result.join(" ");
-}
-function inferWhitespace(node2, info) {
-  if (node2.type === "element") {
-    const properties = node2.properties || {};
-    switch (node2.tagName) {
-      case "listing":
-      case "plaintext":
-      case "xmp": {
-        return "pre";
-      }
-      case "nobr": {
-        return "nowrap";
-      }
-      case "pre": {
-        return properties.wrap ? "pre-wrap" : "pre";
-      }
-      case "td":
-      case "th": {
-        return properties.noWrap ? "nowrap" : info.whitespace;
-      }
-      case "textarea": {
-        return "pre-wrap";
-      }
-      default:
-    }
-  }
-  return info.whitespace;
-}
-function hidden(node2) {
-  return Boolean((node2.properties || {}).hidden);
-}
-function isCell(node2) {
-  return node2.tagName === "td" || node2.tagName === "th";
-}
-function closedDialog(node2) {
-  return node2.tagName === "dialog" && !(node2.properties || {}).open;
-}
 // node_modules/rehype-katex/lib/index.js
 var emptyOptions7 = {};
 var emptyClasses = [];
@@ -54299,4 +54299,4 @@ var createEditor = (content4 = "") => {
     console.error(err);
   }
 };
-fetch("README.md").then((resp) => resp.text()).then(createEditor);
+fetch("/README.md").then((resp) => resp.text()).then(createEditor);
