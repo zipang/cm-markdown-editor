@@ -4,9 +4,9 @@ _A distraction free Markdown editor based on CodeMirror_
 
 ## Technical stack
 
+- [Bun](https://bun.sh/) is used as the Typescript runtime, bundler, and dev server !
 - [CodeMirror (with a few plugins)](https://codemirror.net/docs/) is the underlying editor.
 - [Rehype, Remark..](https://unifiedjs.com/) for parsing of markdown and HTML conversion.
-- [Bun](https://bun.sh/) is used as the Typescript runtime, bundler, and dev server !
 
 ## Demo
 
@@ -108,20 +108,24 @@ List of available themes :
 
 - default
 - clean
-- natgeo
-- marko
-- revisions
-- fruity
-- recipes
-- country
 - dracula
+- eggplant
+- fashion
+- fruity
+- marko
+- natgeo
+- readable
+- recipes
+- revisions
+- science
+- starwars
 
 ### Palettes
 
 Surcharge the theme's default color with a palette.
 Load a different palette by appending a parameter `?palette=` to the editor's URL.
 
-Palettes are just a subset of all the theme's variables. They contain only the colors definitions:
+Palettes are just a subset of all the theme's variables. They contain only the colors definitions and how to apply them to specific content:
 
 ```css
 /**
