@@ -6,6 +6,7 @@ Bun.build({
 	sourcemap: "external",
 	minify: true,
 	packages: "bundle",
+	external: ["react", "react-dom"],
 	loader: {
 		".md": "text"
 	},

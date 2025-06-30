@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"baseUrl": ".",
 		"paths": {
-			"@cme/*": ["src/*"]
+			"@cm-markdown-editor/*": ["src/*"]
 		},
 
 		"jsx": "preserve",
@@ -17,16 +17,20 @@
 		"allowImportingTsExtensions": true,
 		"isolatedModules": true,
 		"moduleDetection": "force",
-		"noEmit": true,
 
 		/* Linting */
 		"strict": true,
+
+		/* Declarations */
+		"declaration": true,
+		"emitDeclarationOnly": true,
+		"declarationDir": "dist/types",
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
 		"noUncheckedSideEffectImports": true
 	},
 
-	// "include": ["src", "app", "app.ts"],
+	"include": ["src", "example"],
 	"exclude": ["content", "dist", "node_modules", "public"]
 }

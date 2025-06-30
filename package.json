@@ -1,16 +1,26 @@
 {
 	"name": "cm-markdown-editor",
-	"private": true,
+	"private": false,
 	"version": "0.1.0",
 	"type": "module",
+	"types": "./dist/types/editor/index.d.ts",
+	"files": [
+		"dist"
+	],
+	"exports": {
+		"./editor": "./dist/editor/index.js",
+		"./utils": "./dist/utils/index.js",
+		"./style/*": "./dist/style/*"
+	},
 	"scripts": {
 		"format": "biome format --write .",
 		"lint": "biome lint --fix --unsafe",
 		"check": "biome check",
 		"dev": "bun dev-server.ts",
-		"build:lib": "rm -Rf dist/ && mkdir dist/ && mkdir dist/style && cp -r src/style/* dist/style && bun ./build.ts",
+		"build:lib": "rm -Rf dist/ && tsc && mkdir dist/style && cp -r src/style/* dist/style && bun ./build.ts",
 		"build:gh-pages": "rm -Rf public/ && mkdir public/ && mkdir public/style && cp README.md public/ && cp -r src/style/* public/style && cp -r src/assets/* public/ && bun ./build-gh-pages.ts",
-		"preview": "bun public/index.html"
+		"preview": "bun public/index.html",
+		"release": "bun build:lib && bun test && npm version patch && npm publish"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.6",
@@ -24,6 +34,7 @@
 		"@codemirror/state": "^6.5.2",
 		"@codemirror/view": "6.36.2",
 		"@lezer/highlight": "^1.2.1",
+		"katex": "^0.16.22",
 		"rehype-external-links": "^3.0.0",
 		"rehype-figure": "^1.0.1",
 		"rehype-katex": "^7.0.1",
