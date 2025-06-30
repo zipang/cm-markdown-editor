@@ -1,7 +1,7 @@
 {
 	"name": "cm-markdown-editor",
 	"private": false,
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"type": "module",
 	"types": "./dist/types/editor/index.d.ts",
 	"files": [
@@ -21,7 +21,7 @@
 		"build:gh-pages": "rm -Rf public/ && mkdir public/ && mkdir public/style && cp README.md public/ && cp -r src/style/* public/style && cp -r src/assets/* public/ && bun ./build-gh-pages.ts",
 		"preview": "bun public/index.html",
 		"release": "./scripts/release.sh",
-        "test": "bun test src/**/*.spec.ts"
+		"test": "bun test src/**/*.spec.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.6",
