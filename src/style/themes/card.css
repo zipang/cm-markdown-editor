@@ -1,0 +1,55 @@
+/* Card Theme */
+@import url("https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&family=Inconsolata:wght@200..900&family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap");
+
+:root {
+	--font-family-headings: "Fira Mono", monospace;
+	--font-family-content: "Inconsolata", monospace;
+	--font-family-mono: "Roboto Serif", monospace;
+	--font-size-base: 16px;
+	--line-height-base: 1.2;
+	--color-text-base: #333;
+	--color-strong: #111;
+	--color-background-base: #d6f0eb;
+	--color-page-background: white;
+	--color-headings: var(--color-link);
+	--color-meta: #6272a4;
+}
+
+body {
+	background-color: var(--color-background-base);
+}
+
+h1,
+.cm-heading-h1,
+h2,
+.cm-heading-h2,
+h3,
+.cm-heading-h3,
+h4,
+h5,
+h6 {
+	font-weight: 400;
+	font-size: larger;
+}
+
+h1,
+.cm-heading-h1 {
+	font-size: x-large;
+}
+
+blockquote {
+	margin-top: 0.2rem;
+	font-family: var(--font-family-mono);
+	font-weight: 300;
+	font-size: small;
+}
+
+blockquote::before {
+	content: "> ";
+	display: inline-block;
+	/* The space after the > is important for spacing */
+	font-weight: bold;
+	/* Optional: makes the > stand out */
+	color: var(--color-meta);
+	/* Optional: gives the > a different color */
+}

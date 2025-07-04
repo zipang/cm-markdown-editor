@@ -3,6 +3,17 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
+# --- Pre-flight Checks ---
+echo "Verifying npm authentication..."
+if ! npm whoami > /dev/null 2>&1; then
+  echo "Error: You are not logged into npm."
+  echo "Please run 'bunx npm login' to authenticate and then try again."
+  exit 1
+fi
+echo "Authentication successful."
+
+# --- Release Process ---
+
 # Prompt for the version type
 read -p "Enter version type (patch, minor, major): " VERSION_TYPE
 

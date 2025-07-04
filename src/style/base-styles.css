@@ -49,11 +49,13 @@ h1,
 	font-size: 2.2rem;
 	color: var(--color-heading-h1);
 }
+
 h2,
 .cm-heading-h2 {
 	font-size: 1.6rem;
 	color: var(--color-heading-h2);
 }
+
 h3,
 .cm-heading-h3 {
 	font-size: 1.2rem;
@@ -64,6 +66,7 @@ p,
 .cm-p {
 	margin-bottom: var(--paragraph-margin-bottom);
 }
+
 .cm-meta {
 	color: var(--color-meta) !important;
 	font-family: var(--font-family-mono);
@@ -75,6 +78,7 @@ strong,
 	font-weight: bold;
 	color: var(--color-strong);
 }
+
 i,
 .cm-italic:not(.cm-meta) {
 	font-style: italic;
@@ -83,6 +87,7 @@ i,
 ul li {
 	line-height: var(--list-item-line-height);
 }
+
 ul.contains-task-list {
 	list-style: none;
 	padding: 1rem;
@@ -95,6 +100,7 @@ a:visited,
 	font-family: var(--font-family-mono);
 	text-decoration: none;
 }
+
 a:hover,
 .cm-link:not(.cm-meta):nth-child(even):hover {
 	text-decoration: underline;
@@ -113,6 +119,7 @@ code,
 	padding: 4px;
 	border-radius: 4px;
 }
+
 pre:has(> code) {
 	background-color: var(--color-code-background);
 }
@@ -126,6 +133,7 @@ img {
 	width: 100%;
 	height: auto;
 }
+
 td > img {
 	margin: 0 auto;
 	width: auto;
@@ -134,6 +142,20 @@ td > img {
 
 figure.image {
 	margin: 1rem 0;
+}
+
+p:has(+ blockquote) {
+	margin-bottom: 0;
+	/* remove bottom margin to tighten the spacing */
+}
+
+blockquote {
+	margin: 0.5rem 0 0.5rem 2rem;
+}
+
+blockquote > p {
+	margin: 0;
+	display: inline;
 }
 
 #page {
@@ -145,18 +167,22 @@ figure.image {
 	padding: var(--page-padding);
 	background-color: var(--color-page-background);
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	overflow: hidden;
 }
 
 #page-editor .cm-scroller {
 	font-family: inherit;
 }
+
 #page-editor .cm-selectionBackground,
 ::selection {
 	background-color: var(--color-selection);
 }
+
 #page-editor .cm-focused {
 	outline: none;
 }
+
 #page-editor .cm-activeLine {
 	background-color: var(--color-active-line);
 }
@@ -164,6 +190,7 @@ figure.image {
 #page-preview *:first-child {
 	margin-top: 0;
 }
+
 #page-preview h1 {
 	text-align: center;
 }
@@ -173,6 +200,7 @@ figure.image {
 	top: 2rem;
 	right: 2rem;
 }
+
 #floating-toolbar button {
 	border: none;
 	text-transform: uppercase;
@@ -185,9 +213,11 @@ figure.image {
 		--color-background-base: white;
 		--color-page-background: white;
 	}
+
 	body {
 		font-size: 16px;
 	}
+
 	#page {
 		background-color: white !important;
 		margin: 0;
@@ -196,6 +226,7 @@ figure.image {
 		max-width: none;
 		box-shadow: none !important;
 	}
+
 	#floating-toolbar {
 		display: none;
 	}
