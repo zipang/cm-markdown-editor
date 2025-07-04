@@ -158,12 +158,26 @@ figure.image {
   margin: 1rem 0;
 }
 
+p:has( + blockquote) {
+  margin-bottom: 0;
+}
+
+blockquote {
+  margin: .5rem 0 .5rem 2rem;
+}
+
+blockquote > p {
+  display: inline;
+  margin: 0;
+}
+
 #page {
   width: var(--page-width);
   max-width: var(--page-max-width);
   margin: var(--page-margin) auto;
   padding: var(--page-padding);
   background-color: var(--color-page-background);
+  overflow: hidden;
   place-self: stretch;
   box-shadow: 0 0 10px #0000001a;
 }
